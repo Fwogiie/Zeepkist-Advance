@@ -153,4 +153,4 @@ async def on_ready():
         print(f"Connected to guild: {guild.name} ({guild.id}) with {guild.member_count} members.")
 
 
-bot.run("MTEyNjQzMDk0MjkyNDM4NjMxNQ.G-0l_J._buxUzpnM3SwxQ9cgBsfDEqg-JJ2UFDsGY6oks")
+bot.run("bot token")
