@@ -1,16 +1,11 @@
-import os
-from os import listdir
 import requests
 import json
 import nextcord
-from nextcord.ext import commands
 import re
-import time
-import asyncio
 import discord
 from discord.ext import commands
-from discord import application_command
 from nextcord.errors import HTTPException
+from nextcord.ui import modal
 
 intents = nextcord.Intents.default()
 intents.message_content = True
@@ -23,12 +18,14 @@ bot = commands.Bot(command_prefix='!',
 ids = []
 lvlsamount = 0
 loglag = bool
-async def fetch(channelid: int, amount: int, oldest_first: bool, fetched_react: int):
+async def fetch(channelid: int, amount: int, oldest_first: bool, fetched_react: int, messageid: int=0):
     global ids, lvlsamount, blocklog
     ids = []
     channel = bot.get_channel(channelid)
     await status(f"Fetching messages.")
     async for x in channel.history(limit=amount, oldest_first=False):
+        if x.id == messageid:
+            return
         if fetched_react == 1:
             await x.add_reaction("✅")
         if x.content.startswith("https://steamcommunity"):
@@ -70,7 +67,8 @@ async def bigstuff(ctx,
                    amount_of_messages: int=nextcord.SlashOption(description="The amount of levels to subtract", required=True),
                    playlistname: str=nextcord.SlashOption(description="The name of the playlist that gets sent once the playlist is done!", required=True),
                    oldest_first: bool=nextcord.SlashOption(description="When True (wich it is defaulted to) the oldest level fetched will be first in the playlist!", required=False, default=True),
-                   react_on_fetched: int=nextcord.SlashOption(description="Choose how the bot reacts with '✅' (useful to keep track of already played levels)", required=False, choices={"React to every single fetched message.": 1, "React to only the level submissions.": 2, "React to nothing. (Default)": 3}, default=2),
+                   react_on_fetched: int=nextcord.SlashOption(description="Choose how the bot reacts with '✅' (useful to keep track of already played levels)", required=False,
+                                                              choices={"React to every single fetched message.": 1, "React to only the level submissions.": 2, "React to nothing. (Default)": 3}, default=2),
                    private: bool = nextcord.SlashOption(description="Sends the playlist in a type of message that only you can see.", required=False, default=False),
                    thread: nextcord.Thread=nextcord.SlashOption(description="If you want to fetch levels from a thread.", required=False, default=None)):
     global ids, lvlsamount, cont, lvlnames, statuslog, unfound
@@ -81,9 +79,9 @@ async def bigstuff(ctx,
     ids = []
     cont = await ctx.send("Waiting for status.", ephemeral=private)
     if thread != None:
-        await fetch(channelid=thread.id, amount=amount_of_messages+1, oldest_first=oldest_first, fetched_react=react_on_fetched)
+        await fetch(channelid=thread.id, amount=amount_of_messages, oldest_first=oldest_first, fetched_react=react_on_fetched)
     else:
-        await fetch(channelid=channel.id, amount=amount_of_messages+1, oldest_first=oldest_first, fetched_react=react_on_fetched)
+        await fetch(channelid=channel.id, amount=amount_of_messages, oldest_first=oldest_first, fetched_react=react_on_fetched)
     print(ids)
     await create_playlist(playlistname, lvlsamount)
     await status("Fetching all required info and Adding levels to playlist. . .")
@@ -152,5 +150,52 @@ async def on_ready():
     for guild in bot.guilds:
         print(f"Connected to guild: {guild.name} ({guild.id}) with {guild.member_count} members.")
 
+cmdmsg = int
+@bot.message_command(name="create-playlist")
+async def msgcmd(ctx, msg):
+    global cmdmsg
+    modal = Crtpl()
+    cmdmsg = msg.id
+    await ctx.response.send_modal(modal)
 
-bot.run("MTEyNjQzMDk0MjkyNDM4NjMxNQ.G-0l_J._buxUzpnM3SwxQ9cgBsfDEqg-JJ2UFDsGY6oks")
+class Crtpl(nextcord.ui.Modal):
+    def __init__(self):
+        super().__init__("playlist creation")  # Modal title
+
+        # Create a text input and add it to the modal
+        self.name = nextcord.ui.TextInput(
+            label="Playlist name",
+            min_length=2,
+            max_length=50,
+        )
+        self.add_item(self.name)
+
+    async def callback(self, ctx: nextcord.Interaction) -> None:
+        global ids, lvlsamount, cont, lvlnames, statuslog, unfound
+        statuslog = "Executing command:\n\n"
+        cont = ctx
+        lvlsamount = 0
+        unfound = 0
+        ids = []
+        cont = await ctx.send("Waiting for status.", ephemeral=True)
+        await fetch(channelid=ctx.channel.id, amount=9999, oldest_first=True, fetched_react=2, messageid=cmdmsg)
+        print(ids)
+        await create_playlist(self.name.value, lvlsamount)
+        await status("Fetching all required info and Adding levels to playlist. . .")
+        for i in ids:
+            req = requests.get(f"https://api.zworpshop.com/levels/workshop/{i}")
+            if req.status_code == 404:
+                unfound += 1
+                await status("Couldnt find a level.")
+            else:
+                reqtxt = req.text
+                lvl = json.loads(reqtxt)[0]
+                await add_level(lvl)
+        await cont.edit("The playlist has been generated."
+                        " To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
+                        " to easily access this directory: (for windows only) press Win+R and paste the directory in the text box.",
+                        file=nextcord.File('playlist.zeeplist'))
+        if unfound > 0:
+            await ctx.send(f"Failed to find {unfound} levels.", ephemeral=True)
+
+bot.run("MTEyNjQzMDk0MjkyNDM4NjMxNQ.GQECw9.fsmJwixgP5vXPXp0mhy6Unr-Wbv4LSW_qolBXE")
