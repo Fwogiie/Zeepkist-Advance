@@ -1,11 +1,11 @@
 import requests
 import json
+import os
 import nextcord
 import re
 import discord
 from discord.ext import commands
 from nextcord.errors import HTTPException
-from nextcord.ui import modal
 
 intents = nextcord.Intents.default()
 intents.message_content = True
@@ -17,22 +17,25 @@ bot = commands.Bot(command_prefix='!',
 
 ids = []
 lvlsamount = 0
-loglag = bool
+gitgud = bool
 async def fetch(channelid: int, amount: int, oldest_first: bool, fetched_react: int, messageid: int=0):
-    global ids, lvlsamount, blocklog
+    global ids, lvlsamount, gitgud
+    gitgud = False
     ids = []
+    patterna = r'https://steamcommunity\.com/sharedfiles/filedetails/\?id=\d+'
     channel = bot.get_channel(channelid)
     await status(f"Fetching messages.")
     async for x in channel.history(limit=amount, oldest_first=False):
-        if x.id == messageid:
+        if gitgud is True:
             return
+        if x.id == messageid:
+            gitgud = True
         if fetched_react == 1:
             await x.add_reaction("✅")
-        if x.content.startswith("https://steamcommunity"):
+        if re.findall(patterna, x.content):
             if fetched_react == 2:
                 await x.add_reaction("✅")
-            pattern = r'https://steamcommunity\.com/sharedfiles/filedetails/\?id=\d+'
-            workshop_urls = re.findall(pattern, x.content)
+            workshop_urls = re.findall(patterna, x.content)
             for url in workshop_urls:
                 pattern = r'id=(\d+)'
                 tmp = re.findall(pattern, url)
@@ -68,7 +71,7 @@ async def bigstuff(ctx,
                    playlistname: str=nextcord.SlashOption(description="The name of the playlist that gets sent once the playlist is done!", required=True),
                    oldest_first: bool=nextcord.SlashOption(description="When True (wich it is defaulted to) the oldest level fetched will be first in the playlist!", required=False, default=True),
                    react_on_fetched: int=nextcord.SlashOption(description="Choose how the bot reacts with '✅' (useful to keep track of already played levels)", required=False,
-                                                              choices={"React to every single fetched message.": 1, "React to only the level submissions.": 2, "React to nothing. (Default)": 3}, default=2),
+                                                              choices={"React to every single fetched message.": 1, "React to only the level submissions. (Default)": 2, "React to nothing.": 3}, default=2),
                    private: bool = nextcord.SlashOption(description="Sends the playlist in a type of message that only you can see.", required=False, default=False),
                    thread: nextcord.Thread=nextcord.SlashOption(description="If you want to fetch levels from a thread.", required=False, default=None)):
     global ids, lvlsamount, cont, lvlnames, statuslog, unfound
@@ -94,9 +97,11 @@ async def bigstuff(ctx,
             reqtxt = req.text
             lvl = json.loads(reqtxt)[0]
             await add_level(lvl)
+    os.rename("playlist.zeeplist", f"{playlistname}.zeeplist")
     await cont.edit("The playlist has been generated."
                    " To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
-                   " to easily access this directory: (for windows only) press Win+R and paste the directory in the text box.", file=nextcord.File('playlist.zeeplist'))
+                   " to easily access this directory: (for windows only) press Win+R and paste the directory in the text box.", file=nextcord.File(f'{playlistname}.zeeplist'))
+    os.rename(f"{playlistname}.zeeplist", "playlist.zeeplist")
     if unfound > 0:
         await ctx.send(f"Failed to find {unfound} levels.")
 async def create_playlist(name: str, amountoflvls: int):
@@ -191,10 +196,12 @@ class Crtpl(nextcord.ui.Modal):
                 reqtxt = req.text
                 lvl = json.loads(reqtxt)[0]
                 await add_level(lvl)
+        os.rename("playlist.zeeplist", f"{self.name.value}.zeeplist")
         await cont.edit("The playlist has been generated."
                         " To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
                         " to easily access this directory: (for windows only) press Win+R and paste the directory in the text box.",
-                        file=nextcord.File('playlist.zeeplist'))
+                        file=nextcord.File(f'{self.name.value}.zeeplist'))
+        os.rename(f"{self.name.value}.zeeplist", "playlist.zeeplist")
         if unfound > 0:
             await ctx.send(f"Failed to find {unfound} levels.", ephemeral=True)
 
