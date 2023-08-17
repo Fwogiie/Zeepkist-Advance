@@ -19,6 +19,7 @@ ids = []
 lvlsamount = 0
 gitgud = bool
 async def fetch(channelid: int, amount: int, oldest_first: bool, fetched_react: int, messageid: int=0):
+    print(oldest_first)
     global ids, lvlsamount, gitgud
     gitgud = False
     ids = []
@@ -27,6 +28,9 @@ async def fetch(channelid: int, amount: int, oldest_first: bool, fetched_react: 
     await status(f"Fetching messages.")
     async for x in channel.history(limit=amount, oldest_first=False):
         if gitgud is True:
+            if oldest_first is True:
+                print("pear")
+                ids.reverse()
             return
         if x.id == messageid:
             gitgud = True
@@ -43,8 +47,6 @@ async def fetch(channelid: int, amount: int, oldest_first: bool, fetched_react: 
                     lvlsamount += 1
                     ids.append(x)
     await status(f"\nFetched {lvlsamount} levels.\n")
-    if oldest_first is True:
-        ids.reverse()
 
 cont = nextcord.InteractionMessage
 statuslog = ""
