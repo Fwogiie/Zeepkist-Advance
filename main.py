@@ -5,7 +5,11 @@ import nextcord
 import re
 import discord
 from discord.ext import commands
-from nextcord.errors import HTTPException
+from nextcord.ui import View, Select
+from nextcord.errors import HTTPException, InteractionResponded
+import urllib
+from urllib import parse
+import privaat
 
 intents = nextcord.Intents.default()
 intents.message_content = True
@@ -46,6 +50,8 @@ async def fetch(channelid: int, amount: int, oldest_first: bool, fetched_react: 
                 for x in tmp:
                     lvlsamount += 1
                     ids.append(x)
+                    if makekoc is True:
+                        ids.append(2973690373)
     await status(f"\nFetched {lvlsamount} levels.\n")
 
 cont = nextcord.InteractionMessage
@@ -145,7 +151,10 @@ async def add_level(lvl: str):
 
 @bot.event
 async def on_application_command_error(ctx, error):
-    await ctx.send(f"An error occured. if this persists please report it in the zeepkist modding server: [here](https://discord.gg/a4FxG9RpV3) in this thread: https://discord.com/channels/972933002516647986/1126438917420359691 \n \n Error: `{error}`")
+    if ctx.guild.id == 1083812526917177514:
+        print(error)
+        return
+    await ctx.send(f"An error occured. if this persists please report it in the zeepkist modding server: [here](https://discord.gg/a4FxG9RpV3) in this thread: https://discord.com/channels/972933002516647986/1126438917420359691 \n \n Error: `{error}`", ephemeral=True)
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -160,13 +169,68 @@ async def on_ready():
 cmdmsg = int
 @bot.message_command(name="create-playlist")
 async def msgcmd(ctx, msg):
-    global cmdmsg
-    modal = Crtpl()
+    global cmdmsg, makekoc
+    makekoc = False
+    modal = Crtpl(guildid=ctx.guild.id)
     cmdmsg = msg.id
     await ctx.response.send_modal(modal)
 
-class Crtpl(nextcord.ui.Modal):
+makekoc = bool
+class Kocfake(nextcord.ui.Select):
     def __init__(self):
+        options = [
+            nextcord.SelectOption(label="Yes", value="True"),
+            nextcord.SelectOption(label="No", value="False")
+        ]
+        super().__init__(
+            placeholder="Make KoC compatible?",
+            options=options,
+            min_values=1,
+            max_values=1
+        )
+
+    async def callback(self, ctx: nextcord.Interaction) -> None:
+        global makekoc, ids, lvlsamount, cont, lvlnames, statuslog, unfound, plname
+        print(self.values[0])
+        if self.values[0] == 'True':
+            makekoc = True
+        elif self.values[0] == 'False':
+            makekoc = False
+        cont = ctx
+        lvlsamount = 0
+        unfound = 0
+        ids = []
+        cont = await ctx.send("Waiting for status.", ephemeral=True)
+        await fetch(channelid=ctx.channel.id, amount=9999, oldest_first=True, fetched_react=2, messageid=cmdmsg)
+        print(ids)
+        await create_playlist(plname, lvlsamount)
+        await status("Fetching all required info and Adding levels to playlist. . .")
+        for i in ids:
+            req = requests.get(f"https://api.zworpshop.com/levels/workshop/{i}")
+            if req.status_code == 404:
+                unfound += 1
+                await status("Couldnt find a level.")
+            else:
+                reqtxt = req.text
+                lvl = json.loads(reqtxt)[0]
+                await add_level(lvl)
+        os.rename("playlist.zeeplist", f"{plname}.zeeplist")
+        await cont.edit("The playlist has been generated."
+                        " To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
+                        " to easily access this directory: (for windows only) press Win+R and paste the directory in the text box.",
+                        file=nextcord.File(f'{plname}.zeeplist'))
+        os.rename(f"{plname}.zeeplist", "playlist.zeeplist")
+        if unfound > 0:
+            await ctx.send(f"Failed to find {unfound} levels.", ephemeral=True)
+
+class Koc(nextcord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=60)
+        self.add_item(Kocfake())
+
+plname = ""
+class Crtpl(nextcord.ui.Modal):
+    def __init__(self, guildid: int):
         super().__init__("playlist creation")  # Modal title
 
         # Create a text input and add it to the modal
@@ -176,10 +240,18 @@ class Crtpl(nextcord.ui.Modal):
             max_length=50,
         )
         self.add_item(self.name)
+        self.guildid = guildid
 
     async def callback(self, ctx: nextcord.Interaction) -> None:
-        global ids, lvlsamount, cont, lvlnames, statuslog, unfound
+        global ids, lvlsamount, cont, lvlnames, statuslog, unfound, plname
         statuslog = "Executing command:\n\n"
+        plname = self.name.value
+        if ctx.guild.id == 1083812526917177514:
+            await ctx.send(
+                "This server is marked as the CTR discord, would you like to make this playlist Kick or Clutch compatible? clicking yes below will make it so the playlist has the KoC voting level inbetween each level!",
+                view=Koc(), ephemeral=True)
+            await Koc().wait()
+            print("going bruv")
         cont = ctx
         lvlsamount = 0
         unfound = 0
@@ -207,4 +279,5 @@ class Crtpl(nextcord.ui.Modal):
         if unfound > 0:
             await ctx.send(f"Failed to find {unfound} levels.", ephemeral=True)
 
-bot.run("MTEyNjQzMDk0MjkyNDM4NjMxNQ.GQECw9.fsmJwixgP5vXPXp0mhy6Unr-Wbv4LSW_qolBXE")
+
+bot.run(privaat.token)
