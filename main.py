@@ -4,12 +4,13 @@ import os
 import nextcord
 import re
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from nextcord.ui import View, Select
 from nextcord.errors import HTTPException, InteractionResponded
 import urllib
 from urllib import parse
 import privaat
+import asyncio
 
 intents = nextcord.Intents.default()
 intents.message_content = True
@@ -158,11 +159,13 @@ async def on_application_command_error(ctx, error):
 
 @bot.event
 async def on_command_error(ctx, error):
+    print(error)
     await ctx.send(f"An error occured. if this persists please report it in the zeepkist modding server: [here](https://discord.gg/a4FxG9RpV3) in this thread: https://discord.com/channels/972933002516647986/1126438917420359691 \n \n Error: `{error}`")
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="For level submissions"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Beta testing."))
+    MyCog()
     for guild in bot.guilds:
         print(f"Connected to guild: {guild.name} ({guild.id}) with {guild.member_count} members.")
 
@@ -279,5 +282,114 @@ class Crtpl(nextcord.ui.Modal):
         if unfound > 0:
             await ctx.send(f"Failed to find {unfound} levels.", ephemeral=True)
 
+
+# ZeeplistBuilder
+async def add_user(discid: int, gtrid: int=0, check: bool=False):
+    with open("auth.json", "r") as file:
+        authlist = json.load(file)
+
+    if check is True:
+        for x in authlist["users"]:
+            if discid == x["discordId"]:
+                return True
+
+    if check is False:
+        # Create a new level tuple
+        new_user = (
+            {
+                "gtrId": gtrid,
+                "discordId": discid,
+                "unlockedAC": [],
+                "lockedAC": []
+            }
+        )
+        print(new_user)
+
+        # Add the new level tuple to the "levels" list
+        authlist["users"].append(new_user)
+
+        # Save the updated playlist back to the file
+        with open("auth.json", "w") as file:
+            json.dump(authlist, file, indent=2)
+        return new_user
+
+class Yes(nextcord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.value = None
+        self.userid = int
+
+    @nextcord.ui.button(label = "Yes", style = nextcord.ButtonStyle.green)
+    async def helpb(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
+        if self.userid == interaction.user.id:
+            print(gtrids)
+            e = await add_user(gtrid=gtrids, discid=interaction.user.id)
+            await interaction.response.send_message(f"You have been Added to the system! (debug json: {e})")
+            self.stop()
+        else:
+            await interaction.response.send_message("This button is not for you.", ephemeral=True)
+
+gtrids = int
+@bot.slash_command(name="login", description="THIS IS A BETA AND WILL MOST LIKELY FAIL!!!")
+async def login(ctx):
+    global gtrids
+    check = await add_user(discid=ctx.user.id, check=True)
+    if check is True:
+        await ctx.send("You are already in the system.")
+        return
+    a = requests.get(f"https://api.zeepkist-gtr.com/users/discord/{ctx.user.id}")
+    if a.status_code == 200:
+        b = a.text
+        c = json.loads(b)
+        gtrids = c["id"]
+        view = Yes()
+        view.userid = ctx.user.id
+        await ctx.send(f"Is [this](https://steamcommunity.com/profiles/{c['steamId']}) your account? if so, please press 'Yes' Below.", view=view)
+        await view.wait()
+    if a.status_code == 404:
+        await ctx.send("I could not find anything linked to your discord, Please make sure you have Zeepkist GTR installed!")
+
+def get_users():
+    with open("auth.json", "r") as file:
+        return json.load(file)["users"]
+
+def format_time(time: float):
+    minutes = int(time // 60)
+    seconds = int(time % 60)
+    milliseconds = int((time % 1) * 1000)
+    formatted_time = f"{minutes:02d}:{seconds:02d}:{milliseconds:03d}"
+    return formatted_time
+
+thinsthing = None
+sent = False
+
+class MyCog(commands.Cog):
+    def __init__(self):
+        self.loop.start()
+    @tasks.loop(seconds=15)
+    async def loop(self):
+        global thisthing, sent
+        a = requests.get("https://api.zeepkist-gtr.com/records?LevelId=19066&BestOnly=true&Limit=25&Offset=0")
+        b = a.text
+        c = json.loads(b)["records"]
+        channel = await bot.fetch_channel(968060466637185044)
+        embedd = discord.Embed(title="Zeepkist Showdown Qualifier times", description=None, color=nextcord.Color.dark_orange())
+        count = 1
+        for x in c:
+            discord.Embed.add_field(self=embedd, name=f"{count}. {format_time(x['time'])}", value=f"by {x['user']['steamName']}", inline=False)
+            count += 1
+        if sent is False:
+            thisthing = await channel.send(embed=embedd)
+            sent = True
+        else:
+            await thisthing.edit(embed=embedd)
+        #gwan = get_users()
+        #for user in gwan:
+            #print(user)
+            #a = requests.get(f"https://api.zeepkist-gtr.com/stats?UserId={user['gtrId']}")
+            #b = a.text
+            #c = json.loads(b)
+            #discuser = await bot.fetch_user(user["discordId"])
+            #await discuser.send(c)
 
 bot.run(privaat.token)
