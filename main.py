@@ -372,7 +372,7 @@ class MyCog(commands.Cog):
         a = requests.get("https://api.zeepkist-gtr.com/records?LevelId=19066&BestOnly=true&Limit=25&Offset=0")
         b = a.text
         c = json.loads(b)["records"]
-        channel = await bot.fetch_channel(968060466637185044)
+        channel = await bot.fetch_channel(1144730662000136315)
         embedd = discord.Embed(title="Zeepkist Showdown Qualifier times", description=None, color=nextcord.Color.dark_orange())
         count = 1
         for x in c:
