@@ -164,7 +164,7 @@ async def on_command_error(ctx, error):
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Beta testing."))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="For level submissions"))
     MyCog()
     for guild in bot.guilds:
         print(f"Connected to guild: {guild.name} ({guild.id}) with {guild.member_count} members.")
@@ -362,22 +362,45 @@ def format_time(time: float):
 
 thinsthing = None
 sent = False
+bl = ["76561198050792757", "76561198091849339", "76561199027567424",
+     "76561198359568548", "76561199089299899", "76561198047403251",
+      "76561198855034411"]
+
+@bot.slash_command(name="blacklist", description="Reserved for yolo and grimmlon only!")
+async def blackl(ctx, usersteamid: str):
+    global bl
+    if ctx.user.id in [257321046611329026, 506854236206792704, 785037540155195424]:
+        bl.append(usersteamid)
+        await ctx.send(f"Blacklisted {usersteamid}", ephemeral=True)
+        print(bl)
+    else:
+        await ctx.send("You are not allowed to use this command.", ephemeral=True)
 
 class MyCog(commands.Cog):
     def __init__(self):
         self.loop.start()
-    @tasks.loop(seconds=15)
+    @tasks.loop(seconds=60)
     async def loop(self):
-        global thisthing, sent
-        a = requests.get("https://api.zeepkist-gtr.com/records?LevelId=19066&BestOnly=true&Limit=25&Offset=0")
+        global thisthing, sent, bl
+        a = requests.get("https://api.zeepkist-gtr.com/records?LevelId=19066&BestOnly=true&ValidOnly=true&After=%221692990000%22&Before=%221692914400%22&Limit=25&Offset=0")
         b = a.text
         c = json.loads(b)["records"]
-        channel = await bot.fetch_channel(968060466637185044)
+        channel = await bot.fetch_channel(1144730662000136315)
         embedd = discord.Embed(title="Zeepkist Showdown Qualifier times", description=None, color=nextcord.Color.dark_orange())
         count = 1
+        blcount = 0
+        for e in c:
+            if e["user"]["steamId"] in bl:
+                blcount += 1
+        a = requests.get(f"https://api.zeepkist-gtr.com/records?LevelId=19066&BestOnly=true&ValidOnly=true&After=%221692990000%22&Before=%221692914400%22&Limit={25 + blcount}&Offset=0")
+        b = a.text
+        c = json.loads(b)["records"]
         for x in c:
-            discord.Embed.add_field(self=embedd, name=f"{count}. {format_time(x['time'])}", value=f"by {x['user']['steamName']}", inline=False)
-            count += 1
+            if x["user"]["steamId"] in bl:
+                print("Blacklisted: " + x["user"]["steamId"])
+            else:
+                discord.Embed.add_field(self=embedd, name=f"{count}. {format_time(x['time'])}", value=f"by {x['user']['steamName']}")
+                count += 1
         if sent is False:
             thisthing = await channel.send(embed=embedd)
             sent = True
