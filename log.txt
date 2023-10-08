@@ -1,0 +1,3 @@
+
+in on_ready @ 10/08, 16:00 : Loaded up!
+in on_ready @ 10/08, 16:02 : Loaded up!
