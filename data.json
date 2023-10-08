@@ -1,0 +1,44 @@
+{
+  "leaderboards": [],
+  "requests": [],
+  "played": [
+    {
+      "msgid": "1155092227270377542",
+      "lvlid": "3022641433",
+      "user": "785037540155195424",
+      "accepted": true
+    },
+    {
+      "msgid": "1157271952248020993",
+      "lvlid": "2847190516",
+      "user": "785037540155195424",
+      "accepted": true
+    },
+    {
+      "msgid": "1157271887278243884",
+      "lvlid": "3009459159",
+      "user": "785037540155195424",
+      "accepted": true
+    }
+  ],
+  "submission-channels": [
+    {
+      "channelid": 1160545903061516481,
+      "logchannel": 1160545903061516481,
+      "levels": [
+        {
+          "wsid": "3025605826",
+          "lvlname": "Showdown Qualifier #2",
+          "lvluid": "25082023-205126755-justMaki-620417121834-1316",
+          "lvlatn": "justMaki"
+        },
+        {
+          "wsid": "3047236711",
+          "lvlname": "Juniper Pass - COTD #28",
+          "lvluid": "06102023-121009855-[cozy]St Nicholas-198465889950-1005",
+          "lvlatn": "[cozy]St Nicholas"
+        }
+      ]
+    }
+  ]
+}
