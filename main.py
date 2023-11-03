@@ -1,4 +1,5 @@
 import datetime
+import time
 import requests
 import json
 import os
@@ -414,72 +415,6 @@ class Crtpl(nextcord.ui.Modal):
         if unfound > 0:
             await ctx.send(f"Failed to find {unfound} levels.", ephemeral=True)
 
-
-# Zeepkist Advance
-async def add_user(discid: int, gtrid: int=0, check: bool=False):
-    with open("auth.json", "r") as file:
-        authlist = json.load(file)
-
-    if check is True:
-        for x in authlist["users"]:
-            if discid == x["discordId"]:
-                return True
-
-    if check is False:
-        new_user = (
-            {
-                "gtrId": gtrid,
-                "discordId": discid,
-                "unlockedAC": [],
-                "lockedAC": []
-            }
-        )
-        print(new_user)
-        authlist["users"].append(new_user)
-        with open("auth.json", "w") as file:
-            json.dump(authlist, file, indent=2)
-        return new_user
-
-class Yes(nextcord.ui.View):
-    def __init__(self):
-        super().__init__()
-        self.value = None
-        self.userid = int
-
-    @nextcord.ui.button(label = "Yes", style = nextcord.ButtonStyle.green)
-    async def helpb(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
-        if self.userid == interaction.user.id:
-            print(gtrids)
-            e = await add_user(gtrid=gtrids, discid=interaction.user.id)
-            await interaction.response.send_message(f"You have been Added to the system! (debug json: {e})")
-            self.stop()
-        else:
-            await interaction.response.send_message("This button is not for you.", ephemeral=True)
-
-gtrids = int
-@bot.slash_command(name="login", description="THIS IS A BETA AND WILL MOST LIKELY FAIL!!!")
-async def login(ctx):
-    global gtrids
-    check = await add_user(discid=ctx.user.id, check=True)
-    if check is True:
-        await ctx.send("You are already in the system.")
-        return
-    a = requests.get(f"https://api.zeepkist-gtr.com/users/discord/{ctx.user.id}")
-    if a.status_code == 200:
-        c = json.loads(a.content)
-        gtrids = c["id"]
-        view = Yes()
-        view.userid = ctx.user.id
-        await ctx.send(f"Is [this](https://steamcommunity.com/profiles/{c['steamId']}) your account? if so, please press 'Yes' Below.", view=view)
-        await view.wait()
-    if a.status_code == 404:
-        await ctx.send("I could not find anything linked to your discord, Please make sure you have Zeepkist GTR installed!")
-
-def get_users():
-    with open("auth.json", "r") as file:
-        return json.load(file)["users"]
-
-
 def format_time(time: float):
     minutes = int(time // 60)
     seconds = int(time % 60)
@@ -487,362 +422,60 @@ def format_time(time: float):
     formatted_time = f"{minutes:02d}:{seconds:02d}:{milliseconds:03d}"
     return formatted_time
 
-class Lbsend(nextcord.ui.ChannelSelect):
-    def __init__(self):
-        super().__init__(channel_types=[nextcord.TextChannel])
-
-class lbedit(nextcord.ui.View):
-    def __init__(self):
-        super().__init__()
-        self.add_item(Lbsend())
-
-    @nextcord.ui.button(label="Edit", style=nextcord.ButtonStyle.gray)
-    async def helpb(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
-        await interaction.response.send_modal(Crtlb(type=lbtypea))
-
-    @nextcord.ui.button(label="Send", style=nextcord.ButtonStyle.green)
-    async def sendlb(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
-        await interaction.response.send_message("Wich channel do you wish this leaderboard to get sent to?")
-
-
-
-defvalues = ""
-@bot.slash_command(name="create_leaderboard")
-async def createlb(ctx, lbtype: str=nextcord.SlashOption(name="leaderboard_type", description="Type of leaderboard you wish to have", choices={"Singular Track": "single", "Multiple Tracks": "multi"}, required=True)):
-    #await ctx.send("This command is currently in progress, thus only developers are allowed to access it.")
-    global lbtypea, defvalues, sent
-    defvalues = {'title': None, 'desc': None, 'slvl': None, 'sstyle': None, 'stop': None, 'mlvls': None, 'mtop': None}
-    view = Crtlb(type=lbtype)
-    lbtypea = lbtype
-    sent = False
-    await ctx.response.send_modal(view)
-
-inline = bool
-lb = ""
-trknm = ""
-lbtypea = ""
-lbmsg = None
-conte = nextcord.Interaction
-sent = bool
-class Crtlb(nextcord.ui.Modal):
-    def __init__(self, type: str):
-        super().__init__("Leaderboard Creation")  # Modal title
-        global defvalues
-
-        # Create a text input and add it to the modal
-        self.lbtitle = nextcord.ui.TextInput(
-            label="Leaderboard Title",
-            min_length=2,
-            max_length=50,
-            default_value=defvalues["title"]
-        )
-        self.lbdesc = nextcord.ui.TextInput(
-            label="Leaderboard Description (optional)",
-            min_length=2,
-            max_length=50,
-            style=nextcord.TextInputStyle.paragraph,
-            required=False,
-            default_value=defvalues["desc"]
-        )
-        self.singlelvl = nextcord.ui.TextInput(
-            label="Leaderboard Level (workshop ID)",
-            min_length=0,
-            max_length=30,
-            placeholder="Level workshop ID",
-            default_value=defvalues["slvl"]
-        )
-        self.singlestyle = nextcord.ui.TextInput(
-            label="Leaderboard style (1-3)",
-            min_length=0,
-            max_length=30,
-            placeholder="Look at the preview if needed.",
-            default_value=defvalues["sstyle"]
-        )
-        self.singletop= nextcord.ui.TextInput(
-            label="Top amount (max 25)",
-            min_length=0,
-            max_length=30,
-            placeholder="Example: 5",
-            default_value=defvalues["stop"]
-        )
-        self.multilvls = nextcord.ui.TextInput(
-            label="Level IDS separated with - (max 25)",
-            min_length=0,
-            max_length=2,
-            placeholder="Example: 3027682870-3027301734-3026954856",
-            default_value=defvalues["mlvls"]
-        )
-        self.multitop = nextcord.ui.TextInput(
-            label="Top amount (max 15)",
-            min_length=0,
-            max_length=2,
-            placeholder="Example: 10",
-            default_value=defvalues["mtop"]
-        )
-
-        if type == "single":
-            self.add_item(self.lbtitle)
-            self.add_item(self.lbdesc)
-            self.add_item(self.singlelvl)
-            self.add_item(self.singletop)
-            self.add_item(self.singlestyle)
-        elif type == "multi":
-            self.add_item(self.lbtitle)
-            self.add_item(self.lbdesc)
-            self.add_item(self.multilvls)
-            self.add_item(self.multitop)
-        self.type = type
-
-    async def callback(self, ctx: nextcord.Interaction) -> None:
-        global inline, lb, trknm, defvalues, lbmsg, sent, conte
-        defvalues = {'title': self.lbtitle.value, 'desc': self.lbdesc.value, 'slvl': self.singlelvl.value,
-                     'sstyle': self.singlestyle.value, 'stop': self.singletop.value, 'mlvls': self.multilvls.value,
-                     'mtop': self.multitop.value}
-        lb = ""
-        lbprev = discord.Embed(title=self.lbtitle.value, description=self.lbdesc.value)
-        if self.type == "single":
-            recs = json.loads(requests.get(f"https://api.zeepkist-gtr.com/records?LevelWorkshopId={self.singlelvl.value}&BestOnly=true&ValidOnly=true&InvalidOnly=false&WorldRecordOnly=false&Limit=25&Offset=0").text)['records']
-            count = 1
-            if self.singlestyle.value == "3":
-                inline = True
-            elif self.singlestyle.value == "1":
-                inline = False
-            for x in recs:
-                if self.singlestyle.value == "2":
-                    lb += f"{count}. {format_time(x['time'])} **by {x['user']['steamName']}**\n"
-                    count += 1
-                    trknm = x["level"]["name"]
-                else:
-                    discord.Embed.add_field(self=lbprev, name=f"{count}. {format_time(x['time'])}", value=f"by {x['user']['steamName']}", inline=inline)
-                    count += 1
-            if self.singlestyle.value == "2":
-                discord.Embed.add_field(self=lbprev, name=trknm, value=lb)
-            if sent is False:
-                conte = await ctx.send("This is what your current leaderboard looks like! Would you want to edit it?", embed=lbprev, view=lbedit(), ephemeral=True)
-                sent = True
-            else:
-                await conte.edit("This is what your current leaderboard looks like! Would you want to edit it?", embed=lbprev, view=lbedit())
-
-def add_lb(type: str):
-    print("it got fooking called mate, you believe this shit?")
-
-def add_req(msgid, lvlid, user):
-    with open("data.json", "r") as file:
-        reqlist = json.load(file)
-        new_req = {"msgid": str(msgid), "lvlid": str(lvlid), "user": str(user), "accepted": False}
-        log(new_req)
-        reqlist["requests"].append(new_req)
-        with open("data.json", "w") as file:
-            json.dump(reqlist, file, indent=2)
-
-def check_reqs(lvlid: str=None, discid: str=None):
-    with open("data.json", "r") as checking:
-        reqlist = json.load(checking)
-        if lvlid is not None:
-            for x in reqlist["requests"]:
-                if x["lvlid"] == lvlid:
-                    return True
-            return False
-        elif discid is not None:
-            for x in reqlist["requests"]:
-                if x["msgid"] == discid:
-                    return x
-            return None
-
-def aareq(msgid: str):
-    with open("data.json", "r") as file:
-        reqlist = json.load(file)
-        for x in reqlist["requests"]:
-            if x['msgid'] == msgid:
-                x["accepted"] = True
-        with open("data.json", "w") as file:
-            json.dump(reqlist, file, indent=2)
-
-def getacclvl():
-    with open("data.json", "r") as file:
-        reqlist = json.load(file)
-        for x in reqlist["requests"]:
-            log("looped in for x")
-            if x["accepted"] is True:
-                log(f"passed 1st if statement: {x}")
-                return x
-        log("for x ended")
-        return "ewwor"
-
-def mtplvls():
-    try:
-        log("called")
-        with open("data.json", "r") as file:
-            reqlist = json.load(file)
-            for x in reqlist["requests"]:
-                if x["accepted"] is True:
-                    log("passed 1st if statement")
-                    reqlist["requests"].remove(x)
-                    reqlist["played"].append(x)
-                    with open("data.json", "w") as file:
-                        json.dump(reqlist, file, indent=2)
-                        return x
-    except Exception as ewwor:
-        log(ewwor)
-
-
-@bot.slash_command(name="request_level")
-async def lvlreq(ctx, workshopid: int):
-    req = json.loads(requests.get(f"https://api.zeepkist-gtr.com/levels?WorkshopId={workshopid}&ValidOnly=false&InvalidOnly=false&Limit=1&Offset=0").text)
-    if req["totalAmount"] > 0:
-        lvl = req["levels"][0]
-        check = check_reqs(lvlid=str(workshopid))
-        if check is True:
-            await ctx.send("This level has already been requested!")
-        else:
-            reqchannel = await bot.fetch_channel(966694897799286787)
-            class Buttons(nextcord.ui.View):
-                def __init__(self):
-                    super().__init__()
-                @nextcord.ui.button(label="Yes", style=nextcord.ButtonStyle.green)
-                async def valid(self, button: nextcord.Button, ctx: nextcord.Interaction):
-                    try:
-                        ureq = await reqchannel.send(f"**{ctx.user}** has requested a Level!\nhttps://steamcommunity.com/sharedfiles/filedetails/?id={workshopid}")
-                        add_req(msgid=ureq.id, lvlid=workshopid, user=ctx.user.id)
-                        await ctx.send("Successfully sent a request, keep an eye in <#968060466637185044> to see if your request got accepted!")
-                        self.stop()
-                    except Exception as error:
-                        await ctx.send(f"An error occurred: {error}")
-
-                @nextcord.ui.button(label="No", style=nextcord.ButtonStyle.red)
-                async def novalid(self, button: nextcord.Button, ctx: nextcord.Interaction):
-                    await ctx.send("Request cancelled.")
-                    self.stop()
-
-            await ctx.send(f"is the level you want to submit called **{lvl['name']}** made by {lvl['author']} ?", view=Buttons())
-    else:
-        await ctx.send("Could not find the level! Make sure the level is registered on GTR!")
-
-@bot.message_command(name="accept-request")
-async def accreq(ctx, msg):
-    log(f"accreq called by {ctx.user}")
-    if ctx.user.id == 785037540155195424:
-        aclvl = check_reqs(discid=str(msg.id))
-        if aclvl is not None:
-            log("aclvl is not None")
-            try:
-                log("Trying to accept a lvl request")
-                aareq(str(msg.id))
-                log("accepting a lvl request went trough.")
-                await ctx.send("level added!")
-            except Exception as ewwor:
-                log(ewwor)
-                ctx.send("Something wrong happened!", ephemeral=True)
-        else:
-            log("aclvl is None (failed to find level)")
-            await ctx.send("failed to find level.", ephemeral=True)
-    else:
-        await ctx.send("You are not allowed to use this.", ephemeral=True)
-
-timestamp = 0
-async def totd():
-    global timestamp
-    timestamp = calendar.timegm(datetime.datetime.utcnow().timetuple())
-    log(f"Timestamp is: {timestamp}")
-    totdchan = await bot.fetch_channel(1154510654196166706) # bot.fetch_channel(899725913586032701)
-    log("DAILY TRACK WOOOOOOOOOOOOOOOOOOOOOOOOOO")
-    dailytrek = getacclvl()
-    if dailytrek == "ewwor":
-        await totdchan.send("An error occurred!")
-        log("NOOOOOO WE DONT GET TOTD CAUSE NO TREK DAMMIT :<")
-    else:
-        dailytrekgtr = json.loads(requests.get(f"https://api.zeepkist-gtr.com/levels?WorkshopId={dailytrek['lvlid']}&ValidOnly=true&Limit=1&Offset=0").text)['levels'][0]
-        log(f"dailytrekgtr went though: {dailytrekgtr}")
-        log(f"TRACK FUCKING FOUND WOOOOOOOOO ALSO HERES THE TRACK JSON: {dailytrek}")
-        embed = discord.Embed(title="Track of the day!", description=None, color=nextcord.Color.purple(), timestamp=datetime.datetime.now())
-        embed = discord.Embed.add_field(self=embed, name="Level:", value=f"**Link:** [steam link](https://steamcommunity.com/sharedfiles/filedetails/?id={dailytrek['lvlid']})\n"
-                                                                         f"**Name:** {dailytrekgtr['name']}\n"
-                                                                         f"**Creator:** {dailytrekgtr['author']}\n"
-                                                                         f"**Author time:** {format_time(dailytrekgtr['timeAuthor'])}", inline=False)
-        embed = discord.Embed.add_field(self=embed, name="Requested by:", value=f"<@{dailytrek['user']}>", inline=False)
-        embed = discord.Embed.set_thumbnail(self=embed, url="https://cdn.discordapp.com/attachments/966694897799286787/1155109884799504424/image.png")
-        embed = discord.Embed.set_image(self=embed, url=f"https://storage.googleapis.com/zeepkist-gtr/thumbnails/{urllib.parse.quote(dailytrekgtr['uniqueId'])}.jpeg")
-        embed = discord.Embed.set_footer(self=embed, icon_url="https://cdn.discordapp.com/attachments/966694897799286787/1155111574160298014/image.png")
-        await totdchan.send("*ping*", embed=embed)
-        embedtwo = discord.Embed(title="Leaderboard:", description="No records yet.", colour=nextcord.Color.purple())
-        totdlb = await totdchan.send(embed=embedtwo)
-        await totdlbt.start(chan=totdlb, lvlid=dailytrekgtr["id"], ts=timestamp)
-
-async def totdend():
-    global timestamp
-    try:
-        totdlbt.cancel()
-        dailytrek = getacclvl()
-        dailytrekgtr = json.loads(requests.get(f"https://api.zeepkist-gtr.com/levels?WorkshopId={dailytrek['lvlid']}&ValidOnly=true&Limit=1&Offset=0").text)['levels'][0]
-        recs = json.loads(requests.get(f"https://api.zeepkist-gtr.com/records/best?Level={dailytrekgtr['id']}&ValidOnly=true&InvalidOnly=false&After={timestamp}&Limit=50").text)["records"]
-        recsamount = 0
-        for c in recs:
-            recsamount += 1
-        points = []
-        for p in recs:
-            points.append({"user": p['user']['steamName'], "points": recsamount})
-            recsamount -= 1
-        log(points)
-        pointslb = ""
-        places = 1
-        for pl in points:
-            pointslb += f"{places}. {pl['user']} with {pl['points']} points\n"
-            places += 1
-        totdchan = await bot.fetch_channel(1154510654196166706)
-        embed = discord.Embed(title="Track of the day!", description="Track of the day is over! These are the results!", color=nextcord.Color.purple(), timestamp=datetime.datetime.now())
-        embed = discord.Embed.set_thumbnail(self=embed, url="https://cdn.discordapp.com/attachments/966694897799286787/1155109884799504424/image.png")
-        embed = discord.Embed.add_field(self=embed, name="Today's Result:", value=pointslb)
-        embed = discord.Embed.add_field(self=embed, name="All-time Results:", value="Coming soon!", inline=False)
-        await totdchan.send(embed=embed)
-        mtplvls()
-    except Exception as ewwor:
-        log(ewwor)
-
-
-scheduler = AsyncIOScheduler()
-cronny = CronTrigger(day_of_week="mon-sun", hour="19", minute="00", timezone="CET")
-cronnyend = CronTrigger(day_of_week="mon-sun", hour="19", minute="15", timezone="CET")
-scheduler.add_job(totd, trigger=cronny)
-scheduler.add_job(totdend, trigger=cronnyend)
-scheduler.start()
-
-@tasks.loop(seconds=5)
-async def totdlbt(chan=None, lvlid: str=None, ts=None):
-    totdlb = ""
-    recs = json.loads(requests.get(f"https://api.zeepkist-gtr.com/records/best?Level={lvlid}&ValidOnly=true&InvalidOnly=false&After={ts}&Limit=50").text)["records"]
-    log(recs)
-    for x in recs:
-        totdlb += f"{format_time(x['time'])} **by {x['user']['steamName']}**\n"
-    embed = discord.Embed(title="Leaderboard:", description=totdlb, colour=nextcord.Color.purple())
-    lead = await chan.edit(embed=embed)
-    log(f"edited the embed desc with: {totdlb}")
-
 submissionschannels = []
 @bot.event
 async def on_ready():
     global submissionschannels
-    log(f"Loaded up!")
-    print("going bruv")
+    log(f"Loaded up! with bot ID: {bot.user.id}")
     with open("data.json", "r") as f:
         data = json.load(f)
         submissionschannels = data["submission-channels"]
     await submission_checker.start()
 
-def m_addlvl(lvl: dict):
+def updatesubchannels():
+    global submissionschannels
+    with open("data.json", "r") as f:
+        data = json.load(f)
+        submissionschannels = data["submission-channels"]
+
+def addlvl(lvl: dict, channelid: int):
     log(f"reached with: {lvl}")
     with open("data.json", 'r') as f:
         data = json.load(f)
     with open("data.json", 'w') as ft:
-        data["submission-channels"][0]['levels'].append({"wsid": lvl['wsid'], "lvlname": lvl['lvlname'], "lvluid": lvl['lvluid'], "lvlatn": lvl['lvlatn']})
+        for x in data["submission-channels"]:
+            if x['channelid'] == channelid:
+                x['levels'].append({"wsid": lvl['wsid'], "lvlname": lvl['lvlname'], "lvluid": lvl['lvluid'], "lvlatn": lvl['lvlatn']})
         json.dump(data, ft, indent=2)
+def checkduplicate(data: list, id: int=None):
+    duplicheck = []
+    duplilevels = []
+    hasdupli = False
+    if id is None:
+        for x in data:
+            if x not in duplicheck:
+                duplicheck.append(x)
+            elif x in duplicheck and x not in duplilevels:
+                duplilevels.append(x)
+                hasdupli = True
+        if hasdupli is False:
+            return False
+        else:
+            return {"duplilvls": duplilevels}
+    elif id is not None:
+        for x in data:
+            if id == x["wsid"]:
+                return True
+        return False
 
-def m_checkduplicate(id: int):
+def clearlevels(channelid: int):
     with open("data.json", 'r') as f:
         data = json.load(f)
-    for x in data["submission-channels"][0]['levels']:
-        if x['wsid'] == id:
-            return True
-    return False
+    with open("data.json", 'w') as ft:
+        for x in data["submission-channels"]:
+            if x['channelid'] == channelid:
+                x['levels'] = []
+        json.dump(data, ft, indent=2)
 
 @tasks.loop(seconds=5)
 async def submission_checker():
@@ -854,7 +487,7 @@ async def submission_checker():
             logchannel = await bot.fetch_channel(info['logchannel'])
             checkage = await fetchmessages({"fetchtype":1, "channel":info["channelid"], "customfeature": 1, "fetchobject": 6969})
             if checkage["code"] == 404 and checkage["objectcode"] == 0:
-                return
+                pass
             else:
                 for x in checkage['message']['usermessages']:
                     if x["code"] == 404:
@@ -866,101 +499,134 @@ async def submission_checker():
                         if req.status_code == 404:
                             await x["rawmessage"].add_reaction("❌")
                             await x['rawmessage'].reply(f":warning: I could not find the level. The playlist creator will have to manually add this level! :warning:")
-                            await logchannel.send(f"*rony ping*\ni could not find a submission where this was linked: {x['message']}\nThis is either an invalid level or a level i could not find!")
+                            await logchannel.send(f"i could not find a submission where this was linked: {x['message']}\nThis is either an invalid level or a level i could not find!")
                         elif req.status_code == 200:
                             lvl = json.loads(req.text)
-                            crtm = lvl[0]["createdAt"].split("-")
-                            lvlmonth = int(crtm[1])
-                            if lvlmonth == datetime.datetime.utcnow().month:
-                                if len(lvl) > 1:
-                                    await x["rawmessage"].add_reaction("❌")
-                                    await x['rawmessage'].reply(f":warning: This submission has several levels in it! Please stop using level packs and upload all levels separately! :warning:")
-                                else:
-                                    if not m_checkduplicate(lvl[0]['workshopId']):
-                                        m_addlvl({"wsid": lvl[0]['workshopId'], "lvlname": lvl[0]['name'], "lvluid": lvl[0]['fileUid'], "lvlatn": lvl[0]['fileAuthor']})
-                                        await x["rawmessage"].add_reaction("✅")
-                                        await x['rawmessage'].reply(f"Level '{lvl[0]['name']}' added!")
-                                    else:
-                                        await x["rawmessage"].add_reaction("❌")
-                                        await x['rawmessage'].reply(":warning: this level is already submitted! :warning:")
-                            else:
+                            if len(lvl) > 1:
                                 await x["rawmessage"].add_reaction("❌")
-                                await x['rawmessage'].reply(f":warning: this level is too old! the level needs to be made in {calendar.month_name[datetime.datetime.utcnow().month]} :warning:")
-                        else:
-                            await x['rawmessage'].reply(f":warning: Something really wrong happened! :warning:")
+                                await x['rawmessage'].reply(f":warning: This submission has several levels in it! Please stop using level packs and upload all levels separately! :warning:")
+                            else:
+                                if not checkduplicate(info["levels"], lvl[0]['workshopId']):
+                                    addlvl({"wsid": lvl[0]['workshopId'], "lvlname": lvl[0]['name'], "lvluid": lvl[0]['fileUid'], "lvlatn": lvl[0]['fileAuthor']}, channelid=info['channelid'])
+                                    updatesubchannels()
+                                    await x["rawmessage"].add_reaction("✅")
+                                    await x['rawmessage'].reply(f"Level '{lvl[0]['name']}' added!")
+                                else:
+                                    await x["rawmessage"].add_reaction("❌")
+                                    await x['rawmessage'].reply(":warning: this level was already submitted! :warning:")
+                    else:
+                        await x['rawmessage'].reply(f":warning: Something really wrong happened! :warning:")
         except Exception as ewwor:
             if isinstance(ewwor, TypeError):
-                return
+               pass
             else:
                 await logchannel.send(f"*rony ping*\n{fwogutils.errormessage(ewwor)}")
                 log(ewwor)
 
-@bot.slash_command(name="set")
-async def set(ctx):
+@bot.slash_command(name="create")
+async def create(ctx):
     pass
 
-@set.subcommand(name="submission")
+@create.subcommand(name="submission")
 async def subm(ctx):
     pass
+
+@subm.subcommand(name="channel")
+async def subchannel(ctx, submissionschannel: nextcord.TextChannel, logchannel: nextcord.TextChannel):
+    global submissionschannels
+    if ctx.user.id in [bot.owner_id, ctx.guild.owner_id]:
+        with open("data.json", 'r') as f:
+            data = json.load(f)
+        with open("data.json", 'w') as ft:
+            data["submission-channels"].append({"guildid": ctx.guild.id, "channelid": submissionschannel.id, "logchannel": logchannel.id, "levels": []})
+            json.dump(data, ft, indent=2)
+        await submissionschannel.send("This channel has been set as a submissions channel! all levels that are sent in here will now be automatically moderated")
+        updatesubchannels()
+        await ctx.send(f"Submissions channel set to: <#{submissionschannel.id}>")
+    else:
+        await ctx.send("You do not have the permission to use this.", ephemeral=True)
 
 @bot.slash_command(name="get")
 async def get(ctx):
     pass
 
-@subm.subcommand(name="channel")
-async def subchannel(ctx, chan: nextcord.TextChannel):
-    global submissionschannels
-    if ctx.user.id in [785037540155195424, 181519107311534080]:
-        with open("data.json", 'r') as f:
-            data = json.load(f)
-        with open("data.json", 'w') as ft:
-            data["submission-channels"][0]['channelid'] = chan.id
-            json.dump(data, ft, indent=2)
-            submissionschannels[0]['channelid'] = chan.id
-            await ctx.send(f"Submissions channel set to: <#{chan.id}>")
-    else:
-        await ctx.send("You do not have the permission to use this.", ephemeral=True)
+def create_filepl(name: str):
+    playlist = {
+    "name": name,
+    "amountOfLevels": 0,
+    "roundLength": 480.0,
+    "shufflePlaylist": False,
+    "UID": [],
+    "levels": []
+    }
+    with open("playlist.zeeplist", "w") as file:
+        json.dump(playlist, file, indent=2)
 
-@subm.subcommand(name="log")
-async def sublog(ctx, chan: nextcord.TextChannel):
-    global submissionschannels
-    if ctx.user.id in [785037540155195424, 181519107311534080]:
-        with open("data.json", 'r') as f:
-            data = json.load(f)
-        with open("data.json", 'w') as ft:
-            data["submission-channels"][0]['logchannel'] = chan.id
-            json.dump(data, ft, indent=2)
-            submissionschannels[0]['logchannel'] = chan.id
-            await ctx.send(f"Submissions log channel set to: <#{chan.id}>")
+def add_levels(lvl: list):
+    with open("playlist.zeeplist", "r") as file:
+        playlist = json.load(file)
+    lvls = []
+    if len(lvl) > 1:
+        for x in lvl:
+            lvls.append(
+                {
+                    "UID": x["lvluid"],
+                    "WorkshopID": x["wsid"],
+                    "Name": x["lvlname"],
+                    "Author": x["lvlatn"]
+                }
+            )
+        playlist["levels"] = lvls
+        with open("playlist.zeeplist", "w") as file:
+            json.dump(playlist, file, indent=2)
     else:
-        await ctx.send("You do not have the permission to use this.", ephemeral=True)
+        return False
 
 @get.subcommand(name="playlist")
-async def getpl(ctx, playlistname: str):
-    if ctx.user.id in [785037540155195424, 181519107311534080]:
+async def getpl(ctx, playlistname: str, channel: nextcord.TextChannel):
+    if ctx.user.id in [bot.owner_id, ctx.guild.owner_id]:
+        for x in submissionschannels:
+            if x['channelid'] == channel.id:
+                create_filepl(playlistname)
+                if add_levels(x['levels']) is not False:
+                    os.rename("playlist.zeeplist", f"{playlistname}.zeeplist")
+                    await ctx.send("The playlist has been generated."
+                                   " To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
+                                   " to easily access this directory: (for windows only) press Win+R and paste the directory in the text box.", file=nextcord.File(f'{playlistname}.zeeplist'))
+                    os.rename(f"{playlistname}.zeeplist", "playlist.zeeplist")
+                    clearlevels(channel.id)
+                    updatesubchannels()
+                    return
+                else:
+                    await ctx.send("The playlist you requested is either empty or only has 1 level. so i did not make it.")
+                    return
+        await ctx.send("The mentioned channel is not a submissions channel.")
+    else:
+        await ctx.send("You do not have the permission to use this.", ephemeral=True)
+
+@bot.slash_command(name="remove")
+async def dell(ctx):
+    pass
+
+@dell.subcommand(name="submission")
+async def delsub(ctx):
+    pass
+
+@delsub.subcommand(name="channel")
+async def delsubchannel(ctx, channel: nextcord.TextChannel):
+    if ctx.user.id in [ctx.guild.owner_id, bot.owner_id]:
         with open("data.json", 'r') as f:
             data = json.load(f)
-        with open("playlist.zeeplist", 'r') as pl:
-            zpl = json.load(pl)
-        with open("playlist.zeeplist", 'w') as pld:
-            zpl["levels"] = []
-            zpl["name"] = playlistname
-            for x in data['submission-channels'][0]['levels']:
-                zpl["levels"].append({
-                    "UID": f"{x['lvluid']}",
-                    "WorkshopID": f"{x['wsid']}",
-                    "Name": f"{x['lvlname']}",
-                    "Author": f"{x['lvlatn']}"
-                })
-            json.dump(zpl, pld, indent=2)
-        os.rename("playlist.zeeplist", f"{playlistname}.zeeplist")
-        await ctx.send("The playlist has been generated."
-                        " To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
-                        " to easily access this directory: (for windows only) press Win+R and paste the directory in the text box.",
-                        file=nextcord.File(f'{playlistname}.zeeplist'))
-        os.rename(f"{playlistname}.zeeplist", "playlist.zeeplist")
+            for x in data["submission-channels"]:
+                if x['channelid'] == channel.id:
+                    with open("data.json", 'w') as ft:
+                        data["submission-channels"].remove(x)
+                        json.dump(data, ft, indent=2)
+                        await ctx.send(f"<#{channel.id}> Is not a submission channel anymore.")
+                    return
+            await ctx.send(f"<#{channel.id}> Is not a submission channel. Please select a submissions channel!")
     else:
-        await ctx.send("You do not have permissions to use this!", ephemeral=True)
+        await ctx.send("You do not have the required permissions to use this.")
 
 
 async def fetchmessages(data: dict):
@@ -986,7 +652,7 @@ async def fetchmessages(data: dict):
             log(f"messages: {messages}")
         elif data["fetchtype"] == 1 and data["customfeature"] == 1:
             async for message in channel.history(limit=6969, oldest_first=False):
-                if message.author.id in [1143521016031744025, 181519107311534080]:
+                if message.author.id in [bot.user.id]:
                     if len(messages) == 0:
                         return {"code": 404, "objectcode": 0}
                     else:
@@ -1000,9 +666,13 @@ async def fetchmessages(data: dict):
                     else:
                         messages.append({'code': 200, 'userid': message.author.id, "message": urls[0], 'rawmessage': message})
                 else:
-                    messages.append({'code': 404, 'userid': message.author.id, "message": message.content, 'rawmessage': message})
+                    if message.author.id == message.guild.owner_id:
+                        log("owner dint send link Exception")
+                    else:
+                        messages.append({'code': 404, 'userid': message.author.id, "message": message.content, 'rawmessage': message})
     except Exception as ewwor:
         await channel.send(fwogutils.errormessage(ewwor))
         log(ewwor)
+
 
 bot.run(privaat.token)

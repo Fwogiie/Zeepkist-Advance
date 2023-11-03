@@ -23,22 +23,10 @@
   ],
   "submission-channels": [
     {
-      "channelid": 1160545903061516481,
-      "logchannel": 1160545903061516481,
-      "levels": [
-        {
-          "wsid": "3025605826",
-          "lvlname": "Showdown Qualifier #2",
-          "lvluid": "25082023-205126755-justMaki-620417121834-1316",
-          "lvlatn": "justMaki"
-        },
-        {
-          "wsid": "3047236711",
-          "lvlname": "Juniper Pass - COTD #28",
-          "lvluid": "06102023-121009855-[cozy]St Nicholas-198465889950-1005",
-          "lvlatn": "[cozy]St Nicholas"
-        }
-      ]
+      "guildid": 966694897799286784,
+      "channelid": 968061747300794368,
+      "logchannel": 966694897799286787,
+      "levels": []
     }
   ]
 }
