@@ -23,6 +23,8 @@ import fwogutils
 from fwogutils import bot as bot
 from fwogutils import log as log
 
+bot.load_extension("onami")
+
 ids = []
 lvlsamount = 0
 gitgud = bool
@@ -439,7 +441,6 @@ def updatesubchannels():
         submissionschannels = data["submission-channels"]
 
 def addlvl(lvl: dict, channelid: int):
-    log(f"reached with: {lvl}")
     with open("data.json", 'r') as f:
         data = json.load(f)
     with open("data.json", 'w') as ft:
@@ -490,8 +491,11 @@ async def submission_checker():
                 pass
             else:
                 for x in checkage['message']['usermessages']:
-                    if x["code"] == 404:
+                    if x["code"] == 404 and x['objectcode'] == 0:
                         await channel.send(f"<@{x['userid']}>, '{x['message']}' is not a valid submission! Please provide a valid steam workshop link!")
+                        await x['rawmessage'].delete()
+                    elif x["code"] == 404 and x['objectcode'] == 1:
+                        await channel.send(f"<@{x['userid']}> Your submission has several of the same links. so i did not process it.")
                         await x['rawmessage'].delete()
                     elif x['code'] == 200:
                         id = re.findall(pattern, x['message'])
@@ -513,14 +517,15 @@ async def submission_checker():
                                     await x['rawmessage'].reply(f"Level '{lvl[0]['name']}' added!")
                                 else:
                                     await x["rawmessage"].add_reaction("❌")
-                                    await x['rawmessage'].reply(":warning: this level was already submitted! :warning:")
+                                    await x['rawmessage'].reply(":warning: this level is already submitted! :warning:")
                     else:
                         await x['rawmessage'].reply(f":warning: Something really wrong happened! :warning:")
+                levels = []
         except Exception as ewwor:
             if isinstance(ewwor, TypeError):
                pass
             else:
-                await logchannel.send(f"*rony ping*\n{fwogutils.errormessage(ewwor)}")
+                await logchannel.send(f"{fwogutils.errormessage(ewwor)}")
                 log(ewwor)
 
 @bot.slash_command(name="create")
@@ -661,15 +666,19 @@ async def fetchmessages(data: dict):
                 if re.findall(patterna, message.content):
                     urls = re.findall(patterna, message.content)
                     if len(urls) > 1:
-                        for l in urls:
-                            messages.append({'code': 200, 'userid': message.author.id, "message": l, 'rawmessage': message})
+                        duplicheck = checkduplicate(urls)
+                        if duplicheck:
+                            messages.append({'code': 404, "objectcode":1, 'userid': message.author.id, "message": message.content, 'rawmessage': message})
+                        else:
+                            for l in urls:
+                                messages.append({'code': 200, 'userid': message.author.id, "message": l, 'rawmessage': message})
                     else:
                         messages.append({'code': 200, 'userid': message.author.id, "message": urls[0], 'rawmessage': message})
                 else:
                     if message.author.id == message.guild.owner_id:
                         log("owner dint send link Exception")
                     else:
-                        messages.append({'code': 404, 'userid': message.author.id, "message": message.content, 'rawmessage': message})
+                        messages.append({'code': 404, "objectcode": 0, 'userid': message.author.id, "message": message.content, 'rawmessage': message})
     except Exception as ewwor:
         await channel.send(fwogutils.errormessage(ewwor))
         log(ewwor)

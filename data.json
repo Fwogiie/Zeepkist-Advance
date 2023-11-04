@@ -21,12 +21,5 @@
       "accepted": true
     }
   ],
-  "submission-channels": [
-    {
-      "guildid": 966694897799286784,
-      "channelid": 968061747300794368,
-      "logchannel": 966694897799286787,
-      "levels": []
-    }
-  ]
+  "submission-channels": []
 }
