@@ -156,7 +156,10 @@ async def add_level(lvl: str):
 @bot.event
 async def on_application_command_error(ctx, error):
     print(error)
-    await ctx.send(f"An error occured. if this persists please report it in the zeepkist modding server: [here](https://discord.gg/a4FxG9RpV3) in this thread: https://discord.com/channels/972933002516647986/1126438917420359691 \n \n Error: `{error}`", ephemeral=True)
+    try:
+        await ctx.send(f"{fwogutils.errormessage(error)}", ephemeral=True)
+    except nextcord.errors.InteractionResponded:
+        pass
 
 @bot.event
 async def on_ready():
@@ -448,6 +451,25 @@ def addlvl(lvl: dict, channelid: int):
             if x['channelid'] == channelid:
                 x['levels'].append({"wsid": lvl['wsid'], "lvlname": lvl['lvlname'], "lvluid": lvl['lvluid'], "lvlatn": lvl['lvlatn']})
         json.dump(data, ft, indent=2)
+
+async def lastmsgsaction(type: int, chan: int, msgs: list):
+    with open("data.json", 'r') as f:
+        data = json.load(f)
+    with open("data.json", 'w') as ft:
+        for x in data["submission-channels"]:
+            if x['channelid'] == chan and type == 1:
+                x['lastsentmsgs'] = msgs
+            elif x['channelid'] == chan and type == 2:
+                try:
+                    if len(x['lastsentmsgs']) > 0:
+                        for w in x["lastsentmsgs"]:
+                            chan = await bot.fetch_channel(x['channelid'])
+                            msg = await chan.fetch_message(w)
+                            await msg.delete()
+                except nextcord.errors.Forbidden:
+                    log("Did not have permissions to delete.")
+        json.dump(data, ft, indent=2)
+
 def checkduplicate(data: list, id: int=None):
     duplicheck = []
     duplilevels = []
@@ -483,6 +505,7 @@ async def submission_checker():
     global submissionschannels
     pattern = r'id=(\d+)'
     for info in submissionschannels:
+        msgs = []
         try:
             channel = await bot.fetch_channel(info['channelid'])
             logchannel = await bot.fetch_channel(info['logchannel'])
@@ -492,35 +515,43 @@ async def submission_checker():
             else:
                 for x in checkage['message']['usermessages']:
                     if x["code"] == 404 and x['objectcode'] == 0:
-                        await channel.send(f"<@{x['userid']}>, '{x['message']}' is not a valid submission! Please provide a valid steam workshop link!")
+                        msg = await channel.send(f"<@{x['userid']}>, '{x['message']}' is not a valid submission! Please provide a valid steam workshop link!")
+                        msgs.append(msg.id)
                         await x['rawmessage'].delete()
                     elif x["code"] == 404 and x['objectcode'] == 1:
-                        await channel.send(f"<@{x['userid']}> Your submission has several of the same links. so i did not process it.")
+                        msg = await channel.send(f"<@{x['userid']}> Your submission has several of the same links. so i did not process it.")
+                        msgs.append(msg.id)
                         await x['rawmessage'].delete()
                     elif x['code'] == 200:
                         id = re.findall(pattern, x['message'])
                         req = requests.get(f"https://api.zworpshop.com/levels/workshop/{id[0]}?IncludeReplaced=true")
                         if req.status_code == 404:
                             await x["rawmessage"].add_reaction("❌")
-                            await x['rawmessage'].reply(f":warning: I could not find the level. The playlist creator will have to manually add this level! :warning:")
+                            msg = await x['rawmessage'].reply(f":warning: I could not find the level. The playlist creator will have to manually add this level! :warning:")
+                            msgs.append(msg.id)
                             await logchannel.send(f"i could not find a submission where this was linked: {x['message']}\nThis is either an invalid level or a level i could not find!")
                         elif req.status_code == 200:
                             lvl = json.loads(req.text)
                             if len(lvl) > 1:
                                 await x["rawmessage"].add_reaction("❌")
-                                await x['rawmessage'].reply(f":warning: This submission has several levels in it! Please stop using level packs and upload all levels separately! :warning:")
+                                msg = await x['rawmessage'].reply(f":warning: This submission has several levels in it! Please stop using level packs and upload all levels separately! :warning:")
+                                msgs.append(msg.id)
                             else:
                                 if not checkduplicate(info["levels"], lvl[0]['workshopId']):
                                     addlvl({"wsid": lvl[0]['workshopId'], "lvlname": lvl[0]['name'], "lvluid": lvl[0]['fileUid'], "lvlatn": lvl[0]['fileAuthor']}, channelid=info['channelid'])
                                     updatesubchannels()
                                     await x["rawmessage"].add_reaction("✅")
-                                    await x['rawmessage'].reply(f"Level '{lvl[0]['name']}' added!")
+                                    msg = await x['rawmessage'].reply(f"Level '{lvl[0]['name']}' added!")
+                                    msgs.append(msg.id)
                                 else:
                                     await x["rawmessage"].add_reaction("❌")
-                                    await x['rawmessage'].reply(":warning: this level is already submitted! :warning:")
+                                    msg = await x['rawmessage'].reply(":warning: this level is already submitted! :warning:")
+                                    msgs.append(msg.id)
                     else:
                         await x['rawmessage'].reply(f":warning: Something really wrong happened! :warning:")
-                levels = []
+                if len(msgs) > 0:
+                    await lastmsgsaction(type=2, chan=channel.id, msgs=msgs)
+                    await lastmsgsaction(type=1, chan=channel.id, msgs=msgs)
         except Exception as ewwor:
             if isinstance(ewwor, TypeError):
                pass
@@ -543,7 +574,7 @@ async def subchannel(ctx, submissionschannel: nextcord.TextChannel, logchannel: 
         with open("data.json", 'r') as f:
             data = json.load(f)
         with open("data.json", 'w') as ft:
-            data["submission-channels"].append({"guildid": ctx.guild.id, "channelid": submissionschannel.id, "logchannel": logchannel.id, "levels": []})
+            data["submission-channels"].append({"guildid": ctx.guild.id, "channelid": submissionschannel.id, "logchannel": logchannel.id, "lastsentmsgs": [], "levels": []})
             json.dump(data, ft, indent=2)
         await submissionschannel.send("This channel has been set as a submissions channel! all levels that are sent in here will now be automatically moderated")
         updatesubchannels()
@@ -676,7 +707,7 @@ async def fetchmessages(data: dict):
                         messages.append({'code': 200, 'userid': message.author.id, "message": urls[0], 'rawmessage': message})
                 else:
                     if message.author.id == message.guild.owner_id:
-                        log("owner dint send link Exception")
+                        pass
                     else:
                         messages.append({'code': 404, "objectcode": 0, 'userid': message.author.id, "message": message.content, 'rawmessage': message})
     except Exception as ewwor:
@@ -684,4 +715,4 @@ async def fetchmessages(data: dict):
         log(ewwor)
 
 
-bot.run(privaat.token)
+bot.run(privaat.ttoken)
