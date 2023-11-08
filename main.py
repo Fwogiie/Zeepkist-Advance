@@ -455,7 +455,6 @@ def addlvl(lvl: dict, channelid: int):
 async def lastmsgsaction(type: int, chan: int, msgs: list):
     with open("data.json", 'r') as f:
         data = json.load(f)
-    with open("data.json", 'w') as ft:
         for x in data["submission-channels"]:
             if x['channelid'] == chan and type == 1:
                 x['lastsentmsgs'] = msgs
@@ -468,7 +467,9 @@ async def lastmsgsaction(type: int, chan: int, msgs: list):
                             await msg.delete()
                 except nextcord.errors.Forbidden:
                     log("Did not have permissions to delete.")
-        json.dump(data, ft, indent=2)
+        if type == 1:
+            with open("data.json", 'w') as ft:
+                json.dump(data, ft, indent=2)
 
 def checkduplicate(data: list, id: int=None):
     duplicheck = []
@@ -715,4 +716,4 @@ async def fetchmessages(data: dict):
         log(ewwor)
 
 
-bot.run(privaat.ttoken)
+bot.run(privaat.token)
