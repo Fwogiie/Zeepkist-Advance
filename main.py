@@ -501,7 +501,7 @@ def clearlevels(channelid: int):
                 x['levels'] = []
         json.dump(data, ft, indent=2)
 
-@tasks.loop(seconds=5)
+@tasks.loop(seconds=5, reconnect=True)
 async def submission_checker():
     global submissionschannels
     pattern = r'id=(\d+)'
@@ -660,6 +660,7 @@ async def delsubchannel(ctx, channel: nextcord.TextChannel):
                         data["submission-channels"].remove(x)
                         json.dump(data, ft, indent=2)
                         await ctx.send(f"<#{channel.id}> Is not a submission channel anymore.")
+                        updatesubchannels()
                     return
             await ctx.send(f"<#{channel.id}> Is not a submission channel. Please select a submissions channel!")
     else:
