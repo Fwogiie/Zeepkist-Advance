@@ -729,4 +729,4 @@ async def fetchmessages(data: dict):
         log(ewwor)
 
 
-bot.run(privaat.ttoken)
+bot.run(privaat.token)
