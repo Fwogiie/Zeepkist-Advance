@@ -605,14 +605,26 @@ def add_levels(lvl: list):
     lvls = []
     if len(lvl) > 1:
         for x in lvl:
-            lvls.append(
-                {
-                    "UID": x["lvluid"],
-                    "WorkshopID": x["wsid"],
-                    "Name": x["lvlname"],
-                    "Author": x["lvlatn"]
-                }
-            )
+            code = requests.get(f"https://api.zworpshop.com/levels/uid/{x['lvluid']}?IncludeReplaced=false&IncludeDeleted=false").status_code
+            if code == 200:
+                lvls.append(
+                    {
+                        "UID": x["lvluid"],
+                        "WorkshopID": x["wsid"],
+                        "Name": x["lvlname"],
+                        "Author": x["lvlatn"]
+                    }
+                )
+            elif code == 404:
+                txt = json.loads(requests.get(f"https://api.zworpshop.com/levels/workshop/{x['wsid']}?IncludeReplaced=false&IncludeDeleted=false").text)[0]
+                lvls.append(
+                    {
+                        "UID": txt["fileUid"],
+                        "WorkshopID": txt["workshopId"],
+                        "Name": txt["name"],
+                        "Author": txt["fileAuthor"]
+                    }
+                )
         playlist["levels"] = lvls
         with open("playlist.zeeplist", "w") as file:
             json.dump(playlist, file, indent=2)
@@ -717,4 +729,4 @@ async def fetchmessages(data: dict):
         log(ewwor)
 
 
-bot.run(privaat.token)
+bot.run(privaat.ttoken)
