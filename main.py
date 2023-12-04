@@ -782,4 +782,4 @@ async def rankings(ctx):
 
 
 
-bot.run(privaat.ttoken)
+bot.run(privaat.token)
