@@ -175,8 +175,11 @@ async def on_ready():
 @bot.is_owner
 @bot.command(name="log")
 async def ownlog(ctx, type: str, *, text: str=None):
-    if type == "send":
+    if type == "send" and text is None:
         await ctx.reply("yes ma'am", file=nextcord.File("log.txt"))
+    elif type == "send" and text == "true":
+        with open("log.txt", 'r') as fr:
+            await ctx.send(f"```{fr.read()}```")
     elif type == "add":
         log(text)
         await ctx.reply(f"Added `{text}` to log.txt")
@@ -779,4 +782,4 @@ async def rankings(ctx):
 
 
 
-bot.run(privaat.token)
+bot.run(privaat.ttoken)
