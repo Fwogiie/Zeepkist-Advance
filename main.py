@@ -30,6 +30,7 @@ lvlsamount = 0
 gitgud = bool
 async def fetch(channelid: int, amount: int, oldest_first: bool, fetched_react: int, messageid: int=0):
     global ids, lvlsamount, gitgud
+    log(f"reached with channelid: {channelid}, amount: {amount}, oldest_first: {oldest_first}, fetched_react: {fetched_react}, messageid: {messageid}")
     gitgud = False
     ids = []
     patterna = r'https://steamcommunity\.com/sharedfiles/filedetails/\?id=\d+'
@@ -42,6 +43,7 @@ async def fetch(channelid: int, amount: int, oldest_first: bool, fetched_react: 
             return
         if x.id == messageid:
             gitgud = True
+            log("set gitgud to True.")
         if fetched_react == 1:
             await x.add_reaction("✅")
         if re.findall(patterna, x.content):
@@ -62,6 +64,7 @@ cont = nextcord.InteractionMessage
 statuslog = ""
 async def status(status: str, reset: bool=False):
     global cont, statuslog
+    log(f"reached with status: {status}, reset: {reset}")
     statuslog += f"{status}\n"
     try:
         if reset is False:
@@ -87,6 +90,9 @@ async def bigstuff(ctx,
                    private: bool = nextcord.SlashOption(description="Sends the playlist in a type of message that only you can see.", required=False, default=False),
                    thread: nextcord.Thread=nextcord.SlashOption(description="If you want to fetch levels from a thread.", required=False, default=None)):
     global ids, lvlsamount, cont, lvlnames, statuslog, unfound
+    log(f"reached by {ctx.user} with: channel: {channel}, amount_of_messages: {amount_of_messages},"
+        f" playlistname: {playlistname}, oldest_first: {oldest_first}, react_on_fetched: {react_on_fetched},"
+        f" private: {private}, thread: {thread}, ")
     statuslog = "Executing command:\n\n"
     cont = ctx
     lvlsamount = 0
@@ -117,6 +123,7 @@ async def bigstuff(ctx,
     if unfound > 0:
         await ctx.send(f"Failed to find {unfound} levels.")
 async def create_playlist(name: str, amountoflvls: int):
+    log(f"name: {name}, amountoflvls: {amountoflvls}")
     await status(f"Creating playlist {name} for {amountoflvls} levels. . .")
     playlist = {
     "name": name,
@@ -132,6 +139,7 @@ async def create_playlist(name: str, amountoflvls: int):
         json.dump(playlist, file, indent=2)
 
 async def add_level(lvl: str):
+    log(f"lvl: {lvl}")
     with open("playlist.zeeplist", "r") as file:
         playlist = json.load(file)
 
@@ -168,6 +176,7 @@ async def on_command_error(ctx, error):
 
 @bot.event
 async def on_ready():
+    log("initializing startup guilds")
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="For level submissions"))
     for guild in bot.guilds:
         print(f"Connected to guild: {guild.name} ({guild.id}) with {guild.member_count} members.")
@@ -205,7 +214,7 @@ async def debug(ctx, type: str, value: str):
 cmdmsg = int
 @bot.message_command(name="create-playlist")
 async def msgcmd(ctx, msg):
-    log(f"msgcmd called by {ctx.user} for msg {msg.content}")
+    log(f"msgcmd called by {ctx.user} for msg {msg.content} ({msg.id})")
     global cmdmsg, makekoc, makemontly, tooold
     makekoc = False
     makemontly = False
@@ -230,6 +239,7 @@ class Kocfake(nextcord.ui.Select):
 
     async def callback(self, ctx: nextcord.Interaction) -> None:
         global makekoc, ids, lvlsamount, cont, lvlnames, statuslog, unfound, plname
+        log("from Kocfake: callback called")
         Koc().stop()
         if self.values[0] == 'True':
             makekoc = True
@@ -284,6 +294,7 @@ class Mn(nextcord.ui.Modal):
 
     async def callback(self, ctx: nextcord.Interaction) -> None:
         global makemontly, ids, lvlsamount, cont, lvlnames, statuslog, unfound, plname, tooold
+        log("from Mn: callback called")
         cont = ctx
         lvlsamount = 0
         unfound = 0
@@ -336,6 +347,7 @@ class Monthlyfake(nextcord.ui.Select):
 
     async def callback(self, ctx: nextcord.Interaction) -> None:
         global makemontly, ids, lvlsamount, cont, lvlnames, statuslog, unfound, plname, tooold
+        log("from Monthlyfake: callback called")
         Monthly().stop()
         if self.values[0] == 'True':
             makemontly = True
@@ -391,6 +403,7 @@ class Crtpl(nextcord.ui.Modal):
 
     async def callback(self, ctx: nextcord.Interaction) -> None:
         global ids, lvlsamount, cont, lvlnames, statuslog, unfound, plname
+        log("from Crtpl: callback called")
         statuslog = "Executing command:\n\n"
         plname = self.name.value
         if ctx.guild.id == 1083812526917177514:
@@ -440,13 +453,16 @@ submissionschannels = []
 async def on_ready():
     global submissionschannels
     log(f"Loaded up! with bot ID: {bot.user.id}")
+    log("initializing startup cache for submission channels.")
     with open("data.json", "r") as f:
         data = json.load(f)
         submissionschannels = data["submission-channels"]
     await submission_checker.start()
+    log(f"Startup cache succeeded.")
 
 def updatesubchannels():
     global submissionschannels
+    log("called")
     with open("data.json", "r") as f:
         data = json.load(f)
         submissionschannels = data["submission-channels"]
@@ -461,6 +477,7 @@ def addlvl(lvl: dict, channelid: int):
         json.dump(data, ft, indent=2)
 
 async def lastmsgsaction(type: int, chan: int, msgs: list):
+    log(f"reached with channel: {chan} for msgs {msgs}")
     with open("data.json", 'r') as f:
         data = json.load(f)
         for x in data["submission-channels"]:
@@ -641,6 +658,7 @@ def add_levels(lvl: list):
 
 @get.subcommand(name="playlist")
 async def getpl(ctx, playlistname: str, channel: nextcord.TextChannel):
+    log(f"called by: {ctx.user} for channel: {channel.name} ({channel.id}) as playlistname: {playlistname}")
     if ctx.user.id in [bot.owner_id, ctx.guild.owner_id]:
         for x in submissionschannels:
             if x['channelid'] == channel.id:
@@ -671,6 +689,7 @@ async def delsub(ctx):
 
 @delsub.subcommand(name="channel")
 async def delsubchannel(ctx, channel: nextcord.TextChannel):
+    log(f"called by: {ctx.user} for channel: {channel.name} ({channel.id})")
     if ctx.user.id in [ctx.guild.owner_id, bot.owner_id]:
         with open("data.json", 'r') as f:
             data = json.load(f)
@@ -741,6 +760,7 @@ page = {"page": 1, "limit": 10, "offset": 0}
 @bot.slash_command(name="rankings")
 async def rankings(ctx):
     global emb, page
+    log(f"called by: {ctx.user}")
     page = {"page": 1, "limit": 10, "offset": 0}
     class Lbpage(nextcord.ui.View):
         def __init__(self):
