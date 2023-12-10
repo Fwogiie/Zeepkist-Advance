@@ -457,8 +457,8 @@ async def on_ready():
     with open("data.json", "r") as f:
         data = json.load(f)
         submissionschannels = data["submission-channels"]
+        log(f"Startup cache succeeded.")
     await submission_checker.start()
-    log(f"Startup cache succeeded.")
 
 def updatesubchannels():
     global submissionschannels
