@@ -596,6 +596,7 @@ async def subm(ctx):
 @subm.subcommand(name="channel")
 async def subchannel(ctx, submissionschannel: nextcord.TextChannel, logchannel: nextcord.TextChannel):
     global submissionschannels
+    log(f"called by: {ctx.user} for submissionschannel: {submissionschannel.name} ({submissionschannel.id}), with logchannel: {logchannel.name} ({logchannel.id})")
     if ctx.user.id in [bot.owner_id, ctx.guild.owner_id]:
         with open("data.json", 'r') as f:
             data = json.load(f)
