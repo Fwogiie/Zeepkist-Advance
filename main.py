@@ -28,6 +28,8 @@ bot.load_extension("onami")
 ids = []
 lvlsamount = 0
 gitgud = bool
+
+
 async def fetch(channelid: int, amount: int, oldest_first: bool, fetched_react: int, messageid: int=0):
     global ids, lvlsamount, gitgud
     log(f"reached with channelid: {channelid}, amount: {amount}, oldest_first: {oldest_first}, fetched_react: {fetched_react}, messageid: {messageid}")
@@ -62,6 +64,8 @@ async def fetch(channelid: int, amount: int, oldest_first: bool, fetched_react: 
 
 cont = nextcord.InteractionMessage
 statuslog = ""
+
+
 async def status(status: str, reset: bool=False):
     global cont, statuslog
     log(f"reached with status: {status}, reset: {reset}")
@@ -79,6 +83,8 @@ async def status(status: str, reset: bool=False):
 levelnames = []
 lvluids = []
 unfound = 0
+
+
 @bot.slash_command(name="create_playlist", description="Create a playlist from a discord level submissions channel! (works for zeepkist only!)")
 async def bigstuff(ctx,
                    channel: nextcord.TextChannel=nextcord.SlashOption(description="The channel to subtract the levels from", required=True),
@@ -122,6 +128,8 @@ async def bigstuff(ctx,
     os.rename(f"{playlistname}.zeeplist", "playlist.zeeplist")
     if unfound > 0:
         await ctx.send(f"Failed to find {unfound} levels.")
+
+
 async def create_playlist(name: str, amountoflvls: int):
     log(f"name: {name}, amountoflvls: {amountoflvls}")
     await status(f"Creating playlist {name} for {amountoflvls} levels. . .")
@@ -137,6 +145,7 @@ async def create_playlist(name: str, amountoflvls: int):
 # Save the playlist as JSON in a file
     with open("playlist.zeeplist", "w") as file:
         json.dump(playlist, file, indent=2)
+
 
 async def add_level(lvl: str):
     log(f"lvl: {lvl}")
@@ -170,9 +179,11 @@ async def on_application_command_error(ctx, error):
     except nextcord.errors.InteractionResponded:
         pass
 
+
 @bot.event
 async def on_command_error(ctx, error):
     log(error)
+
 
 @bot.event
 async def on_ready():
@@ -181,22 +192,28 @@ async def on_ready():
     for guild in bot.guilds:
         print(f"Connected to guild: {guild.name} ({guild.id}) with {guild.member_count} members.")
 
+
 @bot.is_owner
 @bot.command(name="log")
 async def ownlog(ctx, type: str, *, text: str=None):
-    if type == "send" and text is None:
-        await ctx.reply("yes ma'am", file=nextcord.File("log.txt"))
-    elif type == "send" and text == "true":
-        with open("log.txt", 'r') as fr:
-            await ctx.send(f"```{fr.read()}```")
-    elif type == "add":
-        log(text)
-        await ctx.reply(f"Added `{text}` to log.txt")
-    elif type == "clear":
-        log("bruh", "clear")
-        await ctx.reply("cleared log.txt")
-    else:
-        await ctx.reply("Yo fucking stupid bruv?")
+    try:
+        if type == "send" and text is None:
+            await ctx.reply("yes ma'am", file=nextcord.File("log.txt"))
+        elif type == "send" and text == "true":
+            with open("log.txt", 'r') as fr:
+                for a in fr.read().split('\n'):
+                    await ctx.send("```{}```".format(a))
+        elif type == "add":
+            log(text)
+            await ctx.reply(f"Added `{text}` to log.txt")
+        elif type == "clear":
+            log("bruh", "clear")
+            await ctx.reply("cleared log.txt")
+        else:
+            await ctx.reply("Yo fucking stupid bruv?")
+    except HTTPException:
+        await ctx.send("HTTPSException")
+
 
 @bot.is_owner
 @bot.command(name="debug")
@@ -212,6 +229,8 @@ async def debug(ctx, type: str, value: str):
         await ctx.send("No such type found.")
 
 cmdmsg = int
+
+
 @bot.message_command(name="create-playlist")
 async def msgcmd(ctx, msg):
     log(f"msgcmd called by {ctx.user} for msg {msg.content} ({msg.id})")
@@ -224,6 +243,8 @@ async def msgcmd(ctx, msg):
     await ctx.response.send_modal(modal)
 
 makekoc = bool
+
+
 class Kocfake(nextcord.ui.Select):
     def __init__(self):
         options = [
@@ -273,10 +294,12 @@ class Kocfake(nextcord.ui.Select):
         if unfound > 0:
             await ctx.send(f"Failed to find {unfound} levels.", ephemeral=True)
 
+
 class Koc(nextcord.ui.View):
     def __init__(self):
         super().__init__(timeout=60)
         self.add_item(Kocfake())
+
 
 class Mn(nextcord.ui.Modal):
     def __init__(self):
@@ -332,6 +355,7 @@ class Mn(nextcord.ui.Modal):
 
 tooold = 0
 makemontly = bool
+
 class Monthlyfake(nextcord.ui.Select):
     def __init__(self):
         options = [
@@ -381,6 +405,7 @@ class Monthlyfake(nextcord.ui.Select):
         os.rename(f"{plname}.zeeplist", "playlist.zeeplist")
         if unfound > 0:
             await ctx.send(f"Failed to find {unfound} levels.", ephemeral=True)
+
 
 class Monthly(nextcord.ui.View):
     def __init__(self):
@@ -441,6 +466,7 @@ class Crtpl(nextcord.ui.Modal):
         if unfound > 0:
             await ctx.send(f"Failed to find {unfound} levels.", ephemeral=True)
 
+
 def format_time(time: float):
     minutes = int(time // 60)
     seconds = int(time % 60)
@@ -449,6 +475,8 @@ def format_time(time: float):
     return formatted_time
 
 submissionschannels = []
+
+
 @bot.event
 async def on_ready():
     global submissionschannels
@@ -460,12 +488,14 @@ async def on_ready():
         log(f"Startup cache succeeded.")
     await submission_checker.start()
 
+
 def updatesubchannels():
     global submissionschannels
     log("called")
     with open("data.json", "r") as f:
         data = json.load(f)
         submissionschannels = data["submission-channels"]
+
 
 def addlvl(lvl: dict, channelid: int):
     with open("data.json", 'r') as f:
@@ -475,6 +505,7 @@ def addlvl(lvl: dict, channelid: int):
             if x['channelid'] == channelid:
                 x['levels'].append({"wsid": lvl['wsid'], "lvlname": lvl['lvlname'], "lvluid": lvl['lvluid'], "lvlatn": lvl['lvlatn']})
         json.dump(data, ft, indent=2)
+
 
 async def lastmsgsaction(type: int, chan: int, msgs: list):
     log(f"reached with channel: {chan} for msgs {msgs}")
@@ -495,6 +526,7 @@ async def lastmsgsaction(type: int, chan: int, msgs: list):
         if type == 1:
             with open("data.json", 'w') as ft:
                 json.dump(data, ft, indent=2)
+
 
 def checkduplicate(data: list, id: int=None):
     duplicheck = []
@@ -517,6 +549,7 @@ def checkduplicate(data: list, id: int=None):
                 return True
         return False
 
+
 def clearlevels(channelid: int):
     with open("data.json", 'r') as f:
         data = json.load(f)
@@ -525,6 +558,7 @@ def clearlevels(channelid: int):
             if x['channelid'] == channelid:
                 x['levels'] = []
         json.dump(data, ft, indent=2)
+
 
 @tasks.loop(seconds=5, reconnect=True)
 async def submission_checker():
@@ -583,15 +617,18 @@ async def submission_checker():
                pass
             else:
                 await logchannel.send(f"{fwogutils.errormessage(ewwor)}")
-                log(ewwor)
+                log(str(ewwor))
+
 
 @bot.slash_command(name="create")
 async def create(ctx):
     pass
 
+
 @create.subcommand(name="submission")
 async def subm(ctx):
     pass
+
 
 @subm.subcommand(name="channel")
 async def subchannel(ctx, submissionschannel: nextcord.TextChannel, logchannel: nextcord.TextChannel):
@@ -609,9 +646,11 @@ async def subchannel(ctx, submissionschannel: nextcord.TextChannel, logchannel: 
     else:
         await ctx.send("You do not have the permission to use this.", ephemeral=True)
 
+
 @bot.slash_command(name="get")
 async def get(ctx):
     pass
+
 
 def create_filepl(name: str):
     playlist = {
@@ -624,6 +663,7 @@ def create_filepl(name: str):
     }
     with open("playlist.zeeplist", "w") as file:
         json.dump(playlist, file, indent=2)
+
 
 def add_levels(lvl: list):
     with open("playlist.zeeplist", "r") as file:
@@ -657,6 +697,7 @@ def add_levels(lvl: list):
     else:
         return False
 
+
 @get.subcommand(name="playlist")
 async def getpl(ctx, playlistname: str, channel: nextcord.TextChannel):
     log(f"called by: {ctx.user} for channel: {channel.name} ({channel.id}) as playlistname: {playlistname}")
@@ -680,13 +721,16 @@ async def getpl(ctx, playlistname: str, channel: nextcord.TextChannel):
     else:
         await ctx.send("You do not have the permission to use this.", ephemeral=True)
 
+
 @bot.slash_command(name="remove")
 async def dell(ctx):
     pass
 
+
 @dell.subcommand(name="submission")
 async def delsub(ctx):
     pass
+
 
 @delsub.subcommand(name="channel")
 async def delsubchannel(ctx, channel: nextcord.TextChannel):
@@ -754,10 +798,12 @@ async def fetchmessages(data: dict):
                         messages.append({'code': 404, "objectcode": 0, 'userid': message.author.id, "message": message.content, 'rawmessage': message})
     except Exception as ewwor:
         await channel.send(fwogutils.errormessage(ewwor))
-        log(ewwor)
+        log(str(ewwor))
 
 emb = nextcord.InteractionResponse
 page = {"page": 1, "limit": 10, "offset": 0}
+
+
 @bot.slash_command(name="rankings")
 async def rankings(ctx):
     global emb, page
@@ -767,7 +813,8 @@ async def rankings(ctx):
         def __init__(self):
             super().__init__(timeout=30)
             self.page = page
-        @nextcord.ui.button(label="🡨", style=nextcord.ButtonStyle.blurple)
+
+        @nextcord.ui.button(label="<", style=nextcord.ButtonStyle.blurple)
         async def left(self, ctx: nextcord.Interaction, button: nextcord.Button):
             if self.page['page'] > 1:
                 self.page['limit'] -= 10
@@ -780,7 +827,8 @@ async def rankings(ctx):
                     embed.add_field(name=f"{x['position']}. {x['user']['steamName']}", inline=False,
                                     value=f"World Records: {x['amountOfWorldRecords']}\nScore: {x['score']}")
                 await emb.edit(embed=embed, view=Lbpage())
-        @nextcord.ui.button(label="🡪", style=nextcord.ButtonStyle.blurple)
+
+        @nextcord.ui.button(label=">", style=nextcord.ButtonStyle.blurple)
         async def right(self, ctx: nextcord.Interaction, button: nextcord.Button):
             self.page['limit'] += 10
             self.page['offset'] += 10
@@ -802,5 +850,4 @@ async def rankings(ctx):
     emb = await ctx.send(embed=embedd, view=Lbpage())
 
 
-
-bot.run(privaat.token)
+bot.run(privaat.ttoken)
