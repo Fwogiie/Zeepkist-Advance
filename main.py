@@ -850,4 +850,4 @@ async def rankings(ctx):
     emb = await ctx.send(embed=embedd, view=Lbpage())
 
 
-bot.run(privaat.ttoken)
+bot.run(privaat.token)
