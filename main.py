@@ -209,10 +209,11 @@ async def ownlog(ctx, type: str, *, text: str=None):
                         ctn[2] = 0
                         ctn[1] = ""
                     else:
+                        ctn[3] = False
                         ctn[2] += 1
                         ctn[1] += f"{a}\n"
                 if ctn[3] is False:
-                    await ctx.send("```{}```".format(fr.read()))
+                    await ctx.send("```{}```".format(ctn[1]))
         elif type == "add":
             log(text)
             await ctx.reply(f"Added `{text}` to log.txt")
@@ -860,4 +861,4 @@ async def rankings(ctx):
     emb = await ctx.send(embed=embedd, view=Lbpage())
 
 
-bot.run(privaat.token)
+bot.run(privaat.ttoken)
