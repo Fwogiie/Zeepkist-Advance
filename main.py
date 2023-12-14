@@ -201,8 +201,15 @@ async def ownlog(ctx, type: str, *, text: str=None):
             await ctx.reply("yes ma'am", file=nextcord.File("log.txt"))
         elif type == "send" and text == "true":
             with open("log.txt", 'r') as fr:
+                ctn = {1: "", 2: 0}
                 for a in fr.read().split('\n'):
-                    await ctx.send("```{}```".format(a))
+                    if ctn[2] == 10:
+                        await ctx.send("```{}```".format(ctn[1]))
+                        ctn[2] = 0
+                        ctn[1] = ""
+                    else:
+                        ctn[2] += 1
+                        ctn[1] += f"{a}\n"
         elif type == "add":
             log(text)
             await ctx.reply(f"Added `{text}` to log.txt")
@@ -850,4 +857,4 @@ async def rankings(ctx):
     emb = await ctx.send(embed=embedd, view=Lbpage())
 
 
-bot.run(privaat.ttoken)
+bot.run(privaat.token)
