@@ -185,14 +185,6 @@ async def on_command_error(ctx, error):
     log(error)
 
 
-@bot.event
-async def on_ready():
-    log("initializing startup guilds")
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="For level submissions"))
-    for guild in bot.guilds:
-        print(f"Connected to guild: {guild.name} ({guild.id}) with {guild.member_count} members.")
-
-
 @bot.is_owner
 @bot.command(name="log")
 async def ownlog(ctx, type: str, *, text: str=None):
@@ -492,6 +484,10 @@ submissionschannels = []
 async def on_ready():
     global submissionschannels
     log(f"Loaded up! with bot ID: {bot.user.id}")
+    log("initializing startup guilds")
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="For level submissions"))
+    for guild in bot.guilds:
+        print(f"Connected to guild: {guild.name} ({guild.id}) with {guild.member_count} members.")
     log("initializing startup cache for submission channels.")
     with open("data.json", "r") as f:
         data = json.load(f)
