@@ -148,7 +148,7 @@ async def create_playlist(name: str, amountoflvls: int):
 
 
 async def add_level(lvl: str):
-    log(f"lvl: {lvl}")
+    log(f"called! with level WSID: {lvl['workshopId']}")
     with open("playlist.zeeplist", "r") as file:
         playlist = json.load(file)
 
@@ -203,7 +203,7 @@ async def ownlog(ctx, type: str, *, text: str=None):
             with open("log.txt", 'r') as fr:
                 ctn = {1: "", 2: 0, 3: False}
                 for a in fr.read().split('\n'):
-                    if ctn[2] == 10:
+                    if ctn[2] == 5:
                         await ctx.send("```{}```".format(ctn[1]))
                         ctn[3] = True
                         ctn[2] = 0
@@ -222,8 +222,8 @@ async def ownlog(ctx, type: str, *, text: str=None):
             await ctx.reply("cleared log.txt")
         else:
             await ctx.reply("Yo fucking stupid bruv?")
-    except HTTPException:
-        await ctx.send("HTTPSException")
+    except HTTPException as ewwor:
+        await ctx.send(f"HTTPSException: {ewwor}")
 
 
 @bot.is_owner
@@ -860,5 +860,36 @@ async def rankings(ctx):
                         value=f"World Records: {x['amountOfWorldRecords']}\nScore: {x['score']}")
     emb = await ctx.send(embed=embedd, view=Lbpage())
 
+
+@bot.slash_command(name="combine")
+async def comb(ctx):
+    pass
+
+
+@comb.subcommand(name="playlist")
+async def combpl(ctx, pla: nextcord.Attachment = nextcord.SlashOption(name="playlist", description="The Playlist you want to combine", required=True),
+                 plb: nextcord.Attachment = nextcord.SlashOption(name="to_playlist", description="The Playlist you want to combine to", required=True),
+                 name: str = nextcord.SlashOption(description="The name you want the combined playlist to be named", required=True)):
+    log(f"called by user: {ctx.user} ({ctx.user.id}) with plname: {name}")
+    try:
+        if pla.filename.split(".")[1:][0] and plb.filename.split(".")[1:][0] == "zeeplist":
+            plbr = json.loads(await plb.read())
+            for a in json.loads(await pla.read())["levels"]:
+                plbr["levels"].append(a)
+            plbr["name"] = name
+            plbr["amountOfLevels"] = len(plbr["levels"])
+            with open("playlist.zeeplist", 'w') as f:
+                json.dump(plbr, f, indent=2)
+            os.rename("playlist.zeeplist", f"{name}.zeeplist")
+            await ctx.send("The playlist has been generated."
+                           " To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
+                           " to easily access this directory: (for windows only) press Win+R and paste the directory in the text box.",
+                           file=nextcord.File(f'{name}.zeeplist'))
+            os.rename(f"{name}.zeeplist", "playlist.zeeplist")
+        else:
+            await ctx.send(f"please attach a valid .zeeplist file")
+    except Exception as ewwor:
+        log(str(ewwor))
+        await ctx.user(fwogutils.errormessage(ewwor))
 
 bot.run(privaat.token)
