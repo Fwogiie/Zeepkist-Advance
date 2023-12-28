@@ -9,12 +9,13 @@ import discord
 from discord.ext import commands, tasks
 from nextcord.errors import HTTPException
 import privaat
+import urllib
+from urllib.parse import quote
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 import inspect
 import pytz
 import calendar
-import urllib
 import subprocess
 import ast
 import copy
@@ -488,6 +489,7 @@ async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="For level submissions"))
     for guild in bot.guilds:
         print(f"Connected to guild: {guild.name} ({guild.id}) with {guild.member_count} members.")
+        log(f"Connected to guild: {guild.name} ({guild.id}) with {guild.member_count} members.")
     log("initializing startup cache for submission channels.")
     with open("data.json", "r") as f:
         data = json.load(f)
@@ -887,5 +889,63 @@ async def combpl(ctx, pla: nextcord.Attachment = nextcord.SlashOption(name="play
     except Exception as ewwor:
         log(str(ewwor))
         await ctx.user(fwogutils.errormessage(ewwor))
+
+@bot.slash_command(name="update")
+async def upd(ctx):
+    pass
+
+@upd.subcommand(name="playlist")
+async def updpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(description="Update this playlist to newer levels!", required=True)):
+    log(f"reached by {ctx.user} ({ctx.user.id}) with playlist name: {playlist.filename}")
+    if playlist.filename.split(".")[1:][0] == "zeeplist":
+        ctx = await ctx.send("processing")
+        pllvls = json.loads(await playlist.read())
+        log(pllvls)
+        pllvlsupd = {"name": f"{pllvls['name']}",
+                     "amountOfLevels": pllvls["amountOfLevels"],
+                     "roundLength": 480.0,
+                     "shufflePlaylist": False,
+                     "UID": [],
+                     "levels": []}
+        data = {'updlvls': 0, 'updlvlsnames': "", 'dellvls': 0, 'dellvlsnames': "", 'nflvls': 0, 'nflvlsnames': ""}
+        try:
+            for x in pllvls["levels"]:
+                s = x['UID']
+                code = requests.get(f"https://api.zworpshop.com/levels/uid/{urllib.parse.quote_plus(s, encoding='UTF-8')}").status_code
+                if code == 404:
+                    req = requests.get(f"https://api.zworpshop.com/levels/workshop/{x['WorkshopID']}?IncludeReplaced=false&IncludeDeleted=false")
+                    if req.status_code == 200:
+                        reqtxt = json.loads(req.text)
+                        if len(reqtxt) == 1:
+                            log("len reach 1")
+                            pllvlsupd["levels"].append({"UID": f"{reqtxt[0]['fileUid']}", "WorkshopID": int(reqtxt[0]['workshopId']),
+                                                        "Name": f"{reqtxt[0]['name']}", "Author": f"{reqtxt[0]['fileAuthor']}"})
+                            data['updlvls'] += 1
+                            data['updlvlsnames'] += f"> - {x['Name']}\n"
+                        elif len(reqtxt) > 1:
+                            log("len reach bigger than 1")
+                            data['nflvls'] += 1
+                            data['nflvlsnames'] += f"> - {x['Name']}\n"
+                    elif req.status_code == 404:
+                        log("req 404")
+                        data['dellvls'] += 1
+                        data['dellvlsnames'] += f"> - {x['Name']}\n"
+                elif code == 200:
+                    pllvlsupd["levels"].append(x)
+            name = playlist.filename.split(".")[:1][0]
+            with open("playlist.zeeplist", 'w') as f:
+                json.dump(pllvlsupd, f, indent=2)
+            os.rename("playlist.zeeplist", f"{name}.zeeplist")
+            await ctx.edit(f"## {data['updlvls']} level(s) were updated.\n> ### Updated level(s):\n{data['updlvlsnames']}\n"
+                           f"## {data['dellvls']} level(s) were deleted from the workshop. (These can manually be added!)\n> ### Deleted level(s):\n{data['dellvlsnames']}\n"
+                           f"## {data['nflvls']} level(s) were not found. (These can manually be added!)\n> ### Not Found level(s):\n{data['nflvlsnames']}",
+                           file=nextcord.File(f"{name}.zeeplist"))
+            os.rename(f"{name}.zeeplist", "playlist.zeeplist")
+        except Exception as ewwor:
+            await ctx.edit(fwogutils.errormessage(ewwor))
+            log(ewwor)
+    else:
+        await ctx.send("Please attach a valid .zeeplevel file.")
+
 
 bot.run(privaat.token)
