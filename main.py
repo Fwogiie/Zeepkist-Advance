@@ -710,13 +710,14 @@ def add_levels(lvl: list):
 @get.subcommand(name="playlist")
 async def getpl(ctx, playlistname: str, channel: nextcord.TextChannel):
     log(f"called by: {ctx.user} for channel: {channel.name} ({channel.id}) as playlistname: {playlistname}")
+    ctx = await ctx.send("processing")
     if ctx.user.id in [bot.owner_id, ctx.guild.owner_id]:
         for x in submissionschannels:
             if x['channelid'] == channel.id:
                 create_filepl(playlistname)
                 if add_levels(x['levels']) is not False:
                     os.rename("playlist.zeeplist", f"{playlistname}.zeeplist")
-                    await ctx.send("The playlist has been generated."
+                    await ctx.edit("The playlist has been generated."
                                    " To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
                                    " to easily access this directory: (for windows only) press Win+R and paste the directory in the text box.", file=nextcord.File(f'{playlistname}.zeeplist'))
                     os.rename(f"{playlistname}.zeeplist", "playlist.zeeplist")
@@ -724,7 +725,7 @@ async def getpl(ctx, playlistname: str, channel: nextcord.TextChannel):
                     updatesubchannels()
                     return
                 else:
-                    await ctx.send("The playlist you requested is either empty or only has 1 level. so i did not make it.")
+                    await ctx.edit("The playlist you requested is either empty or only has 1 level. so i did not make it.")
                     return
         await ctx.send("The mentioned channel is not a submissions channel.")
     else:
@@ -895,19 +896,20 @@ async def upd(ctx):
     pass
 
 @upd.subcommand(name="playlist")
-async def updpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(description="Update this playlist to newer levels!", required=True)):
+async def updpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(description="Update this playlist to newer levels!", required=True),
+                removeduplicates: bool=nextcord.SlashOption(description="Removes duplicates if there are any.", required=True)):
     log(f"reached by {ctx.user} ({ctx.user.id}) with playlist name: {playlist.filename}")
     if playlist.filename.split(".")[1:][0] == "zeeplist":
         ctx = await ctx.send("processing")
         pllvls = json.loads(await playlist.read())
-        log(pllvls)
         pllvlsupd = {"name": f"{pllvls['name']}",
                      "amountOfLevels": pllvls["amountOfLevels"],
                      "roundLength": 480.0,
                      "shufflePlaylist": False,
                      "UID": [],
                      "levels": []}
-        data = {'updlvls': 0, 'updlvlsnames': "", 'dellvls': 0, 'dellvlsnames': "", 'nflvls': 0, 'nflvlsnames': ""}
+        data = {'updlvls': 0, 'updlvlsnames': "", 'dellvls': 0, 'dellvlsnames': "", 'nflvls': 0, 'nflvlsnames': "",
+                'duplilvls': 0, 'duplilvlsnames': "", 'duplicheck': []}
         try:
             for x in pllvls["levels"]:
                 s = x['UID']
@@ -918,8 +920,13 @@ async def updpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(descript
                         reqtxt = json.loads(req.text)
                         if len(reqtxt) == 1:
                             log("len reach 1")
-                            pllvlsupd["levels"].append({"UID": f"{reqtxt[0]['fileUid']}", "WorkshopID": int(reqtxt[0]['workshopId']),
-                                                        "Name": f"{reqtxt[0]['name']}", "Author": f"{reqtxt[0]['fileAuthor']}"})
+                            if x['WorkshopID'] in data['duplicheck'] and removeduplicates is True:
+                                data['duplilvls'] += 1
+                                data['duplilvlsnames'] += f"> - {x['Name']}\n"
+                            else:
+                                pllvlsupd["levels"].append({"UID": f"{reqtxt[0]['fileUid']}", "WorkshopID": int(reqtxt[0]['workshopId']),
+                                                            "Name": f"{reqtxt[0]['name']}", "Author": f"{reqtxt[0]['fileAuthor']}"})
+                                data['duplicheck'].append(x['WorkshopID'])
                             data['updlvls'] += 1
                             data['updlvlsnames'] += f"> - {x['Name']}\n"
                         elif len(reqtxt) > 1:
@@ -931,14 +938,20 @@ async def updpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(descript
                         data['dellvls'] += 1
                         data['dellvlsnames'] += f"> - {x['Name']}\n"
                 elif code == 200:
-                    pllvlsupd["levels"].append(x)
+                    if x['WorkshopID'] in data['duplicheck'] and removeduplicates is True:
+                        data['duplilvls'] += 1
+                        data['duplilvlsnames'] += f"> - {x['Name']}\n"
+                    else:
+                        pllvlsupd["levels"].append(x)
+                        data['duplicheck'].append(x['WorkshopID'])
             name = playlist.filename.split(".")[:1][0]
             with open("playlist.zeeplist", 'w') as f:
                 json.dump(pllvlsupd, f, indent=2)
             os.rename("playlist.zeeplist", f"{name}.zeeplist")
             await ctx.edit(f"## {data['updlvls']} level(s) were updated.\n> ### Updated level(s):\n{data['updlvlsnames']}\n"
                            f"## {data['dellvls']} level(s) were deleted from the workshop. (These can manually be added!)\n> ### Deleted level(s):\n{data['dellvlsnames']}\n"
-                           f"## {data['nflvls']} level(s) were not found. (These can manually be added!)\n> ### Not Found level(s):\n{data['nflvlsnames']}",
+                           f"## {data['nflvls']} level(s) were not found. (These can manually be added!)\n> ### Not Found level(s):\n{data['nflvlsnames']}\n"
+                           f"## {data['duplilvls']} level(s) were duplicated.\n> ### Duplicated level(s):\n{data['duplilvlsnames']}",
                            file=nextcord.File(f"{name}.zeeplist"))
             os.rename(f"{name}.zeeplist", "playlist.zeeplist")
         except Exception as ewwor:
