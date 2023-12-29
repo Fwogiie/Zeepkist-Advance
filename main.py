@@ -891,11 +891,13 @@ async def combpl(ctx, pla: nextcord.Attachment = nextcord.SlashOption(name="play
         log(str(ewwor))
         await ctx.user(fwogutils.errormessage(ewwor))
 
+
 @bot.slash_command(name="update")
 async def upd(ctx):
     pass
 
-@upd.subcommand(name="playlist")
+
+@upd.subcommand(name="playlist", description="Update outdated levels in a playlist!")
 async def updpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(description="Update this playlist to newer levels!", required=True),
                 removeduplicates: bool=nextcord.SlashOption(description="Removes duplicates if there are any.", required=True)):
     log(f"reached by {ctx.user} ({ctx.user.id}) with playlist name: {playlist.filename}")
@@ -958,7 +960,31 @@ async def updpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(descript
             await ctx.edit(fwogutils.errormessage(ewwor))
             log(ewwor)
     else:
-        await ctx.send("Please attach a valid .zeeplevel file.")
+        await ctx.send("Please attach a valid .zeeplist file.")
+
+
+@bot.slash_command(name="reverse")
+async def rev(ctx):
+    pass
+
+
+@rev.subcommand(name="playlist", description="Reverse a playlist!")
+async def revpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(description="The playlist to reverse.", required=True)):
+    log(f"reached by {ctx.user} ({ctx.user.id}) with playlist name: {playlist.filename}")
+    if playlist.filename.split(".")[1:][0] == "zeeplist":
+        ctx = await ctx.send("processing")
+        pl = json.loads(await playlist.read())
+        log(pl['levels'])
+        pl['levels'].reverse()
+        log(pl['levels'])
+        name = playlist.filename.split(".")[:1][0]
+        with open("playlist.zeeplist", 'w') as f:
+            json.dump(pl, f, indent=2)
+        os.rename("playlist.zeeplist", f"{name}.zeeplist")
+        await ctx.edit("Your playlist has been reversed!", file=nextcord.File(f"{name}.zeeplist"))
+        os.rename(f"{name}.zeeplist", "playlist.zeeplist")
+    else:
+        await ctx.send("Please attach a valid .zeeplist file!")
 
 
 bot.run(privaat.token)
