@@ -906,8 +906,8 @@ async def updpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(descript
         pllvls = json.loads(await playlist.read())
         pllvlsupd = {"name": f"{pllvls['name']}",
                      "amountOfLevels": pllvls["amountOfLevels"],
-                     "roundLength": 480.0,
-                     "shufflePlaylist": False,
+                     "roundLength": pllvls["roundLength"],
+                     "shufflePlaylist": bool(pllvls["shufflePlaylist"]),
                      "UID": [],
                      "levels": []}
         data = {'updlvls': 0, 'updlvlsnames': "", 'dellvls': 0, 'dellvlsnames': "", 'nflvls': 0, 'nflvlsnames': "",
@@ -974,9 +974,7 @@ async def revpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(descript
     if playlist.filename.split(".")[1:][0] == "zeeplist":
         ctx = await ctx.send("processing")
         pl = json.loads(await playlist.read())
-        log(pl['levels'])
         pl['levels'].reverse()
-        log(pl['levels'])
         name = playlist.filename.split(".")[:1][0]
         with open("playlist.zeeplist", 'w') as f:
             json.dump(pl, f, indent=2)
@@ -986,5 +984,49 @@ async def revpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(descript
     else:
         await ctx.send("Please attach a valid .zeeplist file!")
 
+
+sent = False
+conx = nextcord.Interaction
+@tasks.loop(seconds=10, reconnect=True)
+async def emb():
+    global sent, conx
+    this = json.loads(requests.get("https://zeepkist-showdown-4215308f4ce4.herokuapp.com/api/qualifier").text)['qualifier']
+    embed = discord.Embed(title="Pool 1", description="", color=nextcord.Color.red())
+    embeda = discord.Embed(title="Pool 2", description="", color=nextcord.Color.blue())
+    embedb = discord.Embed(title="Substitutes", description="", color=nextcord.Color.dark_grey())
+    count = 1
+    for x in this[:8]:
+        embed.add_field(name=f"{count}. {x['time']}", value=f"by {x['name']}")
+        count += 1
+    embed.add_field(name=f"", value=f"")
+    for x in this[:16][8:]:
+        embeda.add_field(name=f"{count}. {x['time']}", value=f"by {x['name']}")
+        count += 1
+    embeda.add_field(name=f"", value=f"")
+    for x in this[16:41]:
+        embedb.add_field(name=f"{count}. {x['time']}", value=f"by {x['name']}")
+        count += 1
+    if sent:
+        await conx.edit(f"# Showdown Qualifier Season 2", embeds=[embed, embeda, embedb])
+    else:
+        chan = await bot.fetch_channel(1144730662000136315)
+        conx = await chan.send(f"# Showdown Qualifier Season 2", embeds=[embed, embeda, embedb])
+        sent = True
+
+@bot.command(name="startemb")
+async def startemb(ctx):
+    if ctx.author.id in [785037540155195424, 257321046611329026]:
+        emb.start()
+    else:
+        pass
+
+@bot.command(name="stopemb")
+async def stopemb(ctx):
+    global sent
+    if ctx.author.id in [785037540155195424, 257321046611329026]:
+        emb.stop()
+        sent = False
+    else:
+        pass
 
 bot.run(privaat.token)
