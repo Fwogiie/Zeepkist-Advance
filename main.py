@@ -990,28 +990,31 @@ conx = nextcord.Interaction
 @tasks.loop(seconds=10, reconnect=True)
 async def emb():
     global sent, conx
-    this = json.loads(requests.get("https://zeepkist-showdown-4215308f4ce4.herokuapp.com/api/qualifier").text)['qualifier']
-    embed = discord.Embed(title="Pool 1", description="", color=nextcord.Color.red())
-    embeda = discord.Embed(title="Pool 2", description="", color=nextcord.Color.blue())
-    embedb = discord.Embed(title="Substitutes", description="", color=nextcord.Color.dark_grey())
-    count = 1
-    for x in this[:8]:
-        embed.add_field(name=f"{count}. {x['time']}", value=f"by {x['name']}")
-        count += 1
-    embed.add_field(name=f"", value=f"")
-    for x in this[:16][8:]:
-        embeda.add_field(name=f"{count}. {x['time']}", value=f"by {x['name']}")
-        count += 1
-    embeda.add_field(name=f"", value=f"")
-    for x in this[16:41]:
-        embedb.add_field(name=f"{count}. {x['time']}", value=f"by {x['name']}")
-        count += 1
-    if sent:
-        await conx.edit(f"# Showdown Qualifier Season 2", embeds=[embed, embeda, embedb])
-    else:
-        chan = await bot.fetch_channel(1144730662000136315)
-        conx = await chan.send(f"# Showdown Qualifier Season 2", embeds=[embed, embeda, embedb])
-        sent = True
+    chan = await bot.fetch_channel(1137846339670114434)
+    try:
+        this = json.loads(requests.get("https://zeepkist-showdown-4215308f4ce4.herokuapp.com/api/qualifier").text)['qualifier']
+        embed = discord.Embed(title="Pool 1", description="", color=nextcord.Color.red())
+        embeda = discord.Embed(title="Pool 2", description="", color=nextcord.Color.blue())
+        embedb = discord.Embed(title="Substitutes", description="", color=nextcord.Color.dark_grey())
+        count = 1
+        for x in this[:8]:
+            embed.add_field(name=f"{count}. {x['time']}", value=f"by {x['name']}")
+            count += 1
+        embed.add_field(name=f"", value=f"")
+        for x in this[:16][8:]:
+            embeda.add_field(name=f"{count}. {x['time']}", value=f"by {x['name']}")
+            count += 1
+        embeda.add_field(name=f"", value=f"")
+        for x in this[16:41]:
+            embedb.add_field(name=f"{count}. {x['time']}", value=f"by {x['name']}")
+            count += 1
+        if sent:
+            await conx.edit(f"# Showdown Qualifier Season 2", embeds=[embed, embeda, embedb])
+        else:
+            conx = await chan.send(f"# Showdown Qualifier Season 2", embeds=[embed, embeda, embedb])
+            sent = True
+    except Exception as ewwor:
+        await chan.send(f"an error occured.\n\n```{ewwor}```")
 
 @bot.command(name="startemb")
 async def startemb(ctx):
