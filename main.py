@@ -990,7 +990,7 @@ conx = nextcord.Interaction
 @tasks.loop(seconds=10, reconnect=True)
 async def emb():
     global sent, conx
-    chan = await bot.fetch_channel(1137846339670114434)
+    chan = await bot.fetch_channel(1144730662000136315)
     try:
         this = json.loads(requests.get("https://zeepkist-showdown-4215308f4ce4.herokuapp.com/api/qualifier").text)['qualifier']
         embed = discord.Embed(title="Pool 1", description="", color=nextcord.Color.red())
