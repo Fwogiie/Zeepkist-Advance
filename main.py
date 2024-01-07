@@ -993,9 +993,12 @@ async def emb():
     chan = await bot.fetch_channel(1144730662000136315)
     try:
         this = json.loads(requests.get("https://zeepkist-showdown-4215308f4ce4.herokuapp.com/api/qualifier").text)['qualifier']
+        wr = json.loads(requests.get("https://api.zeepkist-gtr.com/records?Level=D94C0982CE0BA4D261DF1A79BF2267B47DFEF715&ValidOnly=true&Limit=1&Offset=0").text)['records'][0]
+        wruser = json.loads(requests.get(f"https://api.zeepkist-gtr.com/users/{wr['user']}").text)
         embed = discord.Embed(title="Pool 1", description="", color=nextcord.Color.red())
         embeda = discord.Embed(title="Pool 2", description="", color=nextcord.Color.blue())
         embedb = discord.Embed(title="Substitutes", description="", color=nextcord.Color.dark_grey())
+        wrembed = discord.Embed(title="GTR World Record", description="", color=nextcord.Color.purple())
         count = 1
         for x in this[:8]:
             embed.add_field(name=f"{count}. {x['time']}", value=f"by {x['name']}")
@@ -1008,10 +1011,11 @@ async def emb():
         for x in this[16:41]:
             embedb.add_field(name=f"{count}. {x['time']}", value=f"by {x['name']}")
             count += 1
+        wrembed.add_field(name=f"{format_time(wr['time'])}", value=f"by {wruser['steamName']}")
         if sent:
-            await conx.edit(f"# Showdown Qualifier Season 2", embeds=[embed, embeda, embedb])
+            await conx.edit(f"# Showdown Qualifier Season 2", embeds=[embed, embeda, embedb, wrembed])
         else:
-            conx = await chan.send(f"# Showdown Qualifier Season 2", embeds=[embed, embeda, embedb])
+            conx = await chan.send(f"# Showdown Qualifier Season 2", embeds=[embed, embeda, embedb, wrembed])
             sent = True
     except Exception as ewwor:
         await chan.send(f"an error occured.\n\n```{ewwor}```")
