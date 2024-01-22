@@ -1,5 +1,6 @@
 import datetime
 import time
+import aiohttp
 import requests
 import json
 import os
@@ -23,6 +24,8 @@ import sys
 import fwogutils
 from fwogutils import bot as bot
 from fwogutils import log as log
+from fwogutils import format_time as format_time
+from nextcord import webhook, Webhook
 
 bot.load_extension("onami")
 
@@ -471,13 +474,6 @@ class Crtpl(nextcord.ui.Modal):
             await ctx.send(f"Failed to find {unfound} levels.", ephemeral=True)
 
 
-def format_time(time: float):
-    minutes = int(time // 60)
-    seconds = int(time % 60)
-    milliseconds = int((time % 1) * 1000)
-    formatted_time = f"{minutes:02d}:{seconds:02d}:{milliseconds:03d}"
-    return formatted_time
-
 submissionschannels = []
 
 
@@ -495,7 +491,6 @@ async def on_ready():
         data = json.load(f)
         submissionschannels = data["submission-channels"]
         log(f"Startup cache succeeded.")
-    await submission_checker.start()
 
 
 def updatesubchannels():
@@ -1020,6 +1015,7 @@ async def emb():
     except Exception as ewwor:
         await chan.send(f"an error occured.\n\n```{ewwor}```")
 
+
 @bot.command(name="startemb")
 async def startemb(ctx):
     if ctx.author.id in [785037540155195424, 257321046611329026]:
@@ -1027,12 +1023,99 @@ async def startemb(ctx):
     else:
         pass
 
+
 @bot.command(name="stopemb")
 async def stopemb(ctx):
     global sent
     if ctx.author.id in [785037540155195424, 257321046611329026]:
         emb.stop()
         sent = False
+    else:
+        pass
+
+
+@bot.slash_command(name='crtteam', guild_ids=[1127321762686836798])
+async def crtteam(ctx, teamname: str, teamtag: str, pa: str, pb: str, color: str):
+    color = fwogutils.hex_to_rgb(color)
+    embed = discord.Embed(title=f"[{teamtag}] {teamname}", description=f"{pa}\n{pb}",
+                          color=nextcord.Color.from_rgb(color[0], color[1], color[2]))
+    await ctx.send(embed=embed)
+
+@bot.command(name='sendteams')
+async def sendteams(ctx):
+    teams = json.loads(requests.get("https://zeepkist-showdown-4215308f4ce4.herokuapp.com/api/test/teams").text)
+    embeds = []
+    for x in teams['teams']:
+        color = fwogutils.hex_to_rgb(x['color'][1:69])
+        embeds.append(discord.Embed(title=f'[{x["tag"]}] {x["name"][:247]}',
+                                    description=f"{x['participants'][0]['steamName']}\n{x['participants'][1]['steamName']}",
+                                    color=nextcord.Color.from_rgb(color[0], color[1], color[2])))
+    await ctx.send(embeds=embeds)
+
+
+sentlb = False
+conxlb = nextcord.Interaction
+@tasks.loop(minutes=5, reconnect=True)
+async def lb():
+    global sentlb, conxlb, cache
+    sdlvls = [{'hash': "6CCAB651EC9FD760D1BE0E71C453290C2A2CD16D", 'name': "Abyssal Windows"},
+              {'hash': "2D9CDA53B58EA5FB3E4D62F9DB1A60DE3DB201A1", 'name': "Crystal Sands"},
+              {'hash': "FE488367F99D07F1D795381E6726C5603495EF6F", 'name': "OOoOoooOooOOOO stairs"},
+              {'hash': "05BD3B69BD469BC9DC24DC89C1E7929445E46D0C", 'name': "Other Green Hills"},
+              {'hash': "29036E8F39B3682BA1576F4268C9BBA278D88C21", 'name': "Schmetterling"},
+              {'hash': "544EF863C7740AEB32D708EE269C3C5D03FF8E9A", 'name': "The Red One"},
+              {'hash': "11ED3D54B27698564A6499B6FEEE996B1D13CE0B", 'name': "Whirlpool"}]
+    chan = await bot.fetch_channel(1198606669123424357)
+    embed = discord.Embed(title="Showdown Levels", description=" ", color=nextcord.Color.purple())
+    embeda = discord.Embed(color=nextcord.Color.purple(), description=" ")
+    embedb = discord.Embed(color=nextcord.Color.purple(), description=" ")
+    embedc = discord.Embed(color=nextcord.Color.purple(), description=" ", timestamp=datetime.datetime.now())
+    embedc.set_footer(text="last updated")
+    try:
+        for x in sdlvls:
+            records = json.loads(requests.get(f"https://api.zeepkist-gtr.com/records?Level={x['hash']}&ValidOnly=true&Limit=75&Offset=0").text)
+            data = {"levelrecs": "", "rcount": 0, "users": []}
+            for a in records['records']:
+                user = fwogutils.getgtruser(a['user'])['steamName']
+                if user not in data['users']:
+                    data['levelrecs'] += f"1. `{format_time(a['time'])}` by **{user}**\n"
+                    data['users'].append(user)
+                    data['rcount'] += 1
+                    if data["rcount"] == 5:
+                        break
+            if x['name'] in ['Abyssal Windows', 'Crystal Sands']:
+                embed.add_field(name=x['name'], value=data['levelrecs'], inline=True)
+            elif x['name'] in ['OOoOoooOooOOOO stairs', 'Other Green Hills']:
+                embeda.add_field(name=x['name'], value=data['levelrecs'], inline=True)
+            elif x['name'] in ['Schmetterling', 'The Red One']:
+                embedb.add_field(name=x['name'], value=data['levelrecs'], inline=True)
+            elif x['name'] in ['Whirlpool']:
+                embedc.add_field(name=x['name'], value=data['levelrecs'], inline=True)
+        if sentlb is not True:
+            embedc.timestamp = datetime.datetime.now()
+            conxlb = await chan.send(embeds=[embed, embeda, embedb, embedc])
+            sentlb = True
+        else:
+            embedc.timestamp = datetime.datetime.now()
+            await conxlb.edit(embeds=[embed, embeda, embedb, embedc])
+    except Exception as ewwor:
+        log(str(ewwor))
+
+
+@bot.command(name="startlb")
+async def startemb(ctx):
+    if ctx.author.id in [785037540155195424, 257321046611329026]:
+        lb.start()
+    else:
+        pass
+
+
+@bot.command(name="stoplb")
+async def stopemb(ctx):
+    global sentlb
+    if ctx.author.id in [785037540155195424, 257321046611329026]:
+        lb.stop()
+        sentlb = False
     else:
         pass
 
