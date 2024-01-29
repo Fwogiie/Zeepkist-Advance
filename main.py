@@ -1139,4 +1139,6 @@ async def stopemb(ctx):
     else:
         pass
 
+she = "hi"
+
 bot.run(privaat.token)
