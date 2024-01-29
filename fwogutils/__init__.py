@@ -5,6 +5,7 @@ import inspect
 import pytz
 import requests
 import json
+import os
 
 intents = nextcord.Intents.default()
 intents.message_content = True
@@ -76,3 +77,25 @@ def getgtrrecord(id: int):
 stay silly girl :3
     """
     return json.loads(requests.get(f"https://api.zeepkist-gtr.com/records/{id}").text)
+
+def checkzeeplist(filename: str):
+    """
+    returns True if the filename is "zeeplist"
+    useful for quite a bit of stuff :3
+
+    go girl! :>
+    """
+    if filename.split(".")[1:][0] == "zeeplist":
+        return True
+    else:
+        return False
+
+def dumppl(pl):
+    with open("playlist.zeeplist", 'w') as f:
+        json.dump(pl, f, indent=2)
+
+def renamepl(name):
+    os.rename("playlist.zeeplist", f"{name}.zeeplist")
+
+def undorename(name):
+    os.rename(f"{name}.zeeplist", "playlist.zeeplist")

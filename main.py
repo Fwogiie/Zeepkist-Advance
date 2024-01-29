@@ -26,6 +26,7 @@ from fwogutils import bot as bot
 from fwogutils import log as log
 from fwogutils import format_time as format_time
 from nextcord import webhook, Webhook
+import random
 
 bot.load_extension("onami")
 
@@ -979,6 +980,24 @@ async def revpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(descript
     else:
         await ctx.send("Please attach a valid .zeeplist file!")
 
+@bot.slash_command(name="shuffle")
+async def shuf(ctx):
+    pass
+
+@shuf.subcommand(name="playlist", description="Shuffle a playlist!")
+async def shufpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(description="The playlist to Shuffle.", required=True)):
+    if fwogutils.checkzeeplist(playlist.filename):
+        ctx = await ctx.send("processing")
+        pl = json.loads(await playlist.read())
+        random.shuffle(pl['levels'])
+        fwogutils.dumppl(pl)
+        name = playlist.filename.split(".")[:1][0]
+        fwogutils.renamepl(name)
+        await ctx.edit("Your playlist has been shuffled!", file=nextcord.File(f"{name}.zeeplist"))
+        fwogutils.undorename(name)
+    else:
+        await ctx.send("Please attach a valid .zeeplist file!")
+
 
 sent = False
 conx = nextcord.Interaction
@@ -1040,6 +1059,7 @@ async def crtteam(ctx, teamname: str, teamtag: str, pa: str, pb: str, color: str
     embed = discord.Embed(title=f"[{teamtag}] {teamname}", description=f"{pa}\n{pb}",
                           color=nextcord.Color.from_rgb(color[0], color[1], color[2]))
     await ctx.send(embed=embed)
+
 
 @bot.command(name='sendteams')
 async def sendteams(ctx):
