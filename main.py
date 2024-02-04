@@ -1176,10 +1176,12 @@ async def verify(ctx):
     else:
         await ctx.send("you are already verified!", ephemeral=True)
 
-@bot.event
-async def on_message(ctx):
-    if ctx.channel.id == 1201928657703292959 and ctx.author.id not in [785037540155195424, bot.user.id]:
-        await ctx.delete()
+class Cog(commands.Cog):
+    @commands.Cog.listener()
+    async def on_message(self, ctx):
+        if ctx.channel.id == 1201928657703292959 and ctx.author.id not in [785037540155195424, bot.user.id]:
+            await ctx.delete()
+bot.add_cog(Cog())
 
 
 bot.run(privaat.token)
