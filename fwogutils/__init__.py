@@ -47,7 +47,7 @@ def hex_to_rgb(hex):
   return tuple(int(hex[i:i+2], 16) for i in (0, 2, 4))
 
 
-def getgtruser(id: int):
+def getgtruser(id: int=None, discid: int=None):
     """
     remember fwogiie,
     to get username: steamName
@@ -56,7 +56,18 @@ def getgtruser(id: int):
 
     stay awesome girl <3
     """
-    return json.loads(requests.get(f"https://api.zeepkist-gtr.com/users/{id}").text)
+    if id != None:
+        req = requests.get(f"https://api.zeepkist-gtr.com/users/{id}")
+        if req.status_code != 200:
+            return [False, req.status_code]
+        else:
+            return [True, json.loads(req.text)]
+    elif discid != None:
+        req = requests.get(f"https://api.zeepkist-gtr.com/users/discord/{discid}")
+        if req.status_code != 200:
+            return [False, req.status_code]
+        else:
+            return [True, json.loads(req.text)]
 
 
 def getgtrrecord(id: int):
@@ -99,3 +110,10 @@ def renamepl(name):
 
 def undorename(name):
     os.rename(f"{name}.zeeplist", "playlist.zeeplist")
+
+def addgtruser(discid: str, user: str):
+    with open("users.json", 'r') as f:
+        data = json.loads(f.read())
+    with open("users.json", 'w') as ft:
+        data[discid] = user
+        json.dump(data, ft, indent=2)
