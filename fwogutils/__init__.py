@@ -89,6 +89,41 @@ stay silly girl :3
     """
     return json.loads(requests.get(f"https://api.zeepkist-gtr.com/records/{id}").text)
 
+def getgtruserrankings(limit: int, offset: int):
+    """
+    {
+  "totalAmount": 0,
+  "rankings": [
+    {
+      "user": {
+        "id": 0,
+        "steamId": "string",
+        "steamName": "string",
+        "discordId": "string"
+      },
+      "amountOfWorldRecords": 0,
+      "position": 0,
+      "score": 0
+    }
+  ]
+}
+
+good girl :>
+    """
+    return json.loads(requests.get(f"https://api.zeepkist-gtr.com/users/rankings?Limit={limit}&Offset={offset}").text)
+
+def getgtruserrank(id: int):
+    """
+    {
+  "amountOfWorldRecords": 0,
+  "position": 0,
+  "score": 0
+}
+
+girl!
+    """
+    return json.loads(requests.get(f"https://api.zeepkist-gtr.com/users/ranking/{id}").text)
+
 def checkzeeplist(filename: str):
     """
     returns True if the filename is "zeeplist"
@@ -115,5 +150,33 @@ def addgtruser(discid: str, user: str):
     with open("users.json", 'r') as f:
         data = json.loads(f.read())
     with open("users.json", 'w') as ft:
-        data[discid] = user
+        data["linked"][discid] = user
         json.dump(data, ft, indent=2)
+
+def add_usercache(id: int):
+    """
+    this is obsolete, don't use this fwogiie <3
+    """
+    user = getgtruser(id=id)
+    if user[0]:
+        with open("users.json", 'r') as f:
+            data = json.loads(f.read())
+        with open("users.json", 'w') as ft:
+            data["usercache"][str(id)] = user[1]
+            json.dump(data, ft, indent=2)
+
+def get_linked_users():
+    with open("users.json", 'r') as f:
+        return json.loads(f.read())["linked"]
+
+def all_24hours():
+    return [
+        datetime.time(hour=0, minute=1), datetime.time(hour=1, minute=1), datetime.time(hour=2, minute=1),
+        datetime.time(hour=3, minute=1), datetime.time(hour=4, minute=1), datetime.time(hour=5, minute=1),
+        datetime.time(hour=6, minute=1), datetime.time(hour=7, minute=1), datetime.time(hour=8, minute=1),
+        datetime.time(hour=9, minute=1), datetime.time(hour=10, minute=1), datetime.time(hour=11, minute=1),
+        datetime.time(hour=12, minute=1), datetime.time(hour=13, minute=1), datetime.time(hour=14, minute=1),
+        datetime.time(hour=15, minute=1), datetime.time(hour=16, minute=1), datetime.time(hour=17, minute=1),
+        datetime.time(hour=18, minute=1), datetime.time(hour=19, minute=1), datetime.time(hour=20, minute=1),
+        datetime.time(hour=21, minute=1), datetime.time(hour=22, minute=1), datetime.time(hour=23, minute=1)
+    ]
