@@ -1249,7 +1249,7 @@ async def rankings():
             linked = fwogutils.get_linked_users()
             if str(ctx.user.id) in linked:
                 userrank = fwogutils.getgtruserrank(linked[str(ctx.user.id)]["id"])
-                closeranks = gtrrankings[userrank['position']+5:userrank['position']-6]
+                closeranks = fwogutils.getgtruserrankings(limit=userrank['position']+5, offset=userrank['position']-6)
                 ranks = ""
                 for x in closeranks["rankings"]:
                     if x['position'] != userrank['position']:
