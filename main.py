@@ -1157,7 +1157,7 @@ async def verify(ctx):
                         log(f"verified user {ctx.user} ({ctx.user.id}), also accepted to link their GTR :3")
                         await ctx.send("You have been verified!", ephemeral=True)
                     except Exception as ewwor:
-                        await ctx.send(fwogutils.errormessage(ewwor))
+                        await ctx.send(fwogutils.errormessage(ewwor), ephemeral=True)
 
                 @nextcord.ui.button(label="No", style=nextcord.ButtonStyle.red)
                 async def no(self, button: nextcord.Button, ctx: nextcord.Interaction):
@@ -1175,6 +1175,11 @@ async def verify(ctx):
             await ctx.send("you have been verified!", ephemeral=True)
     else:
         await ctx.send("you are already verified!", ephemeral=True)
+
+@bot.event
+async def on_message(ctx):
+    if ctx.channel.id == 1201928657703292959 and ctx.author.id not in [785037540155195424, bot.user.id]:
+        await ctx.delete()
 
 
 bot.run(privaat.token)
