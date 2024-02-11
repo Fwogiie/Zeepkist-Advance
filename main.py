@@ -25,6 +25,7 @@ import fwogutils
 from fwogutils import bot as bot
 from fwogutils import log as log
 from fwogutils import format_time as format_time
+from fwogutils import views
 from nextcord import webhook, Webhook
 import random
 from nextcord.components import Button
@@ -488,16 +489,19 @@ async def on_ready():
         print(f"Connected to guild: {guild.name} ({guild.id}) with {guild.member_count} members.")
         log(f"Connected to guild: {guild.name} ({guild.id}) with {guild.member_count} members.")
     log("initializing startup cache for submission channels.")
-    with open("data.json", "r") as f:
-        data = json.load(f)
-        submissionschannels = data["submission-channels"]
-        log(f"submission channels cache succeeded.")
+    # with open("data.json", "r") as f:
+        # data = json.load(f)
+        # submissionschannels = data["submission-channels"]
+        # log(f"submission channels cache succeeded.")
     log("initializing startup cache for live leaderboards.")
     with open("data.json", "r") as f:
         data = json.load(f)
         leaderboards = data["leaderboards"]
         log(f"leaderboards cache succeeded.")
-
+    log("updating the live leaderboards cause of restart.")
+    leaderboard = await bot.get_channel(1203645881279184948).fetch_message(leaderboards['rankings'])
+    await rankingsfunc()
+    log("Process done to the GTR rankings leaderboard.")
 
 def updatesubchannels():
     global submissionschannels
@@ -1215,56 +1219,21 @@ async def linkgtr(ctx):
         await ctx.send(f"i have detected a GTR account by the name of **{gtrcheck[1]['steamName']}**, do you wish to link it?",
                        view=YesOrNoButtons(), ephemeral=True)
 
-@tasks.loop(time=fwogutils.all_24hours(), reconnect=True)
-async def rankings():
+async def rankingsfunc():
     global leaderboards
-    print("GOING!!!")
     leaderboard = await bot.get_channel(1203645881279184948).fetch_message(leaderboards['rankings'])
     gtrrankings = fwogutils.getgtruserrankings(limit=100, offset=0)
     stringedrankings = ""
     for x in gtrrankings["rankings"][:20]:
         stringedrankings += f"{x['position']}. `{x['user']['steamName']}` with **{x['score']}** points and **{x['amountOfWorldRecords']}** World Records\n"
-    class LButtons(nextcord.ui.View):
-        def __init__(self):
-            super().__init__(timeout=None)
-
-        @nextcord.ui.button(label="Show more", style=nextcord.ButtonStyle.grey)
-        async def show_more(self, button: nextcord.Button, ctx: nextcord.Interaction):
-            stringedrankings = ""
-            stringranks = ""
-            strranks = ""
-            for x in gtrrankings["rankings"][:30]:
-                stringedrankings += f"{x['position']}. `{x['user']['steamName']}` with **{x['score']}** points and **{x['amountOfWorldRecords']}** World Records\n"
-            for x in gtrrankings["rankings"][30:60]:
-                stringranks += f"{x['position']}. `{x['user']['steamName']}` with **{x['score']}** points and **{x['amountOfWorldRecords']}** World Records\n"
-            for x in gtrrankings["rankings"][60:90]:
-                strranks += f"{x['position']}. `{x['user']['steamName']}` with **{x['score']}** points and **{x['amountOfWorldRecords']}** World Records\n"
-            embed = discord.Embed(title="GTR Rankings", description=stringedrankings, color=nextcord.Color.blue())
-            embeda = discord.Embed(title=" ", description=stringranks, color=nextcord.Color.blue())
-            embedb = discord.Embed(title=" ", description=strranks, color=nextcord.Color.blue())
-            await ctx.send(embeds=[embed, embeda, embedb], ephemeral=True)
-
-        @nextcord.ui.button(label="My ranking")
-        async def my_rank(self, button: nextcord.Button, ctx: nextcord.Interaction):
-            linked = fwogutils.get_linked_users()
-            if str(ctx.user.id) in linked:
-                userrank = fwogutils.getgtruserrank(linked[str(ctx.user.id)]["id"])
-                closeranks = fwogutils.getgtruserrankings(limit=userrank['position']+5, offset=userrank['position']-6)
-                ranks = ""
-                for x in closeranks["rankings"]:
-                    if x['position'] != userrank['position']:
-                        ranks += f"{x['position']}. `{x['user']['steamName']}` with **{x['score']}** points and **{x['amountOfWorldRecords']}** World Records\n"
-                    else:
-                        ranks += f"> {x['position']}. `{x['user']['steamName']}` with **{x['score']}** points and **{x['amountOfWorldRecords']}** World Records\n"
-                embed = discord.Embed(title="Your Rank", description=ranks, color=nextcord.Color.blue())
-                await ctx.send(embed=embed, ephemeral=True)
-            else:
-                await ctx.send("You did not link your GTR!", ephemeral=True)
-
     embed = discord.Embed(title="GTR Rankings", description=stringedrankings, color=nextcord.Color.blue(),
                           timestamp=datetime.datetime.now())
     embed.set_footer(text="last updated")
-    await leaderboard.edit(embed=embed, view=LButtons())
+    await leaderboard.edit(embed=embed, view=fwogutils.views.LButtons())
+
+@tasks.loop(time=fwogutils.all_24hours(), reconnect=True)
+async def rankings():
+    await rankingsfunc()
 rankings.start()
 
 
