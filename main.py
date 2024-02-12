@@ -200,19 +200,20 @@ async def ownlog(ctx, type: str, *, text: str=None):
             await ctx.reply("yes ma'am", file=nextcord.File("log.txt"))
         elif type == "send" and text == "true":
             with open("log.txt", 'r') as fr:
-                ctn = {1: "", 2: 0, 3: False}
-                for a in fr.read().split('\n'):
-                    if ctn[2] == 5:
-                        await ctx.send("```{}```".format(ctn[1]))
-                        ctn[3] = True
-                        ctn[2] = 0
+                ctn = {1: "", 2: 0, 3: 5}
+                block = False
+                splitted = fr.read().split('\n')
+                while block is False:
+                    logblock = splitted[ctn[2]:ctn[3]]
+                    if logblock:
+                        for x in logblock:
+                            ctn[1] += f"{x}\n"
+                        ctn[3] += 5
+                        ctn[2] += 5
+                        await ctx.send(f"```{ctn[1]}```")
                         ctn[1] = ""
                     else:
-                        ctn[3] = False
-                        ctn[2] += 1
-                        ctn[1] += f"{a}\n"
-                if ctn[3] is False:
-                    await ctx.send("```{}```".format(ctn[1]))
+                        block = True
         elif type == "add":
             log(text)
             await ctx.reply(f"Added `{text}` to log.txt")
