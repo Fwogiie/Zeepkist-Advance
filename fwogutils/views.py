@@ -69,7 +69,7 @@ class LButtons(nextcord.ui.View):
                 else:
                     ranks += f"> {x['position']}. `{x['user']['steamName']}` with **{x['score']}** points and **{x['amountOfWorldRecords']}** World Records\n"
             embed = discord.Embed(title="Your Rank", description=ranks, color=nextcord.Color.blue())
-            await ctx.edit(embed=embed)
+            await ctx.edit("", embed=embed)
         else:
 
             log(f"user did not have gtr linked!")
