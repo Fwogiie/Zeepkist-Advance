@@ -55,10 +55,12 @@ class LButtons(nextcord.ui.View):
     @nextcord.ui.button(label="My ranking")
     async def my_rank(self, button: nextcord.Button, ctx: nextcord.Interaction):
         log(f"reached by {ctx.user} ({ctx.user.id})")
+        userid = ctx.user.id
+        ctx = await ctx.send("processing", ephemeral=True)
         linked = fwogutils.get_linked_users()
-        if str(ctx.user.id) in linked:
+        if str(userid) in linked:
             log(f"user had gtr linked, showing rank!")
-            userrank = fwogutils.getgtruserrank(linked[str(ctx.user.id)]["id"])
+            userrank = fwogutils.getgtruserrank(linked[str(userid)]["id"])
             closeranks = fwogutils.getgtruserrankings(limit=userrank['position']+5, offset=userrank['position']-6)
             ranks = ""
             for x in closeranks["rankings"]:
@@ -67,8 +69,8 @@ class LButtons(nextcord.ui.View):
                 else:
                     ranks += f"> {x['position']}. `{x['user']['steamName']}` with **{x['score']}** points and **{x['amountOfWorldRecords']}** World Records\n"
             embed = discord.Embed(title="Your Rank", description=ranks, color=nextcord.Color.blue())
-            await ctx.send(embed=embed, ephemeral=True)
+            await ctx.edit(embed=embed)
         else:
 
             log(f"user did not have gtr linked!")
-            await ctx.send("You did not link your GTR! use `/link gtr` to do so!", ephemeral=True)
+            await ctx.edit("You did not link your GTR! use `/link gtr` to do so!")
