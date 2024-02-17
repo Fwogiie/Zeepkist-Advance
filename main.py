@@ -501,7 +501,7 @@ async def on_ready():
         log(f"leaderboards cache succeeded.")
     log("updating the live leaderboards cause of restart.")
     leaderboard = await bot.get_channel(1203645881279184948).fetch_message(leaderboards['rankings'])
-    await rankingsfunc()
+    await rankingsfunc(fwogutils.getgtruserrankings(limit=100, offset=0))
     log("Process done to the GTR rankings leaderboard.")
 
 def updatesubchannels():
@@ -996,6 +996,7 @@ async def shuf(ctx):
 
 @shuf.subcommand(name="playlist", description="Shuffle a playlist!")
 async def shufpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(description="The playlist to Shuffle.", required=True)):
+    log(f"reached by {ctx.user} ({ctx.user.id})")
     if fwogutils.checkzeeplist(playlist.filename):
         ctx = await ctx.send("processing")
         pl = json.loads(await playlist.read())
@@ -1007,6 +1008,38 @@ async def shufpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(descrip
         fwogutils.undorename(name)
     else:
         await ctx.send("Please attach a valid .zeeplist file!")
+
+@get.subcommand(name="top")
+async def gettop(ctx):
+    pass
+
+@gettop.subcommand(name="levels")
+async def gettoplvls(ctx, amount: int, playlistname: str):
+    log(f"reached by {ctx.user} ({ctx.user.id})")
+    ctx = await ctx.send("processing (this might take a while)")
+    toplvls = fwogutils.jsonapi_get_toplevelpoints(limit=amount)
+    if toplvls is not False:
+        sepplevels = fwogutils.converturlsepperations(toplvls)
+        levelhashes = fwogutils.zworp_getlevelsbyhashlist(sepplevels)
+        levels = []
+        for x in toplvls:
+            try:
+                levels.append(levelhashes[x])
+            except KeyError as notfound:
+                log(f"did not find level: {notfound}")
+        fwogutils.dumppl({
+            "name": playlistname,
+            "amountOfLevels": len(levels),
+            "roundLength": 480.0,
+            "shufflePlaylist": False,
+            "UID": [],
+            "levels": levels
+        })
+        fwogutils.renamepl(playlistname)
+        await ctx.edit(f"Your playlist has been generated! {len(levels)}/{amount} levels were found!", file=nextcord.File(f"{playlistname}.zeeplist"))
+        fwogutils.undorename(playlistname)
+    else:
+        await ctx.edit("Error! Limit is 999!")
 
 
 sent = False
@@ -1192,12 +1225,13 @@ class Cog(commands.Cog):
             await ctx.delete()
 bot.add_cog(Cog())
 
-@bot.slash_command(name="link")
+@bot.slash_command(name="link", guild_ids=[1200812715527114824])
 async def link(ctx):
     pass
 
 @link.subcommand(name="gtr")
 async def linkgtr(ctx):
+    log(f"reached by {ctx.user} ({ctx.user.id})")
     gtrcheck = fwogutils.getgtruser(discid=ctx.user.id)
     if gtrcheck[0]:
         log(f"gtrcheck index 0 returned true")
@@ -1220,10 +1254,9 @@ async def linkgtr(ctx):
         await ctx.send(f"i have detected a GTR account by the name of **{gtrcheck[1]['steamName']}**, do you wish to link it?",
                        view=YesOrNoButtons(), ephemeral=True)
 
-async def rankingsfunc():
+async def rankingsfunc(gtrrankings):
     global leaderboards
     leaderboard = await bot.get_channel(1203645881279184948).fetch_message(leaderboards['rankings'])
-    gtrrankings = fwogutils.getgtruserrankings(limit=100, offset=0)
     stringedrankings = ""
     for x in gtrrankings["rankings"][:20]:
         stringedrankings += f"{x['position']}. `{x['user']['steamName']}` with **{x['score']}** points and **{x['amountOfWorldRecords']}** World Records\n"
@@ -1231,11 +1264,80 @@ async def rankingsfunc():
                           timestamp=datetime.datetime.now())
     embed.set_footer(text="last updated")
     await leaderboard.edit(embed=embed, view=fwogutils.views.LButtons())
+'''    ruusies = fwogutils.getRUusers()
+    linkeds = fwogutils.get_linked_users()
+    for x in ruusies:
+        log(f"checking rank for {x}")
+        checkrank = linkeds[x]["userdata"]["position"]
+        if gtrrankings["rankings"][checkrank - 1]["user"]["discordId"] == x:
+            log(f"{x} record still detected at index-1")
+            return
+        elif gtrrankings["rankings"][checkrank - 2]["user"]["discordId"] == x:
+            log(f"{x} ranked up!! sending notif!")
+            channel = await bot.fetch_channel(1207401802769633310)
+            await channel.send(f"<@{int(x)}>\nYou have ranked up to position **{gtrrankings['rankings'][checkrank - 2]['position']}**!!\n\n`debug: \n{gtrrankings['rankings'][checkrank - 2]}`")
+        else:
+            log("no conditions were met??")
+    rdusies = fwogutils.getRDusers()
+    for x in rdusies:
+        log(f"checking rank for {x}")
+        checkrank = linkeds[x]["userdata"]["position"]
+        if gtrrankings["rankings"][checkrank - 1]["user"]["discordId"] == x:
+            log(f"{x} record still detected at index-1")
+            return
+        elif gtrrankings["rankings"][checkrank]["user"]["discordId"] == x:
+            log(f"{x} ranked down!! sending notif!")
+            channel = await bot.fetch_channel(1207401802769633310)
+            await channel.send(f"<@{int(x)}>\nYou have ranked down to position **{gtrrankings['rankings'][checkrank]['position']}** :/\n\n`debug: \n{gtrrankings['rankings'][checkrank]}`")
+        else:
+            log("no conditions were met??")'''
+
 
 @tasks.loop(time=fwogutils.all_24hours(), reconnect=True)
 async def rankings():
-    await rankingsfunc()
+    gtrrankings = fwogutils.getgtruserrankings(limit=100, offset=0)
+    await rankingsfunc(gtrrankings=gtrrankings)
+
 rankings.start()
 
+'''@bot.slash_command(name="notify", guild_ids=[1200812715527114824])
+async def notif(ctx):
+    pass
+
+@notif.subcommand(name="me", description="will notify you for what you select!")
+async def notifme(ctx, to: str=nextcord.SlashOption(name="for", description="will notify you for what you select!", choices={"GTR Rank up": "RU", "GTR Rank down": "RD"})):
+    log(f"reached by {ctx.user} ({ctx.user.id})")
+    try:
+        if fwogutils.userislinked(ctx.user.id):
+            log("user is linked")
+            usersettings = fwogutils.getlinkedusersettings(ctx.user.id)
+            if usersettings["notifs"][to] is True:
+                await ctx.send("You already enabled this notification!")
+                log("setting already disabled, returning")
+                return
+            log(f"setting {to} to False")
+            fwogutils.setlinkedusersetting(setting=to, value=True, user=ctx.user.id)
+            await ctx.send(f"You will now be notified for what you selected!")
+    except Exception as ewwor:
+        await ctx.send(fwogutils.errormessage(ewwor))
+        log(str(ewwor))
+
+@notif.subcommand(name="remove", description="will stop notifying you for what you select!")
+async def notifme(ctx, to: str=nextcord.SlashOption(name="for", description="will stop notifying you for what you select!", choices={"GTR Rank up": "RU", "GTR Rank down": "RD"})):
+    log(f"reached by {ctx.user} ({ctx.user.id})")
+    try:
+        if fwogutils.userislinked(ctx.user.id):
+            log("user is linked")
+            usersettings = fwogutils.getlinkedusersettings(ctx.user.id)
+            if usersettings["notifs"][to] is False:
+                await ctx.send("This was already disabled!")
+                log("setting already disabled, returning")
+                return
+            log(f"setting {to} to False")
+            fwogutils.setlinkedusersetting(setting=to, value=False, user=ctx.user.id)
+            await ctx.send(f"We will stop to notify you for what you selected!")
+    except Exception as ewwor:
+        await ctx.send(fwogutils.errormessage(ewwor))
+        log(str(ewwor))'''
 
 bot.run(privaat.token)

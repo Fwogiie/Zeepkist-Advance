@@ -151,6 +151,7 @@ def addgtruser(discid: str, user: str):
         data = json.loads(f.read())
     with open("users.json", 'w') as ft:
         data["linked"][discid] = user
+        data["linked"][discid]["settings"] = {"notifs": {"RU": False, "RD": False}}
         json.dump(data, ft, indent=2)
 
 def add_usercache(id: int):
@@ -180,3 +181,108 @@ def all_24hours():
         datetime.time(hour=18, minute=1), datetime.time(hour=19, minute=1), datetime.time(hour=20, minute=1),
         datetime.time(hour=21, minute=1), datetime.time(hour=22, minute=1), datetime.time(hour=23, minute=1)
     ]
+
+def setlinkedusersetting(setting: str, value, user):
+    with open("users.json", 'r') as f:
+        data = json.loads(f.read())
+    with open("users.json", 'w') as ft:
+        data["linked"][str(user)]["settings"]["notifs"][str(setting)] = value
+        if setting == 'RU' and value is True:
+            data["usercache"]["RUusers"].append(str(user))
+        if setting == 'RD' and value is True:
+            data["usercache"]["RDusers"].append(str(user))
+        if setting == 'RU' and value is False:
+            data["usercache"]["RUusers"].remove(str(user))
+        if setting == 'RD' and value is False:
+            data["usercache"]["RDusers"].remove(str(user))
+        json.dump(data, ft, indent=2)
+
+def getlinkedusersettings(user):
+    with open("users.json", 'r') as f:
+        data = json.loads(f.read())
+        return data["linked"][str(user)]["settings"]
+
+def userislinked(id):
+    with open("users.json", 'r') as f:
+        data = json.loads(f.read())
+    if str(id) in data["linked"]:
+        return True
+    else:
+        return False
+
+def getRUusers():
+    with open("users.json", 'r') as f:
+        data = json.loads(f.read())
+        return data["usercache"]["RUusers"]
+
+def getRDusers():
+    with open("users.json", 'r') as f:
+        data = json.loads(f.read())
+        return data["usercache"]["RDusers"]
+
+def getlinkeduserdata(user):
+    with open("users.json", 'r') as f:
+        data = json.loads(f.read())
+        return data["linked"][str(user)]["userdata"]
+
+def jsonapi_get_toplevelpoints(limit: int):
+    if limit < 1000:
+        if limit > 100:
+            hashes = []
+            pages = int(str(limit)[0])
+            for x in range(pages):
+                req = json.loads(requests.get(f"https://jsonapi.zeepkist-gtr.com/levelPoints?page[number]={x+1}&page[size]=100&sort=-points&fields[levelPoints]=level").text)
+                for x in req["data"]:
+                    if x["attributes"]["level"] not in hashes:
+                        hashes.append(x["attributes"]["level"])
+            req = json.loads(requests.get(f"https://jsonapi.zeepkist-gtr.com/levelPoints?page[number]={pages+1}&page[size]=100&sort=-points&fields[levelPoints]=level").text)
+            for x in req["data"][0:int(str(limit)[1:69])]:
+                if x["attributes"]["level"] not in hashes:
+                    hashes.append(x["attributes"]["level"])
+            return hashes
+        else:
+            hashes = []
+            req = json.loads(requests.get(f"https://jsonapi.zeepkist-gtr.com/levelPoints?page[number]=1&page[size]={limit}&sort=-points&fields[levelPoints]=level").text)
+            for x in req["data"]:
+                if x["attributes"]["level"] not in hashes:
+                    hashes.append(x["attributes"]["level"])
+                    log(x["attributes"]["level"])
+            return hashes
+    else:
+        return False
+
+def converturlsepperations(data: list):
+    returndata = ""
+    for x in data:
+        returndata += f"{x},"
+    return returndata
+
+def zworp_getlevelsbyhashlist(levels: str):
+    """
+    takes level hashes from converturlsepperations and returns all the info you need for a playlist.
+
+    go girl!
+    """
+    zeeplist = {}
+    loopy = True
+    duplicheck = []
+    loopsets = {"offset": 0, "limit": 4100}
+    while loopy is True:
+        reqlevels = levels[loopsets["offset"]:loopsets["limit"]]
+        if list(reqlevels):
+            rawreq = requests.get(f"https://api.zworpshop.com/levels/hashes/{reqlevels}")
+            req = json.loads(rawreq.text)
+            for x in req:
+                if x['fileHash'] not in duplicheck:
+                    zeeplist[x['fileHash']] = {
+                        "UID": x['fileUid'],
+                        "WorkshopID": int(x['workshopId']),
+                        "Name": x['name'],
+                        "Author": x['fileAuthor']
+                    }
+                    duplicheck.append(x['fileHash'])
+            loopsets["offset"] += 4100
+            loopsets["limit"] += 4100
+        else:
+            loopy = False
+    return zeeplist
