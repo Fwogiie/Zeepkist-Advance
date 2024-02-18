@@ -1013,8 +1013,8 @@ async def shufpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(descrip
 async def gettop(ctx):
     pass
 
-@gettop.subcommand(name="levels")
-async def gettoplvls(ctx, amount: int, playlistname: str):
+@gettop.subcommand(name="levels", description="Get a playlist from levels worth the most points in GTR!")
+async def gettoplvls(ctx, amount: int=nextcord.SlashOption(description="Amount of levels to have in the playlist! (Maximum 999)"), playlistname: str=nextcord.SlashOption(description="The name of the playlist!")):
     log(f"reached by {ctx.user} ({ctx.user.id})")
     ctx = await ctx.send("processing (this might take a while)")
     toplvls = fwogutils.jsonapi_get_toplevelpoints(limit=amount)
@@ -1229,7 +1229,7 @@ bot.add_cog(Cog())
 async def link(ctx):
     pass
 
-@link.subcommand(name="gtr")
+@link.subcommand(name="gtr", description="Link your GTR to this server!")
 async def linkgtr(ctx):
     log(f"reached by {ctx.user} ({ctx.user.id})")
     gtrcheck = fwogutils.getgtruser(discid=ctx.user.id)

@@ -246,7 +246,6 @@ def jsonapi_get_toplevelpoints(limit: int):
             for x in req["data"]:
                 if x["attributes"]["level"] not in hashes:
                     hashes.append(x["attributes"]["level"])
-                    log(x["attributes"]["level"])
             return hashes
     else:
         return False
