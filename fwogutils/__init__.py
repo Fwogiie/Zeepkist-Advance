@@ -151,7 +151,7 @@ def addgtruser(discid: str, user: str):
         data = json.loads(f.read())
         data["linked"][discid] = user
         data["linked"][discid]["settings"] = {"notifs": {"RU": False, "RD": False, "WRST": False}}
-        data["linked"][discid]["userdata"]["position"] = 6969
+        data["linked"][discid]["userdata"] = {"position": 6969}
     with open("users.json", 'w') as ft:
         json.dump(data, ft, indent=2)
 
