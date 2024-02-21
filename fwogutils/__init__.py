@@ -169,7 +169,8 @@ def add_usercache(id: int):
 
 def get_linked_users():
     with open("users.json", 'r') as f:
-        return json.loads(f.read())["linked"]
+        data = json.loads(f.read())
+        return data['linked']
 
 def all_24hours():
     return [
