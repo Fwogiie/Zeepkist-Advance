@@ -499,10 +499,10 @@ async def on_ready():
         data = json.load(f)
         leaderboards = data["leaderboards"]
         log(f"leaderboards cache succeeded.")
-    log("updating the live leaderboards cause of restart.")
-    leaderboard = await bot.get_channel(1203645881279184948).fetch_message(leaderboards['rankings'])
-    await rankingsfunc(fwogutils.getgtruserrankings(limit=100, offset=0))
-    log("Process done to the GTR rankings leaderboard.")
+        log("updating the live leaderboards cause of restart.")
+        leaderboard = await bot.get_channel(1203645881279184948).fetch_message(leaderboards['rankings'])
+        await rankingsfunc(fwogutils.getgtruserrankings(limit=100, offset=0))
+        log("Process done to the GTR rankings leaderboard.")
 
 def updatesubchannels():
     global submissionschannels
@@ -1264,33 +1264,27 @@ async def rankingsfunc(gtrrankings):
                           timestamp=datetime.datetime.now())
     embed.set_footer(text="last updated")
     await leaderboard.edit(embed=embed, view=fwogutils.views.LButtons())
-'''    ruusies = fwogutils.getRUusers()
+    ruusies = fwogutils.getRUusers()
     linkeds = fwogutils.get_linked_users()
     for x in ruusies:
         log(f"checking rank for {x}")
-        checkrank = linkeds[x]["userdata"]["position"]
-        if gtrrankings["rankings"][checkrank - 1]["user"]["discordId"] == x:
-            log(f"{x} record still detected at index-1")
-            return
-        elif gtrrankings["rankings"][checkrank - 2]["user"]["discordId"] == x:
+        checkrank = fwogutils.getlinkeduserdata(x)["position"]
+        userrank = fwogutils.jsonapi_get_playerrank(linkeds[x]["id"])
+        if checkrank > userrank:
             log(f"{x} ranked up!! sending notif!")
             channel = await bot.fetch_channel(1207401802769633310)
-            await channel.send(f"<@{int(x)}>\nYou have ranked up to position **{gtrrankings['rankings'][checkrank - 2]['position']}**!!\n\n`debug: \n{gtrrankings['rankings'][checkrank - 2]}`")
-        else:
-            log("no conditions were met??")
+            await channel.send(f"<@{int(x)}>\nYou have ranked up to position **{userrank}** in the GTR rankings!!")
+            fwogutils.setlinkedranking(user=x, pos=userrank)
     rdusies = fwogutils.getRDusers()
     for x in rdusies:
         log(f"checking rank for {x}")
-        checkrank = linkeds[x]["userdata"]["position"]
-        if gtrrankings["rankings"][checkrank - 1]["user"]["discordId"] == x:
-            log(f"{x} record still detected at index-1")
-            return
-        elif gtrrankings["rankings"][checkrank]["user"]["discordId"] == x:
-            log(f"{x} ranked down!! sending notif!")
+        checkrank = fwogutils.getlinkeduserdata(x)["position"]
+        userrank = fwogutils.jsonapi_get_playerrank(linkeds[x]["id"])
+        if checkrank < userrank:
+            log(f"{x} ranked up!! sending notif!")
             channel = await bot.fetch_channel(1207401802769633310)
-            await channel.send(f"<@{int(x)}>\nYou have ranked down to position **{gtrrankings['rankings'][checkrank]['position']}** :/\n\n`debug: \n{gtrrankings['rankings'][checkrank]}`")
-        else:
-            log("no conditions were met??")'''
+            await channel.send(f"<@{int(x)}>\nYou have ranked down to position **{userrank}** in the GTR rankings :/")
+            fwogutils.setlinkedranking(user=x, pos=userrank)
 
 
 @tasks.loop(time=fwogutils.all_24hours(), reconnect=True)
@@ -1300,11 +1294,11 @@ async def rankings():
 
 rankings.start()
 
-'''@bot.slash_command(name="notify", guild_ids=[1200812715527114824])
+@bot.slash_command(name="notif", guild_ids=[1200812715527114824])
 async def notif(ctx):
     pass
 
-@notif.subcommand(name="me", description="will notify you for what you select!")
+@notif.subcommand(name="add", description="will notify you for what you select!")
 async def notifme(ctx, to: str=nextcord.SlashOption(name="for", description="will notify you for what you select!", choices={"GTR Rank up": "RU", "GTR Rank down": "RD"})):
     log(f"reached by {ctx.user} ({ctx.user.id})")
     try:
@@ -1338,6 +1332,7 @@ async def notifme(ctx, to: str=nextcord.SlashOption(name="for", description="wil
             await ctx.send(f"We will stop to notify you for what you selected!")
     except Exception as ewwor:
         await ctx.send(fwogutils.errormessage(ewwor))
-        log(str(ewwor))'''
+        log(str(ewwor))
+
 
 bot.run(privaat.token)

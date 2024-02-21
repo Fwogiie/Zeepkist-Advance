@@ -151,7 +151,8 @@ def addgtruser(discid: str, user: str):
         data = json.loads(f.read())
     with open("users.json", 'w') as ft:
         data["linked"][discid] = user
-        data["linked"][discid]["settings"] = {"notifs": {"RU": False, "RD": False}}
+        data["linked"][discid]["settings"] = {"notifs": {"RU": False, "RD": False, "WRST": False}}
+        data["linked"][discid]["userdata"]["position"] = 6969
         json.dump(data, ft, indent=2)
 
 def add_usercache(id: int):
@@ -189,8 +190,10 @@ def setlinkedusersetting(setting: str, value, user):
         data["linked"][str(user)]["settings"]["notifs"][str(setting)] = value
         if setting == 'RU' and value is True:
             data["usercache"]["RUusers"].append(str(user))
+            data["linked"][str(user)]["userdata"]["position"] = jsonapi_get_playerrank(data["linked"][str(user)]["id"])
         if setting == 'RD' and value is True:
             data["usercache"]["RDusers"].append(str(user))
+            data["linked"][str(user)]["userdata"]["position"] = jsonapi_get_playerrank(data["linked"][str(user)]["id"])
         if setting == 'RU' and value is False:
             data["usercache"]["RUusers"].remove(str(user))
         if setting == 'RD' and value is False:
@@ -224,6 +227,13 @@ def getlinkeduserdata(user):
     with open("users.json", 'r') as f:
         data = json.loads(f.read())
         return data["linked"][str(user)]["userdata"]
+
+def setlinkedranking(user: str, pos: int):
+    with open("users.json", 'r') as f:
+        data = json.loads(f.read())
+        data["linked"][user]["userdata"]["position"] = pos
+        with open("users.json", 'w') as ft:
+            json.dump(data, ft, indent=2)
 
 def jsonapi_get_toplevelpoints(limit: int):
     if limit < 1000:
@@ -285,3 +295,6 @@ def zworp_getlevelsbyhashlist(levels: str):
         else:
             loopy = False
     return zeeplist
+
+def jsonapi_get_playerrank(user: int):
+    return json.loads(requests.get(f"https://jsonapi.zeepkist-gtr.com/users/{user}/playerPoints").text)['data'][0]['attributes']['rank']
