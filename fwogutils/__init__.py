@@ -149,10 +149,10 @@ def undorename(name):
 def addgtruser(discid: str, user: str):
     with open("users.json", 'r') as f:
         data = json.loads(f.read())
-    with open("users.json", 'w') as ft:
         data["linked"][discid] = user
         data["linked"][discid]["settings"] = {"notifs": {"RU": False, "RD": False, "WRST": False}}
         data["linked"][discid]["userdata"]["position"] = 6969
+    with open("users.json", 'w') as ft:
         json.dump(data, ft, indent=2)
 
 def add_usercache(id: int):
@@ -163,8 +163,8 @@ def add_usercache(id: int):
     if user[0]:
         with open("users.json", 'r') as f:
             data = json.loads(f.read())
-        with open("users.json", 'w') as ft:
             data["usercache"][str(id)] = user[1]
+        with open("users.json", 'w') as ft:
             json.dump(data, ft, indent=2)
 
 def get_linked_users():
@@ -186,7 +186,6 @@ def all_24hours():
 def setlinkedusersetting(setting: str, value, user):
     with open("users.json", 'r') as f:
         data = json.loads(f.read())
-    with open("users.json", 'w') as ft:
         data["linked"][str(user)]["settings"]["notifs"][str(setting)] = value
         if setting == 'RU' and value is True:
             data["usercache"]["RUusers"].append(str(user))
@@ -198,6 +197,7 @@ def setlinkedusersetting(setting: str, value, user):
             data["usercache"]["RUusers"].remove(str(user))
         if setting == 'RD' and value is False:
             data["usercache"]["RDusers"].remove(str(user))
+    with open("users.json", 'w') as ft:
         json.dump(data, ft, indent=2)
 
 def getlinkedusersettings(user):
