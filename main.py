@@ -1363,16 +1363,8 @@ async def listen_forever():
         log(str(ewwor))
         await listen_forever()
 
-@bot.command()
-async def simws(ctx, *, data: str):
-    await wrcallback(message=data, websocket=None)
-    await ctx.send("okidoki :3")
-
 async def wrcallback(websocket, message=None):
-    if message is None:
-        content = json.loads(await websocket.recv())
-    else:
-        content = json.loads(message)
+    content = json.loads(await websocket.recv())
     print(content)
     if str(content['Data']['PreviousUserId']) in fwogutils.getWRSTusers() and content['Data']['PreviousUserId'] != content['Data']['NewUserId'] and content['Type'] == "wr":
         if content['Data']['LevelHash'] in fwogutils.loc_getuserwrs(content['Data']['PreviousUserId']):
