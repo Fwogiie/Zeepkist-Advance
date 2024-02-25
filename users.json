@@ -4,8 +4,196 @@
       "id": 3,
       "steamId": "76561199230094250",
       "steamName": "Fwogiie",
-      "discordId": "785037540155195424"
+      "discordId": "785037540155195424",
+      "settings": {
+        "notifs": {
+          "RU": true,
+          "RD": true,
+          "WRST": false
+        }
+      },
+      "userdata": {
+        "position": 9
+      }
+    },
+    "166738481874206720": {
+      "id": 489,
+      "steamId": "76561198159073318",
+      "steamName": "GuAlexItar",
+      "discordId": "166738481874206720",
+      "settings": {
+        "notifs": {
+          "RU": true,
+          "RD": true,
+          "WRST": false
+        }
+      },
+      "userdata": {
+        "position": 29
+      }
+    },
+    "257321046611329026": {
+      "id": 84,
+      "steamId": "76561198091849339",
+      "steamName": "Hi Im Yolo",
+      "discordId": "257321046611329026",
+      "settings": {
+        "notifs": {
+          "RU": true,
+          "RD": true,
+          "WRST": false
+        }
+      },
+      "userdata": {
+        "position": 41
+      }
+    },
+    "240942014865080320": {
+      "id": 744,
+      "steamId": "76561198225925644",
+      "steamName": "[QRI] Darth Rose",
+      "discordId": "240942014865080320",
+      "settings": {
+        "notifs": {
+          "RU": false,
+          "RD": false,
+          "WRST": false
+        }
+      },
+      "userdata": {
+        "position": 281
+      }
+    },
+    "944624994229579786": {
+      "id": 544,
+      "steamId": "76561199243030718",
+      "steamName": "[QRI] Quantomonkey",
+      "discordId": "944624994229579786",
+      "settings": {
+        "notifs": {
+          "RU": false,
+          "RD": false,
+          "WRST": false
+        }
+      },
+      "userdata": {
+        "position": 63
+      }
+    },
+    "236839534082392065": {
+      "id": 671,
+      "steamId": "76561198076411436",
+      "steamName": "Stony\u2067\u2067Baboon",
+      "discordId": "236839534082392065",
+      "settings": {
+        "notifs": {
+          "RU": false,
+          "RD": false,
+          "WRST": false
+        }
+      },
+      "userdata": {
+        "position": 57
+      }
+    },
+    "805114834140135435": {
+      "id": 87,
+      "steamId": "76561199135775747",
+      "steamName": "Renergy",
+      "discordId": "805114834140135435",
+      "settings": {
+        "notifs": {
+          "RU": false,
+          "RD": false,
+          "WRST": false
+        },
+        "userdata": {
+          "position": 7
+        }
+      }
+    },
+    "573169135295660050": {
+      "id": 13,
+      "steamId": "76561199027567424",
+      "steamName": "Hydro",
+      "discordId": "573169135295660050",
+      "settings": {
+        "notifs": {
+          "RU": true,
+          "RD": true,
+          "WRST": false
+        }
+      },
+      "userdata": {
+        "position": 4
+      }
+    },
+    "393485108293795840": {
+      "id": 16,
+      "steamId": "76561198104372256",
+      "steamName": "Jakie",
+      "discordId": "393485108293795840",
+      "settings": {
+        "notifs": {
+          "RU": true,
+          "RD": true,
+          "WRST": false
+        }
+      },
+      "userdata": {
+        "position": 20
+      }
+    },
+    "217779716289986560": {
+      "id": 1,
+      "steamId": "76561198023561976",
+      "steamName": "Thundernerd",
+      "discordId": "217779716289986560",
+      "settings": {
+        "notifs": {
+          "RU": true,
+          "RD": true,
+          "WRST": false
+        }
+      },
+      "userdata": {
+        "position": 288
+      }
+    },
+    "340672064174424065": {
+      "id": 812,
+      "steamId": "76561198000529645",
+      "steamName": "ButItRuns",
+      "discordId": "340672064174424065",
+      "settings": {
+        "notifs": {
+          "RU": false,
+          "RD": false,
+          "WRST": false
+        }
+      },
+      "userdata": {
+        "position": 6969
+      }
     }
   },
-  "usercache": {}
+  "usercache": {
+    "RUusers": [
+      "785037540155195424",
+      "257321046611329026",
+      "166738481874206720",
+      "217779716289986560",
+      "393485108293795840",
+      "573169135295660050"
+    ],
+    "RDusers": [
+      "785037540155195424",
+      "257321046611329026",
+      "166738481874206720",
+      "217779716289986560",
+      "393485108293795840",
+      "573169135295660050"
+    ],
+    "WRSTusers": []
+  }
 }
