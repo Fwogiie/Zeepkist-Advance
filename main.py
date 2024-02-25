@@ -29,6 +29,9 @@ from fwogutils import views
 from nextcord import webhook, Webhook
 import random
 from nextcord.components import Button
+import asyncio
+import websockets
+from itertools import count
 
 bot.load_extension("onami")
 
@@ -501,8 +504,9 @@ async def on_ready():
         log(f"leaderboards cache succeeded.")
         log("updating the live leaderboards cause of restart.")
         leaderboard = await bot.get_channel(1203645881279184948).fetch_message(leaderboards['rankings'])
-        await rankingsfunc(fwogutils.getgtruserrankings(limit=100, offset=0))
+        #await rankingsfunc(fwogutils.getgtruserrankings(limit=100, offset=0))
         log("Process done to the GTR rankings leaderboard.")
+        await listen_forever()
 
 def updatesubchannels():
     global submissionschannels
@@ -1075,7 +1079,7 @@ async def emb():
             conx = await chan.send(f"# Showdown Qualifier Season 2", embeds=[embed, embeda, embedb, wrembed])
             sent = True
     except Exception as ewwor:
-        await chan.send(f"an error occured.\n\n```{ewwor}```")
+        await chan.send(f"an error occurred.\n\n```{ewwor}```")
 
 
 @bot.command(name="startemb")
@@ -1253,6 +1257,9 @@ async def linkgtr(ctx):
 
         await ctx.send(f"i have detected a GTR account by the name of **{gtrcheck[1]['steamName']}**, do you wish to link it?",
                        view=YesOrNoButtons(), ephemeral=True)
+    else:
+        await ctx.send("I did not find any discord linkage, Please link your discord to your GTR by reproducing the following steps in-game:\n`Settings -> Mods -> Scroll to GTR -> In the 'discord' section, Press 'Link'`",
+                       ephemeral=True)
 
 async def rankingsfunc(gtrrankings):
     global leaderboards
@@ -1267,23 +1274,25 @@ async def rankingsfunc(gtrrankings):
     ruusies = fwogutils.getRUusers()
     linkeds = fwogutils.get_linked_users()
     for x in ruusies:
-        log(f"checking rank for {x}")
         checkrank = fwogutils.getlinkeduserdata(x)["position"]
         userrank = fwogutils.jsonapi_get_playerrank(linkeds[x]["id"])
         if checkrank > userrank:
             log(f"{x} ranked up!! sending notif!")
             channel = await bot.fetch_channel(1207401802769633310)
-            await channel.send(f"<@{int(x)}>\nYou have ranked up to position **{userrank}** in the GTR rankings!!")
+            embed = discord.Embed(title="Ranked up!", description=f"You have ranked up to position **{userrank}** in the GTR rankings!!", color=nextcord.Color.blue())
+            embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
+            await channel.send(f"<@{int(x)}>", embed=embed)
             fwogutils.setlinkedranking(user=x, pos=userrank)
     rdusies = fwogutils.getRDusers()
     for x in rdusies:
-        log(f"checking rank for {x}")
         checkrank = fwogutils.getlinkeduserdata(x)["position"]
         userrank = fwogutils.jsonapi_get_playerrank(linkeds[x]["id"])
         if checkrank < userrank:
-            log(f"{x} ranked up!! sending notif!")
+            log(f"{x} ranked down :/ sending notif!")
             channel = await bot.fetch_channel(1207401802769633310)
-            await channel.send(f"<@{int(x)}>\nYou have ranked down to position **{userrank}** in the GTR rankings :/")
+            embed = discord.Embed(title="Ranked down :/", description=f"You have ranked down to position **{userrank}** in the GTR rankings :/", color=nextcord.Color.blue())
+            embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
+            await channel.send(f"<@{int(x)}>", embed=embed)
             fwogutils.setlinkedranking(user=x, pos=userrank)
 
 
@@ -1299,7 +1308,7 @@ async def notif(ctx):
     pass
 
 @notif.subcommand(name="add", description="will notify you for what you select!")
-async def notifme(ctx, to: str=nextcord.SlashOption(name="for", description="will notify you for what you select!", choices={"GTR Rank up": "RU", "GTR Rank down": "RD"})):
+async def notifme(ctx, to: str=nextcord.SlashOption(name="for", description="will notify you for what you select!", choices={"GTR Rank up": "RU", "GTR Rank down": "RD", "World Record stolen": "WRST"})):
     log(f"reached by {ctx.user} ({ctx.user.id})")
     try:
         if fwogutils.userislinked(ctx.user.id):
@@ -1307,17 +1316,24 @@ async def notifme(ctx, to: str=nextcord.SlashOption(name="for", description="wil
             usersettings = fwogutils.getlinkedusersettings(ctx.user.id)
             if usersettings["notifs"][to] is True:
                 await ctx.send("You already enabled this notification!")
-                log("setting already disabled, returning")
+                log("setting already enabled, returning")
                 return
-            log(f"setting {to} to False")
+            log(f"setting {to} to True")
             fwogutils.setlinkedusersetting(setting=to, value=True, user=ctx.user.id)
+            if to == "WRST":
+                log("setting user wrs for WRST notif")
+                user = fwogutils.get_linked_users()[str(ctx.user.id)]
+                allwrs = fwogutils.gtr_getalluserwrs(user['id'])
+                fwogutils.loc_setuserwrs(user['id'], allwrs)
             await ctx.send(f"You will now be notified for what you selected!")
+        else:
+            await ctx.send("You are not linked! use the `/link gtr` command to link your GTR to this server!")
     except Exception as ewwor:
         await ctx.send(fwogutils.errormessage(ewwor))
         log(str(ewwor))
 
 @notif.subcommand(name="remove", description="will stop notifying you for what you select!")
-async def notifme(ctx, to: str=nextcord.SlashOption(name="for", description="will stop notifying you for what you select!", choices={"GTR Rank up": "RU", "GTR Rank down": "RD"})):
+async def notifme(ctx, to: str=nextcord.SlashOption(name="for", description="will stop notifying you for what you select!", choices={"GTR Rank up": "RU", "GTR Rank down": "RD", "World Record stolen": "WRST"})):
     log(f"reached by {ctx.user} ({ctx.user.id})")
     try:
         if fwogutils.userislinked(ctx.user.id):
@@ -1329,10 +1345,57 @@ async def notifme(ctx, to: str=nextcord.SlashOption(name="for", description="wil
                 return
             log(f"setting {to} to False")
             fwogutils.setlinkedusersetting(setting=to, value=False, user=ctx.user.id)
+            user = fwogutils.get_linked_users()[str(ctx.user.id)]
+            fwogutils.loc_setuserwrs(user['id'], ["user opt-out"])
             await ctx.send(f"We will stop to notify you for what you selected!")
+        else:
+            await ctx.send("You are not linked! use the `/link gtr` command to link your GTR to this server!")
     except Exception as ewwor:
         await ctx.send(fwogutils.errormessage(ewwor))
         log(str(ewwor))
+
+async def listen_forever():
+    try:
+        async with websockets.connect("wss://stream.zeepkist-gtr.com/ws") as websocket:
+            websocket.recv = await wrcallback(websocket, None)
+            await listen_forever()
+    except Exception as ewwor:
+        log(str(ewwor))
+        await listen_forever()
+
+@bot.command()
+async def simws(ctx, *, data: str):
+    await wrcallback(message=data, websocket=None)
+    await ctx.send("okidoki :3")
+
+async def wrcallback(websocket, message=None):
+    if message is None:
+        content = json.loads(await websocket.recv())
+    else:
+        content = json.loads(message)
+    print(content)
+    if str(content['Data']['PreviousUserId']) in fwogutils.getWRSTusers() and content['Data']['PreviousUserId'] != content['Data']['NewUserId'] and content['Type'] == "wr":
+        if content['Data']['LevelHash'] in fwogutils.loc_getuserwrs(content['Data']['PreviousUserId']):
+            log("WR GOT FUCKING STOLEN WOOOO")
+            wrstuserinfo = fwogutils.getWRSTusers()[str(content['Data']['PreviousUserId'])]
+            userlink = fwogutils.get_linked_users()[str(wrstuserinfo['discid'])]
+            level = fwogutils.zworp_getlevel(content['Data']['LevelHash'])
+            if level is not False:
+                log("level was not false")
+                wrstembed = discord.Embed(title="One of your World Records has been taken!", description=f"Your World Record on **{level[0]['name']}** by **{level[0]['fileAuthor']}** was taken!",
+                                          color=nextcord.Color.blue(), url=f"https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']}")
+                wrstembed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
+                prevrec = fwogutils.getgtrrecord(content['Data']['PreviousRecordId'])
+                newrec = fwogutils.getgtrrecord(content['Data']['NewRecordId'])
+                newuser = fwogutils.getgtruser(content['Data']['NewUserId'])
+                wrstembed.add_field(name="Info", value=f"Previous time: **{fwogutils.format_time(prevrec['time'])}** by **{userlink['steamName']}**\n"
+                                                       f"New time: **{fwogutils.format_time(newrec['time'])}** by **{newuser[1]['steamName']}**\n"
+                                                       f"Level: [{level[0]['name']} by {level[0]['fileAuthor']}](https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']})")
+                notifchannel = await bot.fetch_channel(1207401802769633310)
+                await notifchannel.send(f"<@{wrstuserinfo['discid']}>", embed=wrstembed)
+                fwogutils.loc_removeuserwr(content['Data']['PreviousUserId'], content['Data']['LevelHash'])
+    if str(content['Data']['NewUserId']) in fwogutils.getWRSTusers() and content['Data']['NewUserId'] != content['Data']['PreviousUserId'] and content['Type'] == "wr":
+        fwogutils.loc_adduserwr(content['Data']['NewUserId'], content['Data']['LevelHash'])
 
 
 bot.run(privaat.token)

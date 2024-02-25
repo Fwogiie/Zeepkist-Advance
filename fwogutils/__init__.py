@@ -194,10 +194,14 @@ def setlinkedusersetting(setting: str, value, user):
         if setting == 'RD' and value is True:
             data["usercache"]["RDusers"].append(str(user))
             data["linked"][str(user)]["userdata"]["position"] = jsonapi_get_playerrank(data["linked"][str(user)]["id"])
+        if setting == 'WRST' and value is True:
+            data["usercache"]["WRSTusers"][str(data["linked"][str(user)]["id"])] = {"discid": str(user)}
         if setting == 'RU' and value is False:
             data["usercache"]["RUusers"].remove(str(user))
         if setting == 'RD' and value is False:
             data["usercache"]["RDusers"].remove(str(user))
+        if setting == 'WRST' and value is False:
+            data["usercache"]["WRSTusers"].pop(str(data["linked"][str(user)]["id"]))
     with open("users.json", 'w') as ft:
         json.dump(data, ft, indent=2)
 
@@ -223,6 +227,11 @@ def getRDusers():
     with open("users.json", 'r') as f:
         data = json.loads(f.read())
         return data["usercache"]["RDusers"]
+
+def getWRSTusers():
+    with open("users.json", 'r') as f:
+        data = json.loads(f.read())
+        return data["usercache"]["WRSTusers"]
 
 def getlinkeduserdata(user):
     with open("users.json", 'r') as f:
@@ -297,5 +306,59 @@ def zworp_getlevelsbyhashlist(levels: str):
             loopy = False
     return zeeplist
 
+def zworp_getlevel(hash: str):
+    req = requests.get(f"https://api.zworpshop.com/levels/hash/{hash}?IncludeReplaced=false&IncludeDeleted=false")
+    if req.status_code != 200:
+        return False
+    else:
+        return json.loads(req.text)
+
 def jsonapi_get_playerrank(user: int):
     return json.loads(requests.get(f"https://jsonapi.zeepkist-gtr.com/users/{user}/playerPoints").text)['data'][0]['attributes']['rank']
+
+def gtr_getalluserwrs(gtruserid: int):
+    amount = json.loads(requests.get(f"https://api.zeepkist-gtr.com/wrs/user/{gtruserid}?Limit=0&Offset=0").text)["totalAmount"]
+    pages = int(amount / 100)
+    leftovers = int(str(amount)[1:69])
+    wrs = []
+    if pages > 0:
+        for x in range(pages):
+            wrpage = json.loads(requests.get(f"https://api.zeepkist-gtr.com/wrs/user/{gtruserid}?Limit={x+1}00&Offset={x}00").text)
+            for wr in wrpage['items']:
+                wrs.append(wr['level'])
+    wrpage = json.loads(requests.get(f"https://api.zeepkist-gtr.com/wrs/user/{gtruserid}?Limit={leftovers}&Offset={pages}00").text)
+    for wr in wrpage['items']:
+        wrs.append(wr['level'])
+    return wrs
+
+def loc_setuserwrs(gtruserid: int, wrs: list):
+    with open("userwrs.json", 'r') as f:
+        data = json.loads(f.read())
+        data[str(gtruserid)] = wrs
+    with open("userwrs.json", 'w') as ft:
+        json.dump(data, ft, indent=2)
+
+def loc_getuserwrs(gtruserid: int):
+    with open("userwrs.json", 'r') as f:
+        data = json.loads(f.read())
+        return data[str(gtruserid)]
+
+def loc_removeuserwr(gtruserid: int, level: str):
+    """
+    scary!
+    """
+    with open("userwrs.json", 'r') as f:
+        data = json.loads(f.read())
+        data[str(gtruserid)].remove(level)
+    with open("userwrs.json", 'w') as ft:
+        json.dump(data, ft, indent=2)
+
+def loc_adduserwr(gtruserid: int, level: str):
+    """
+    scary!
+    """
+    with open("userwrs.json", 'r') as f:
+        data = json.loads(f.read())
+        data[str(gtruserid)].append(level)
+    with open("userwrs.json", 'w') as ft:
+        json.dump(data, ft, indent=2)
