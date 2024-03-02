@@ -1270,7 +1270,7 @@ async def rankingsfunc(gtrrankings):
     embed = discord.Embed(title="GTR Rankings", description=stringedrankings, color=nextcord.Color.blue(),
                           timestamp=datetime.datetime.now())
     embed.set_footer(text="last updated")
-    await leaderboard.edit(embed=embed, view=fwogutils.views.LButtons())
+    await leaderboard.edit(embed=embed, view=fwogutils.views.LButtons(gtrrankings))
     ruusies = fwogutils.getRUusers()
     linkeds = fwogutils.get_linked_users()
     for x in ruusies:

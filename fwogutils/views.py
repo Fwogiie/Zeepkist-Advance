@@ -30,13 +30,14 @@ import random
 from nextcord.components import Button
 
 
-gtrrankings = fwogutils.getgtruserrankings(limit=100, offset=0)
 class LButtons(nextcord.ui.View):
-    def __init__(self):
+    def __init__(self, gtrrankings):
         super().__init__(timeout=None)
+        self.gtrrankings = gtrrankings
 
     @nextcord.ui.button(label="Show more", style=nextcord.ButtonStyle.grey)
     async def show_more(self, button: nextcord.Button, ctx: nextcord.Interaction):
+        gtrrankings = self.gtrrankings
         log(f"reached by {ctx.user} ({ctx.user.id})")
         stringedrankings = ""
         stringranks = ""
