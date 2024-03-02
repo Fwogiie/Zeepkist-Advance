@@ -1365,29 +1365,24 @@ async def listen_forever():
 
 async def wrcallback(websocket, message=None):
     content = json.loads(await websocket.recv())
-    print(content)
     if str(content['Data']['PreviousUserId']) in fwogutils.getWRSTusers() and content['Data']['PreviousUserId'] != content['Data']['NewUserId'] and content['Type'] == "wr":
-        if content['Data']['LevelHash'] in fwogutils.loc_getuserwrs(content['Data']['PreviousUserId']):
-            log("WR GOT FUCKING STOLEN WOOOO")
-            wrstuserinfo = fwogutils.getWRSTusers()[str(content['Data']['PreviousUserId'])]
-            userlink = fwogutils.get_linked_users()[str(wrstuserinfo['discid'])]
-            level = fwogutils.zworp_getlevel(content['Data']['LevelHash'])
-            if level is not False:
-                log("level was not false")
-                wrstembed = discord.Embed(title="One of your World Records has been taken!", description=f"Your World Record on **{level[0]['name']}** by **{level[0]['fileAuthor']}** was taken!",
-                                          color=nextcord.Color.blue(), url=f"https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']}")
-                wrstembed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
-                prevrec = fwogutils.getgtrrecord(content['Data']['PreviousRecordId'])
-                newrec = fwogutils.getgtrrecord(content['Data']['NewRecordId'])
-                newuser = fwogutils.getgtruser(content['Data']['NewUserId'])
-                wrstembed.add_field(name="Info", value=f"Previous time: **{fwogutils.format_time(prevrec['time'])}** by **{userlink['steamName']}**\n"
-                                                       f"New time: **{fwogutils.format_time(newrec['time'])}** by **{newuser[1]['steamName']}**\n"
-                                                       f"Level: [{level[0]['name']} by {level[0]['fileAuthor']}](https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']})")
-                notifchannel = await bot.fetch_channel(1207401802769633310)
-                await notifchannel.send(f"<@{wrstuserinfo['discid']}>", embed=wrstembed)
-                fwogutils.loc_removeuserwr(content['Data']['PreviousUserId'], content['Data']['LevelHash'])
-    if str(content['Data']['NewUserId']) in fwogutils.getWRSTusers() and content['Data']['NewUserId'] != content['Data']['PreviousUserId'] and content['Type'] == "wr":
-        fwogutils.loc_adduserwr(content['Data']['NewUserId'], content['Data']['LevelHash'])
-
+        log("WR GOT FUCKING STOLEN WOOOO")
+        wrstuserinfo = fwogutils.getWRSTusers()[str(content['Data']['PreviousUserId'])]
+        userlink = fwogutils.get_linked_users()[str(wrstuserinfo['discid'])]
+        level = fwogutils.zworp_getlevel(content['Data']['LevelHash'])
+        if level is not False:
+            log("level was not false")
+            wrstembed = discord.Embed(title="One of your World Records has been taken!", description=f"Your World Record on **{level[0]['name']}** by **{level[0]['fileAuthor']}** was taken!",
+                                      color=nextcord.Color.blue(), url=f"https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']}")
+            wrstembed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
+            prevrec = fwogutils.getgtrrecord(content['Data']['PreviousRecordId'])
+            newrec = fwogutils.getgtrrecord(content['Data']['NewRecordId'])
+            newuser = fwogutils.getgtruser(content['Data']['NewUserId'])
+            wrstembed.add_field(name="Info", value=f"Previous time: **{fwogutils.format_time(prevrec['time'])}** by **{userlink['steamName']}**\n"
+                                                   f"New time: **{fwogutils.format_time(newrec['time'])}** by **{newuser[1]['steamName']}**\n"
+                                                   f"Level: [{level[0]['name']} by {level[0]['fileAuthor']}](https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']})")
+            notifchannel = await bot.fetch_channel(1207401802769633310)
+            await notifchannel.send(f"<@{wrstuserinfo['discid']}>", embed=wrstembed)
+            fwogutils.loc_removeuserwr(content['Data']['PreviousUserId'], content['Data']['LevelHash'])
 
 bot.run(privaat.token)
