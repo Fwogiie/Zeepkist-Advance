@@ -9,11 +9,11 @@
         "notifs": {
           "RU": true,
           "RD": true,
-          "WRST": false
+          "WRST": true
         }
       },
       "userdata": {
-        "position": 9
+        "position": 13
       }
     },
     "166738481874206720": {
@@ -25,11 +25,11 @@
         "notifs": {
           "RU": true,
           "RD": true,
-          "WRST": false
+          "WRST": true
         }
       },
       "userdata": {
-        "position": 29
+        "position": 19
       }
     },
     "257321046611329026": {
@@ -45,7 +45,7 @@
         }
       },
       "userdata": {
-        "position": 41
+        "position": 27
       }
     },
     "240942014865080320": {
@@ -89,11 +89,11 @@
         "notifs": {
           "RU": true,
           "RD": true,
-          "WRST": false
+          "WRST": true
         }
       },
       "userdata": {
-        "position": 57
+        "position": 101
       }
     },
     "805114834140135435": {
@@ -125,7 +125,7 @@
         }
       },
       "userdata": {
-        "position": 4
+        "position": 5
       }
     },
     "393485108293795840": {
@@ -137,11 +137,11 @@
         "notifs": {
           "RU": true,
           "RD": true,
-          "WRST": false
+          "WRST": true
         }
       },
       "userdata": {
-        "position": 20
+        "position": 36
       }
     },
     "217779716289986560": {
@@ -153,7 +153,7 @@
         "notifs": {
           "RU": true,
           "RD": false,
-          "WRST": false
+          "WRST": true
         }
       },
       "userdata": {
@@ -167,13 +167,13 @@
       "discordId": "340672064174424065",
       "settings": {
         "notifs": {
-          "RU": false,
+          "RU": true,
           "RD": false,
           "WRST": false
         }
       },
       "userdata": {
-        "position": 6969
+        "position": 258
       }
     },
     "423163427528245259": {
@@ -199,9 +199,25 @@
       "discordId": "826460112520216586",
       "settings": {
         "notifs": {
+          "RU": true,
+          "RD": true,
+          "WRST": true
+        }
+      },
+      "userdata": {
+        "position": 96
+      }
+    },
+    "702633794024374403": {
+      "id": 93,
+      "steamId": "76561199024808939",
+      "steamName": "Kernkob",
+      "discordId": "702633794024374403",
+      "settings": {
+        "notifs": {
           "RU": false,
           "RD": false,
-          "WRST": false
+          "WRST": true
         }
       },
       "userdata": {
@@ -217,7 +233,9 @@
       "393485108293795840",
       "573169135295660050",
       "217779716289986560",
-      "236839534082392065"
+      "236839534082392065",
+      "340672064174424065",
+      "826460112520216586"
     ],
     "RDusers": [
       "785037540155195424",
@@ -225,8 +243,31 @@
       "166738481874206720",
       "393485108293795840",
       "573169135295660050",
-      "236839534082392065"
+      "236839534082392065",
+      "826460112520216586"
     ],
-    "WRSTusers": []
+    "WRSTusers": {
+      "3": {
+        "discid": "785037540155195424"
+      },
+      "248": {
+        "discid": "826460112520216586"
+      },
+      "16": {
+        "discid": "393485108293795840"
+      },
+      "1": {
+        "discid": "217779716289986560"
+      },
+      "489": {
+        "discid": "166738481874206720"
+      },
+      "93": {
+        "discid": "702633794024374403"
+      },
+      "671": {
+        "discid": "236839534082392065"
+      }
+    }
   }
 }
