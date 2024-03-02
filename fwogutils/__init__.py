@@ -359,3 +359,51 @@ def loc_adduserwr(gtruserid: int, level: str):
         data[str(gtruserid)].append(level)
     with open("userwrs.json", 'w') as ft:
         json.dump(data, ft, indent=2)
+
+def jsonfromreq(req):
+    return json.loads(req.text)
+
+class GTR:
+    class Levels:
+        class Hot:
+            def __init__(self):
+                self.req = requests.get("https://api.zeepkist-gtr.com/levels/hot")
+            @property
+            def levels(self):
+                """{"level": "string", "recordsCount": 0}"""
+                return jsonfromreq(self.req)["levels"]
+            @property
+            def status_code(self):
+                return self.req.status_code
+
+class Zworp:
+    class Levels:
+        class Hashes:
+            def __init__(self, hashlist):
+                self.req = requests.get(f"https://api.zworpshop.com/levels/hashes/{hashlist}?IncludeReplaced=false&IncludeDeleted=false")
+            @property
+            def levels(self):
+                """[{
+                    "id": 0,
+                    "replacedBy": 0,
+                    "deleted": true,
+                    "workshopId": "string",
+                    "authorId": "string",
+                    "name": "string",
+                    "createdAt": "2024-03-02T19:44:54.306Z",
+                    "updatedAt": "2024-03-02T19:44:54.306Z",
+                    "imageUrl": "string",
+                    "fileUrl": "string",
+                    "fileUid": "string",
+                    "fileHash": "string",
+                    "fileAuthor": "string",
+                    "valid": true,
+                    "validation": 0,
+                    "gold": 0,
+                    "silver": 0,
+                    "bronze": 0
+                  }]"""
+                return jsonfromreq(self.req)
+            @property
+            def status_code(self):
+                return self.req.status_code

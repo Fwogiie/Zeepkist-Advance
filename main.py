@@ -32,6 +32,8 @@ from nextcord.components import Button
 import asyncio
 import websockets
 from itertools import count
+from fwogutils import GTR as GTR
+from fwogutils import Zworp as Zworp
 
 bot.load_extension("onami")
 
@@ -1384,5 +1386,43 @@ async def wrcallback(websocket, message=None):
             notifchannel = await bot.fetch_channel(1207401802769633310)
             await notifchannel.send(f"<@{wrstuserinfo['discid']}>", embed=wrstembed)
             fwogutils.loc_removeuserwr(content['Data']['PreviousUserId'], content['Data']['LevelHash'])
+
+@get.subcommand(name="hot")
+async def gethot(ctx):
+    pass
+
+@gethot.subcommand(name="levels", description="Get a playlist of the levels that have been played the most in the past 24 hours!")
+async def gethotlvls(ctx, playlistname: str=nextcord.SlashOption(description="The name for the playlist", required=True)):
+    ctx = await ctx.send("processing!")
+    hot = GTR.Levels.Hot()
+    if hot.status_code != 200:
+        await ctx.send(f"Error occured.\n`{hot.status_code}`")
+    else:
+        hotlvls = hot.levels
+        hashlist = []
+        for x in hotlvls:
+            hashlist.append(x['level'])
+        sepplevels = fwogutils.converturlsepperations(hashlist)
+        levelhashes = fwogutils.zworp_getlevelsbyhashlist(sepplevels)
+        levels = []
+        for x in hashlist:
+            try:
+                levels.append(levelhashes[x])
+            except KeyError as notfound:
+                log(f"did not find level: {notfound}")
+        fwogutils.dumppl({
+                "name": playlistname,
+                "amountOfLevels": len(levels),
+                "roundLength": 480.0,
+                "shufflePlaylist": False,
+                "UID": [],
+                "levels": levels
+            })
+        fwogutils.renamepl(playlistname)
+        await ctx.edit(f"Your playlist has been generated!",
+                       file=nextcord.File(f"{playlistname}.zeeplist"))
+        fwogutils.undorename(playlistname)
+
+
 
 bot.run(privaat.token)
