@@ -504,7 +504,7 @@ async def on_ready():
         log(f"leaderboards cache succeeded.")
         log("updating the live leaderboards cause of restart.")
         leaderboard = await bot.get_channel(1203645881279184948).fetch_message(leaderboards['rankings'])
-        #await rankingsfunc(fwogutils.getgtruserrankings(limit=100, offset=0))
+        await rankingsfunc(fwogutils.getgtruserrankings(limit=100, offset=0))
         log("Process done to the GTR rankings leaderboard.")
         await listen_forever()
 
