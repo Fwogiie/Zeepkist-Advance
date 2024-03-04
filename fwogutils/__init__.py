@@ -1,5 +1,8 @@
 import datetime
+import time
+
 import nextcord
+import tzlocal
 from discord.ext import commands, tasks
 import inspect
 import pytz
@@ -407,3 +410,8 @@ class Zworp:
             @property
             def status_code(self):
                 return self.req.status_code
+
+def jsonapi_getrecord(id: int):
+    return json.loads(requests.get(f"https://jsonapi.zeepkist-gtr.com/records/{id}").text)['data']['attributes']
+
+

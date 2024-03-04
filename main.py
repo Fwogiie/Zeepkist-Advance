@@ -877,7 +877,7 @@ async def comb(ctx):
     pass
 
 
-@comb.subcommand(name="playlist")
+@comb.subcommand(name="playlists", description="Combine two playlists together!")
 async def combpl(ctx, pla: nextcord.Attachment = nextcord.SlashOption(name="playlist", description="The Playlist you want to combine", required=True),
                  plb: nextcord.Attachment = nextcord.SlashOption(name="to_playlist", description="The Playlist you want to combine to", required=True),
                  name: str = nextcord.SlashOption(description="The name you want the combined playlist to be named", required=True)):
@@ -1368,19 +1368,23 @@ async def listen_forever():
 async def wrcallback(websocket, message=None):
     content = json.loads(await websocket.recv())
     if str(content['Data']['PreviousUserId']) in fwogutils.getWRSTusers() and content['Data']['PreviousUserId'] != content['Data']['NewUserId'] and content['Type'] == "wr":
-        log("WR GOT FUCKING STOLEN WOOOO")
+        log("WR is stolen!!")
         wrstuserinfo = fwogutils.getWRSTusers()[str(content['Data']['PreviousUserId'])]
         userlink = fwogutils.get_linked_users()[str(wrstuserinfo['discid'])]
         level = fwogutils.zworp_getlevel(content['Data']['LevelHash'])
         if level is not False:
             log("level was not false")
+            prevrec = fwogutils.jsonapi_getrecord(content['Data']['PreviousRecordId'])
+            recordcreated = datetime.datetime.fromisoformat(prevrec["dateCreated"])
+            timenow = datetime.datetime.now()
+            if timenow.date() == recordcreated.date() and int(recordcreated.timestamp())+600 > int(timenow.timestamp()):
+                return
+            newrec = fwogutils.getgtrrecord(content['Data']['NewRecordId'])
+            newuser = fwogutils.getgtruser(content['Data']['NewUserId'])
             wrstembed = discord.Embed(title="One of your World Records has been taken!", description=f"Your World Record on **{level[0]['name']}** by **{level[0]['fileAuthor']}** was taken!",
                                       color=nextcord.Color.blue(), url=f"https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']}")
             wrstembed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
-            prevrec = fwogutils.getgtrrecord(content['Data']['PreviousRecordId'])
-            newrec = fwogutils.getgtrrecord(content['Data']['NewRecordId'])
-            newuser = fwogutils.getgtruser(content['Data']['NewUserId'])
-            wrstembed.add_field(name="Info", value=f"Previous time: **{fwogutils.format_time(prevrec['time'])}** by **{userlink['steamName']}**\n"
+            wrstembed.add_field(name="Info", value=f"Previous time: **{fwogutils.format_time(prevrec['time'])}** by **{userlink['steamName']}** set <t:{recordcreated}:R>\n"
                                                    f"New time: **{fwogutils.format_time(newrec['time'])}** by **{newuser[1]['steamName']}**\n"
                                                    f"Level: [{level[0]['name']} by {level[0]['fileAuthor']}](https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']})")
             notifchannel = await bot.fetch_channel(1207401802769633310)
