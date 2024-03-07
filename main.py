@@ -1375,7 +1375,7 @@ async def wrcallback(websocket, message=None):
         if level is not False:
             log("level was not false")
             prevrec = fwogutils.jsonapi_getrecord(content['Data']['PreviousRecordId'])
-            recordcreated = datetime.datetime.fromisoformat(prevrec["dateCreated"])
+            recordcreated = datetime.datetime.strptime(prevrec["dateCreated"], '%Y-%m-%dT%H:%M:%S.%fZ')
             timenow = datetime.datetime.now()
             if timenow.date() == recordcreated.date() and int(recordcreated.timestamp())+600 > int(timenow.timestamp()):
                 return
