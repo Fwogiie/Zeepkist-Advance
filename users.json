@@ -137,7 +137,7 @@
         "notifs": {
           "RU": true,
           "RD": true,
-          "WRST": true
+          "WRST": false
         }
       },
       "userdata": {
@@ -173,7 +173,7 @@
         }
       },
       "userdata": {
-        "position": 258
+        "position": 249
       }
     },
     "423163427528245259": {
@@ -205,7 +205,7 @@
         }
       },
       "userdata": {
-        "position": 85
+        "position": 83
       }
     },
     "702633794024374403": {
@@ -233,11 +233,11 @@
         "notifs": {
           "RU": true,
           "RD": true,
-          "WRST": false
+          "WRST": true
         }
       },
       "userdata": {
-        "position": 44
+        "position": 42
       }
     },
     "259431561131327488": {
@@ -254,6 +254,38 @@
       },
       "userdata": {
         "position": 78
+      }
+    },
+    "298933342970052609": {
+      "id": 70,
+      "steamId": "76561198851912263",
+      "steamName": "Lexer",
+      "discordId": "298933342970052609",
+      "settings": {
+        "notifs": {
+          "RU": false,
+          "RD": false,
+          "WRST": true
+        }
+      },
+      "userdata": {
+        "position": 6969
+      }
+    },
+    "784982408906014750": {
+      "id": 99,
+      "steamId": "76561198052077385",
+      "steamName": "schmxrg",
+      "discordId": "784982408906014750",
+      "settings": {
+        "notifs": {
+          "RU": false,
+          "RD": false,
+          "WRST": true
+        }
+      },
+      "userdata": {
+        "position": 6969
       }
     }
   },
@@ -285,9 +317,6 @@
       "248": {
         "discid": "826460112520216586"
       },
-      "16": {
-        "discid": "393485108293795840"
-      },
       "1": {
         "discid": "217779716289986560"
       },
@@ -305,6 +334,15 @@
       },
       "600": {
         "discid": "259431561131327488"
+      },
+      "70": {
+        "discid": "298933342970052609"
+      },
+      "225": {
+        "discid": "764998418669633556"
+      },
+      "99": {
+        "discid": "784982408906014750"
       }
     }
   }
