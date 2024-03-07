@@ -41,7 +41,7 @@
         "notifs": {
           "RU": true,
           "RD": true,
-          "WRST": false
+          "WRST": true
         }
       },
       "userdata": {
@@ -137,11 +137,11 @@
         "notifs": {
           "RU": true,
           "RD": true,
-          "WRST": false
+          "WRST": true
         }
       },
       "userdata": {
-        "position": 35
+        "position": 30
       }
     },
     "217779716289986560": {
@@ -173,7 +173,7 @@
         }
       },
       "userdata": {
-        "position": 249
+        "position": 235
       }
     },
     "423163427528245259": {
@@ -205,7 +205,7 @@
         }
       },
       "userdata": {
-        "position": 83
+        "position": 80
       }
     },
     "702633794024374403": {
@@ -237,7 +237,7 @@
         }
       },
       "userdata": {
-        "position": 42
+        "position": 37
       }
     },
     "259431561131327488": {
@@ -343,6 +343,12 @@
       },
       "99": {
         "discid": "784982408906014750"
+      },
+      "16": {
+        "discid": "393485108293795840"
+      },
+      "84": {
+        "discid": "257321046611329026"
       }
     }
   }
