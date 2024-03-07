@@ -1389,7 +1389,6 @@ async def wrcallback(websocket, message=None):
                                                    f"Level: [{level[0]['name']} by {level[0]['fileAuthor']}](https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']})")
             notifchannel = await bot.fetch_channel(1207401802769633310)
             await notifchannel.send(f"<@{wrstuserinfo['discid']}>", embed=wrstembed)
-            fwogutils.loc_removeuserwr(content['Data']['PreviousUserId'], content['Data']['LevelHash'])
 
 @get.subcommand(name="hot")
 async def gethot(ctx):
