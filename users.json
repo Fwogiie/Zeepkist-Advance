@@ -96,22 +96,6 @@
         "position": 101
       }
     },
-    "805114834140135435": {
-      "id": 87,
-      "steamId": "76561199135775747",
-      "steamName": "Renergy",
-      "discordId": "805114834140135435",
-      "settings": {
-        "notifs": {
-          "RU": false,
-          "RD": false,
-          "WRST": false
-        },
-        "userdata": {
-          "position": 7
-        }
-      }
-    },
     "573169135295660050": {
       "id": 13,
       "steamId": "76561199027567424",
@@ -121,7 +105,7 @@
         "notifs": {
           "RU": true,
           "RD": true,
-          "WRST": false
+          "WRST": true
         }
       },
       "userdata": {
@@ -173,7 +157,7 @@
         }
       },
       "userdata": {
-        "position": 233
+        "position": 217
       }
     },
     "423163427528245259": {
@@ -237,7 +221,7 @@
         }
       },
       "userdata": {
-        "position": 37
+        "position": 38
       }
     },
     "259431561131327488": {
@@ -253,7 +237,7 @@
         }
       },
       "userdata": {
-        "position": 77
+        "position": 76
       }
     },
     "298933342970052609": {
@@ -349,6 +333,9 @@
       },
       "84": {
         "discid": "257321046611329026"
+      },
+      "13": {
+        "discid": "573169135295660050"
       }
     }
   }
