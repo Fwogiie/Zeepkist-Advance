@@ -504,11 +504,10 @@ async def on_ready():
         data = json.load(f)
         leaderboards = data["leaderboards"]
         log(f"leaderboards cache succeeded.")
-        log("updating the live leaderboards cause of restart.")
-        leaderboard = await bot.get_channel(1203645881279184948).fetch_message(leaderboards['rankings'])
+        log("updating the live leaderboards cause of start.")
         await rankingsfunc(fwogutils.getgtruserrankings(limit=100, offset=0))
         log("Process done to the GTR rankings leaderboard.")
-        await listen_forever()
+        await wrcallback()
 
 def updatesubchannels():
     global submissionschannels
@@ -1357,38 +1356,46 @@ async def notifme(ctx, to: str=nextcord.SlashOption(name="for", description="wil
         log(str(ewwor))
 
 async def listen_forever():
+    """Is now obsolete but kept in case needed!"""
     try:
         async with websockets.connect("wss://stream.zeepkist-gtr.com/ws") as websocket:
-            websocket.recv = await wrcallback(websocket, None)
+            websocket.recv = await wrcallback() # won't work to recent change
             await listen_forever()
     except Exception as ewwor:
         log(str(ewwor))
         await listen_forever()
 
-async def wrcallback(websocket, message=None):
-    content = json.loads(await websocket.recv())
-    if str(content['Data']['PreviousUserId']) in fwogutils.getWRSTusers() and content['Data']['PreviousUserId'] != content['Data']['NewUserId'] and content['Type'] == "wr":
-        log("WR is stolen!!")
-        wrstuserinfo = fwogutils.getWRSTusers()[str(content['Data']['PreviousUserId'])]
-        userlink = fwogutils.get_linked_users()[str(wrstuserinfo['discid'])]
-        level = fwogutils.zworp_getlevel(content['Data']['LevelHash'])
-        if level is not False:
-            log("level was not false")
-            prevrec = fwogutils.jsonapi_getrecord(content['Data']['PreviousRecordId'])
-            recordcreated = datetime.datetime.strptime(prevrec["dateCreated"], '%Y-%m-%dT%H:%M:%S.%fZ')
-            timenow = datetime.datetime.now()
-            if timenow.date() == recordcreated.date() and int(recordcreated.timestamp())+600 > int(timenow.timestamp()):
-                return
-            newrec = fwogutils.getgtrrecord(content['Data']['NewRecordId'])
-            newuser = fwogutils.getgtruser(content['Data']['NewUserId'])
-            wrstembed = discord.Embed(title="One of your World Records has been taken!", description=f"Your World Record on **{level[0]['name']}** by **{level[0]['fileAuthor']}** was taken!",
-                                      color=nextcord.Color.blue(), url=f"https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']}")
-            wrstembed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
-            wrstembed.add_field(name="Info", value=f"Previous time: **{fwogutils.format_time(prevrec['time'])}** by **{userlink['steamName']}** set <t:{int(recordcreated.timestamp())}:R>\n"
-                                                   f"New time: **{fwogutils.format_time(newrec['time'])}** by **{newuser[1]['steamName']}**\n"
-                                                   f"Level: [{level[0]['name']} by {level[0]['fileAuthor']}](https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']})")
-            notifchannel = await bot.fetch_channel(1207401802769633310)
-            await notifchannel.send(f"<@{wrstuserinfo['discid']}>", embed=wrstembed)
+async def wrcallback(message=None):
+    while True:
+        try:
+            print('connecting to gtr wss')
+            async with websockets.connect("wss://stream.zeepkist-gtr.com/ws") as ws:
+                while True:
+                    content = json.loads(await ws.recv())
+                    if str(content['Data']['PreviousUserId']) in fwogutils.getWRSTusers() and content['Data']['PreviousUserId'] != content['Data']['NewUserId'] and content['Type'] == "wr":
+                        log("WR is stolen!!")
+                        wrstuserinfo = fwogutils.getWRSTusers()[str(content['Data']['PreviousUserId'])]
+                        userlink = fwogutils.get_linked_users()[str(wrstuserinfo['discid'])]
+                        level = fwogutils.zworp_getlevel(content['Data']['LevelHash'])
+                        if level is not False:
+                            log("level was not false")
+                            prevrec = fwogutils.jsonapi_getrecord(content['Data']['PreviousRecordId'])
+                            recordcreated = datetime.datetime.strptime(prevrec["dateCreated"], '%Y-%m-%dT%H:%M:%S.%fZ')
+                            timenow = datetime.datetime.now()
+                            if timenow.date() == recordcreated.date() and int(recordcreated.timestamp())+600 > int(timenow.timestamp()):
+                                return
+                            newrec = fwogutils.getgtrrecord(content['Data']['NewRecordId'])
+                            newuser = fwogutils.getgtruser(content['Data']['NewUserId'])
+                            wrstembed = discord.Embed(title="One of your World Records has been taken!", description=f"Your World Record on **{level[0]['name']}** by **{level[0]['fileAuthor']}** was taken!",
+                                                      color=nextcord.Color.blue(), url=f"https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']}")
+                            wrstembed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
+                            wrstembed.add_field(name="Info", value=f"Previous time: **{fwogutils.format_time(prevrec['time'])}** by **{userlink['steamName']}** set <t:{int(recordcreated.timestamp())}:R>\n"
+                                                                   f"New time: **{fwogutils.format_time(newrec['time'])}** by **{newuser[1]['steamName']}**\n"
+                                                                   f"Level: [{level[0]['name']} by {level[0]['fileAuthor']}](https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']})")
+                            notifchannel = await bot.fetch_channel(1207401802769633310)
+                            await notifchannel.send(f"<@{wrstuserinfo['discid']}>", embed=wrstembed)
+        except Exception as ex:
+            print(ex)
 
 @get.subcommand(name="hot")
 async def gethot(ctx):
@@ -1426,6 +1433,29 @@ async def gethotlvls(ctx, playlistname: str=nextcord.SlashOption(description="Th
                        file=nextcord.File(f"{playlistname}.zeeplist"))
         fwogutils.undorename(playlistname)
 
+# test for learning, not wanted gone but not wanted either, so letting it as comment block in case of future use
+"""@bot.slash_command(name="gliderify_level")
+async def gliderifylvl(ctx, level: nextcord.Attachment, include_booster: bool, booster_speed: int, booster_force: int):
+    newlvl = ""
+    lvlread = bytearray(await level.read()).decode("utf-8")
+    oldlvl = lvlread.split("\r\n")
+    e = oldlvl[0].split('\ufeff')[1:][0]
+    newlvl += f"{e}\n"
+    for x in oldlvl[1:3]:
+        newlvl += f"{x}\n"
+    for x in oldlvl[3:9999999999999]:
+        if x:
+            splitted = x.split(",")
+            if int(splitted[0]) in [1, 1363]:
+                newlvl += (f"1985,{float(splitted[1])},{float(splitted[2])},{float(splitted[3])},{float(splitted[4])},{float(splitted[5])},{float(splitted[6])},{float(splitted[7])},{float(splitted[8])},{float(splitted[9])},"
+                           f"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0\n")
+                if include_booster is True:
+                    newlvl += (f"1545,{float(splitted[1])},{float(splitted[2])},{float(splitted[3])},{float(splitted[4])},{float(splitted[5])},{float(splitted[6])},{float(splitted[7])},{float(splitted[8])},{float(splitted[9])},"
+                               f"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,{booster_force},0,{booster_speed},0\n")
+            newlvl += f"{x}\n"
+    with open("level.zeeplevel", 'w') as fw:
+        fw.write(newlvl)
+    await ctx.send("It's been generated!", file=nextcord.File("level.zeeplevel"))"""
 
 
-bot.run(privaat.token)
+bot.run(privaat.ttoken)
