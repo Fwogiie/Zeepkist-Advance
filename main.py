@@ -1368,10 +1368,11 @@ async def listen_forever():
 async def wrcallback(message=None):
     while True:
         try:
-            print('connecting to gtr wss')
+            log('connecting to gtr wss')
             async with websockets.connect("wss://stream.zeepkist-gtr.com/ws") as ws:
                 while True:
                     content = json.loads(await ws.recv())
+                    log(content)
                     if str(content['Data']['PreviousUserId']) in fwogutils.getWRSTusers() and content['Data']['PreviousUserId'] != content['Data']['NewUserId'] and content['Type'] == "wr":
                         log("WR is stolen!!")
                         wrstuserinfo = fwogutils.getWRSTusers()[str(content['Data']['PreviousUserId'])]
@@ -1383,6 +1384,7 @@ async def wrcallback(message=None):
                             recordcreated = datetime.datetime.strptime(prevrec["dateCreated"], '%Y-%m-%dT%H:%M:%S.%fZ')
                             timenow = datetime.datetime.now()
                             if timenow.date() == recordcreated.date() and int(recordcreated.timestamp())+600 > int(timenow.timestamp()):
+                                log('wr beat before 10 mins, returning')
                                 return
                             newrec = fwogutils.getgtrrecord(content['Data']['NewRecordId'])
                             newuser = fwogutils.getgtruser(content['Data']['NewUserId'])
@@ -1396,6 +1398,7 @@ async def wrcallback(message=None):
                             await notifchannel.send(f"<@{wrstuserinfo['discid']}>", embed=wrstembed)
         except Exception as ex:
             print(ex)
+            log(str(ex))
 
 @get.subcommand(name="hot")
 async def gethot(ctx):
@@ -1458,4 +1461,4 @@ async def gliderifylvl(ctx, level: nextcord.Attachment, include_booster: bool, b
     await ctx.send("It's been generated!", file=nextcord.File("level.zeeplevel"))"""
 
 
-bot.run(privaat.ttoken)
+bot.run(privaat.token)
