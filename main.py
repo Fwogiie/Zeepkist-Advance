@@ -1460,5 +1460,5 @@ async def gliderifylvl(ctx, level: nextcord.Attachment, include_booster: bool, b
         fw.write(newlvl)
     await ctx.send("It's been generated!", file=nextcord.File("level.zeeplevel"))"""
 
-
+"e"
 bot.run(privaat.token)
