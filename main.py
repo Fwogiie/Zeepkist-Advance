@@ -1366,66 +1366,65 @@ async def listen_forever():
         await listen_forever()
 
 async def wrcallback(message=None):
-    count = 0
-    log("entering while 1 (also wrcallback called)")
+    """logging for debug, bug found but not sure, so letting them as comments in case <3"""
+    #log("entering while 1 (also wrcallback called)")
     while True:
-        log("while 1 went, going to try connecting")
+        #log("while 1 went, going to try connecting")
         try:
             log('connecting to gtr wss')
             async with websockets.connect("wss://stream.zeepkist-gtr.com/ws") as ws:
-                log("connected, entering while 2")
+                #log("connected, entering while 2")
                 while True:
-                    log(f"(while 2), waiting for content, debug count: {count}")
+                    #log(f"(while 2), waiting for content, debug count: {count}")
                     content = json.loads(await ws.recv())
-                    log(content)
-                    count += 1
-                    log("setting/fetching WRSTusers")
+                    #log(content)
+                    #log("setting/fetching WRSTusers")
                     wrstusers = fwogutils.getWRSTusers()
-                    log(f"WRSTusers returned: {wrstusers}")
+                    #log(f"WRSTusers returned: {wrstusers}")
                     if str(content['Data']['PreviousUserId']) in wrstusers and content['Data']['PreviousUserId'] != content['Data']['NewUserId'] and content['Type'] == "wr":
-                        log("WR is stolen!! (getting wrstuserinfo)")
+                        log("WR is stolen!!")
                         wrstuserinfo = wrstusers[str(content['Data']['PreviousUserId'])]
-                        log(f"wrstuserinfo returned: {wrstuserinfo}")
-                        log("getting userlink")
+                        #log(f"wrstuserinfo returned: {wrstuserinfo}")
+                        #log("getting userlink")
                         userlink = fwogutils.get_linked_users()[str(wrstuserinfo['discid'])]
-                        log(f"userlink returned: {userlink}")
-                        log("getting level")
+                        #log(f"userlink returned: {userlink}")
+                        #log("getting level")
                         level = fwogutils.zworp_getlevel(content['Data']['LevelHash'])
-                        log(f"level returned: {level}")
+                        #log(f"level returned: {level}")
                         if level is not False:
                             log("level was not false")
-                            log("getting prevrec")
+                            #log("getting prevrec")
                             prevrec = fwogutils.jsonapi_getrecord(content['Data']['PreviousRecordId'])
-                            log(f"prevrec returned: {prevrec}")
-                            log("getting recordcreated")
+                            #log(f"prevrec returned: {prevrec}")
+                            #log("getting recordcreated")
                             recordcreated = datetime.datetime.strptime(prevrec["dateCreated"], '%Y-%m-%dT%H:%M:%S.%fZ')
-                            log(f"recordcreated returned: {recordcreated}")
-                            log("getting timenow")
+                            #log(f"recordcreated returned: {recordcreated}")
+                            #log("getting timenow")
                             timenow = datetime.datetime.now()
                             log(f"timenow returned: {timenow}")
-                            log("going trough 10 mins check")
+                            #log("going trough 10 mins check")
                             if timenow.date() == recordcreated.date() and int(recordcreated.timestamp())+600 > int(timenow.timestamp()):
-                                log('wr beat before 10 mins, returning')
-                                return
-                            log("after if reached (getting newrec)")
+                                log('wr beat before 10 mins, breaking')
+                                break
+                            #log("after if reached (getting newrec)")
                             newrec = fwogutils.getgtrrecord(content['Data']['NewRecordId'])
-                            log(f"newrec returned: {newrec}")
-                            log("getting newuser")
+                            #log(f"newrec returned: {newrec}")
+                            #log("getting newuser")
                             newuser = fwogutils.getgtruser(content['Data']['NewUserId'])
-                            log(f"newuser returned: {newuser}")
-                            log("creating embed (should work fine if all logs above are valid)")
+                            #log(f"newuser returned: {newuser}")
+                            #log("creating embed (should work fine if all logs above are valid)")
                             wrstembed = discord.Embed(title="One of your World Records has been taken!", description=f"Your World Record on **{level[0]['name']}** by **{level[0]['fileAuthor']}** was taken!",
                                                       color=nextcord.Color.blue(), url=f"https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']}")
                             wrstembed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
                             wrstembed.add_field(name="Info", value=f"Previous time: **{fwogutils.format_time(prevrec['time'])}** by **{userlink['steamName']}** set <t:{int(recordcreated.timestamp())}:R>\n"
                                                                    f"New time: **{fwogutils.format_time(newrec['time'])}** by **{newuser[1]['steamName']}**\n"
                                                                    f"Level: [{level[0]['name']} by {level[0]['fileAuthor']}](https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']})")
-                            log("fetching notifchannel (1207401802769633310)")
+                            #log("fetching notifchannel (1207401802769633310)")
                             notifchannel = await bot.fetch_channel(1207401802769633310)
-                            log(f"notifchannel name: {notifchannel.name}")
-                            log("sending notif (should be fine if channel name fetched correctly in log above)")
+                            #log(f"notifchannel name: {notifchannel.name}")
+                            #log("sending notif (should be fine if channel name fetched correctly in log above)")
                             await notifchannel.send(f"<@{wrstuserinfo['discid']}>", embed=wrstembed)
-                            log("notif sent")
+                            #log("notif sent")
         except Exception as ex:
             print(ex)
             log(str(ex))
