@@ -175,13 +175,9 @@ def get_linked_users():
         data = json.loads(f.read())
         return data['linked']
 
-def all_24hours():
-    times = []
-    for x in range(24):
-        times.append(datetime.time(hour=x, minute=10))
-        times.append(datetime.time(hour=x, minute=25))
-        times.append(datetime.time(hour=x, minute=40))
-        times.append(datetime.time(hour=x, minute=55))
+def gtrlb_shedule():
+    times = [datetime.time(hour=0, minute=5), datetime.time(hour=6, minute=5), datetime.time(hour=12, minute=5),
+             datetime.time(hour=18, minute=5)]
     return times
 
 def setlinkedusersetting(setting: str, value, user):
@@ -332,14 +328,14 @@ def gtr_getalluserwrs(gtruserid: int):
     return wrs
 
 def loc_setuserwrs(gtruserid: int, wrs: list):
-    with open("userwrs.json", 'r') as f:
+    with open("gtrusercache.json", 'r') as f:
         data = json.loads(f.read())
         data[str(gtruserid)] = wrs
-    with open("userwrs.json", 'w') as ft:
+    with open("gtrusercache.json", 'w') as ft:
         json.dump(data, ft, indent=2)
 
 def loc_getuserwrs(gtruserid: int):
-    with open("userwrs.json", 'r') as f:
+    with open("gtrusercache.json", 'r') as f:
         data = json.loads(f.read())
         return data[str(gtruserid)]
 
@@ -347,20 +343,20 @@ def loc_removeuserwr(gtruserid: int, level: str):
     """
     scary!
     """
-    with open("userwrs.json", 'r') as f:
+    with open("gtrusercache.json", 'r') as f:
         data = json.loads(f.read())
         data[str(gtruserid)].remove(level)
-    with open("userwrs.json", 'w') as ft:
+    with open("gtrusercache.json", 'w') as ft:
         json.dump(data, ft, indent=2)
 
 def loc_adduserwr(gtruserid: int, level: str):
     """
     scary!
     """
-    with open("userwrs.json", 'r') as f:
+    with open("gtrusercache.json", 'r') as f:
         data = json.loads(f.read())
         data[str(gtruserid)].append(level)
-    with open("userwrs.json", 'w') as ft:
+    with open("gtrusercache.json", 'w') as ft:
         json.dump(data, ft, indent=2)
 
 def jsonfromreq(req):
@@ -414,4 +410,82 @@ class Zworp:
 def jsonapi_getrecord(id: int):
     return json.loads(requests.get(f"https://jsonapi.zeepkist-gtr.com/records/{id}").text)['data']['attributes']
 
+def jsonapi_getgtrpositions(frompos: int, amount: int):
+    return json.loads(requests.get(f"https://jsonapi.zeepkist-gtr.com/playerpoints?filter=greaterOrEqual(rank,%27{frompos}%27)&page[size]={amount}&fields[playerPoints]=rank,userId,worldRecords,points&sort=rank").text)
 
+def getgtruserv2(userid: int=None, steamid: int=None, discordid: int=None):
+    if userid != None:
+        req = requests.get(f"https://api.zeepkist-gtr.com/users/{userid}")
+        if req.status_code != 200:
+            return False
+        else:
+            return json.loads(req.text)
+    elif steamid != None:
+        req = requests.get(f"https://api.zeepkist-gtr.com/users/steam/{steamid}")
+        if req.status_code != 200:
+            return False
+        else:
+            return json.loads(req.text)
+    elif discordid != None:
+        req = requests.get(f"https://api.zeepkist-gtr.com/users/discord/{discordid}")
+        if req.status_code != 200:
+            return False
+        else:
+            return json.loads(req.text)
+
+def userhandler(userid: str=None, steamid: str=None, steamname: str=None, discordid: str=None):
+    with open("gtrusercache.json", 'r') as cacheread:
+        cache = json.loads(cacheread.read())
+    if userid != None:
+        if userid in cache['userId']:
+            return cache['userId'][str(userid)]
+        else:
+            user = getgtruserv2(userid=userid)
+            if user is False:
+                return False
+            else:
+                cache["userId"][str(user["id"])] = user
+                cache["steamId"][str(user["steamId"])] = user
+                cache["steamName"][str(user["steamName"])] = user
+                if user["discordId"] != None or discordid != "-1":
+                    cache["discordId"][str(user["discordId"])] = user
+                with open("gtrusercache.json", 'w') as cachewrite:
+                    json.dump(cache, cachewrite, indent=2)
+                return user
+    elif steamid != None:
+        if steamid in cache['steamId']:
+            return cache['steamId'][str(steamid)]
+        else:
+            user = getgtruserv2(userid=steamid)
+            if user is False:
+                return False
+            else:
+                cache["userId"][str(user["id"])] = user
+                cache["steamId"][str(user["steamId"])] = user
+                cache["steamName"][str(user["steamName"])] = user
+                if user["discordId"] != None or discordid != "-1":
+                    cache["discordId"][str(user["discordId"])] = user
+                with open("gtrusercache.json", 'w') as cachewrite:
+                    json.dump(cache, cachewrite, indent=2)
+                return user
+    elif steamname != None:
+        if steamname in cache['steamName']:
+            return cache['steamName'][str(steamname)]
+        else:
+            return False
+    elif discordid != None:
+        if discordid in cache['discordId']:
+            return cache['discordId'][str(discordid)]
+        else:
+            user = getgtruserv2(userid=discordid)
+            if user is False:
+                return False
+            else:
+                cache["userId"][str(user["id"])] = user
+                cache["steamId"][str(user["steamId"])] = user
+                cache["steamName"][str(user["steamName"])] = user
+                if user["discordId"] != None or discordid != "-1":
+                    cache["discordId"][str(user["discordId"])] = user
+                with open("gtrusercache.json", 'w') as cachewrite:
+                    json.dump(cache, cachewrite, indent=2)
+                return user
