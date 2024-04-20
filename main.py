@@ -42,7 +42,7 @@ lvlsamount = 0
 gitgud = bool
 
 
-async def fetch(channelid: int, amount: int, oldest_first: bool, fetched_react: int, messageid: int=0):
+async def fetch(channelid: int, amount: int, oldest_first: bool, fetched_react: int, messageid: int = 0):
     global ids, lvlsamount, gitgud
     log(f"reached with channelid: {channelid}, amount: {amount}, oldest_first: {oldest_first}, fetched_react: {fetched_react}, messageid: {messageid}")
     gitgud = False
@@ -74,39 +74,57 @@ async def fetch(channelid: int, amount: int, oldest_first: bool, fetched_react: 
                         ids.append(2973690373)
     await status(f"\nFetched {lvlsamount} levels.\n")
 
+
 cont = nextcord.InteractionMessage
 statuslog = ""
 
 
-async def status(status: str, reset: bool=False):
+async def status(status: str, reset: bool = False):
     global cont, statuslog
     log(f"reached with status: {status}, reset: {reset}")
     statuslog += f"{status}\n"
     try:
         if reset is False:
-            await cont.edit(content=f"Creating playlist. please wait. this might take a hot minute depending on the amount of levels. \n \n Status log: ```{statuslog}```")
+            await cont.edit(
+                content=f"Creating playlist. please wait. this might take a hot minute depending on the amount of levels. \n \n Status log: ```{statuslog}```")
         else:
             statuslog = "Log has been Reset.\n\n"
-            await cont.edit(content=f"Creating playlist. please wait. this might take a hot minute depending on the amount of levels. \n \n Status log: ```{statuslog}```")
+            await cont.edit(
+                content=f"Creating playlist. please wait. this might take a hot minute depending on the amount of levels. \n \n Status log: ```{statuslog}```")
     except HTTPException:
         statuslog = "Cleared log Because of character limit.\n\n"
-        await cont.edit(content=f"Creating playlist. please wait. this might take a hot minute depending on the amount of levels. \n \n Status log: ```{statuslog}```")
+        await cont.edit(
+            content=f"Creating playlist. please wait. this might take a hot minute depending on the amount of levels. \n \n Status log: ```{statuslog}```")
+
 
 levelnames = []
 lvluids = []
 unfound = 0
 
 
-@bot.slash_command(name="create_playlist", description="Create a playlist from a discord level submissions channel! (works for zeepkist only!)")
+@bot.slash_command(name="create_playlist",
+                   description="Create a playlist from a discord level submissions channel! (works for zeepkist only!)")
 async def bigstuff(ctx,
-                   channel: nextcord.TextChannel=nextcord.SlashOption(description="The channel to subtract the levels from", required=True),
-                   amount_of_messages: int=nextcord.SlashOption(description="The amount of levels to subtract", required=True),
-                   playlistname: str=nextcord.SlashOption(description="The name of the playlist that gets sent once the playlist is done!", required=True),
-                   oldest_first: bool=nextcord.SlashOption(description="When True (wich it is defaulted to) the oldest level fetched will be first in the playlist!", required=False, default=True),
-                   react_on_fetched: int=nextcord.SlashOption(description="Choose how the bot reacts with '✅' (useful to keep track of already played levels)", required=False,
-                                                              choices={"React to every single fetched message.": 1, "React to only the level submissions. (Default)": 2, "React to nothing.": 3}, default=2),
-                   private: bool = nextcord.SlashOption(description="Sends the playlist in a type of message that only you can see.", required=False, default=False),
-                   thread: nextcord.Thread=nextcord.SlashOption(description="If you want to fetch levels from a thread.", required=False, default=None)):
+                   channel: nextcord.TextChannel = nextcord.SlashOption(
+                       description="The channel to subtract the levels from", required=True),
+                   amount_of_messages: int = nextcord.SlashOption(description="The amount of levels to subtract",
+                                                                  required=True),
+                   playlistname: str = nextcord.SlashOption(
+                       description="The name of the playlist that gets sent once the playlist is done!", required=True),
+                   oldest_first: bool = nextcord.SlashOption(
+                       description="When True (wich it is defaulted to) the oldest level fetched will be first in the playlist!",
+                       required=False, default=True),
+                   react_on_fetched: int = nextcord.SlashOption(
+                       description="Choose how the bot reacts with '✅' (useful to keep track of already played levels)",
+                       required=False,
+                       choices={"React to every single fetched message.": 1,
+                                "React to only the level submissions. (Default)": 2, "React to nothing.": 3},
+                       default=2),
+                   private: bool = nextcord.SlashOption(
+                       description="Sends the playlist in a type of message that only you can see.", required=False,
+                       default=False),
+                   thread: nextcord.Thread = nextcord.SlashOption(
+                       description="If you want to fetch levels from a thread.", required=False, default=None)):
     global ids, lvlsamount, cont, lvlnames, statuslog, unfound
     log(f"reached by {ctx.user} with: channel: {channel}, amount_of_messages: {amount_of_messages},"
         f" playlistname: {playlistname}, oldest_first: {oldest_first}, react_on_fetched: {react_on_fetched},"
@@ -118,9 +136,11 @@ async def bigstuff(ctx,
     ids = []
     cont = await ctx.send("Waiting for status.", ephemeral=private)
     if thread != None:
-        await fetch(channelid=thread.id, amount=amount_of_messages, oldest_first=oldest_first, fetched_react=react_on_fetched)
+        await fetch(channelid=thread.id, amount=amount_of_messages, oldest_first=oldest_first,
+                    fetched_react=react_on_fetched)
     else:
-        await fetch(channelid=channel.id, amount=amount_of_messages, oldest_first=oldest_first, fetched_react=react_on_fetched)
+        await fetch(channelid=channel.id, amount=amount_of_messages, oldest_first=oldest_first,
+                    fetched_react=react_on_fetched)
     print(ids)
     await create_playlist(playlistname, lvlsamount)
     await status("Fetching all required info and Adding levels to playlist. . .")
@@ -135,8 +155,10 @@ async def bigstuff(ctx,
             await add_level(lvl)
     os.rename("playlist.zeeplist", f"{playlistname}.zeeplist")
     await cont.edit("The playlist has been generated."
-                   " To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
-                   " to easily access this directory: (for windows only) press Win+R and paste the directory in the text box.", file=nextcord.File(f'{playlistname}.zeeplist'))
+                    "To import the playlist into the host controls simply drag the file below into this specific "
+                    r"directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
+                    " to easily access this directory: (for windows only) press Win+R and paste the directory in the text box.",
+                    file=nextcord.File(f'{playlistname}.zeeplist'))
     os.rename(f"{playlistname}.zeeplist", "playlist.zeeplist")
     if unfound > 0:
         await ctx.send(f"Failed to find {unfound} levels.")
@@ -146,15 +168,15 @@ async def create_playlist(name: str, amountoflvls: int):
     log(f"name: {name}, amountoflvls: {amountoflvls}")
     await status(f"Creating playlist {name} for {amountoflvls} levels. . .")
     playlist = {
-    "name": name,
-    "amountOfLevels": amountoflvls,
-    "roundLength": 480.0,
-    "shufflePlaylist": False,
-    "UID": [],
-    "levels": []
-}
+        "name": name,
+        "amountOfLevels": amountoflvls,
+        "roundLength": 480.0,
+        "shufflePlaylist": False,
+        "UID": [],
+        "levels": []
+    }
 
-# Save the playlist as JSON in a file
+    # Save the playlist as JSON in a file
     with open("playlist.zeeplist", "w") as file:
         json.dump(playlist, file, indent=2)
 
@@ -199,7 +221,7 @@ async def on_command_error(ctx, error):
 
 @bot.is_owner
 @bot.command(name="log")
-async def ownlog(ctx, type: str, *, text: str=None):
+async def ownlog(ctx, type: str, *, text: str = None):
     try:
         if type == "send" and text is None:
             await ctx.reply("yes ma'am", file=nextcord.File("log.txt"))
@@ -244,6 +266,7 @@ async def debug(ctx, type: str, value: str):
     else:
         await ctx.send("No such type found.")
 
+
 cmdmsg = int
 
 
@@ -257,6 +280,7 @@ async def msgcmd(ctx, msg):
     modal = Crtpl(guildid=ctx.guild.id)
     cmdmsg = msg.id
     await ctx.response.send_modal(modal)
+
 
 makekoc = bool
 
@@ -303,7 +327,7 @@ class Kocfake(nextcord.ui.Select):
                 await add_level(lvl)
         os.rename("playlist.zeeplist", f"{plname}.zeeplist")
         await cont.edit("The playlist has been generated."
-                        " To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
+                        r" To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
                         " to easily access this directory: (for windows only) press Win+R and paste the directory in the text box.",
                         file=nextcord.File(f'{plname}.zeeplist'))
         os.rename(f"{plname}.zeeplist", "playlist.zeeplist")
@@ -359,7 +383,7 @@ class Mn(nextcord.ui.Modal):
                     tooold += 1
         os.rename("playlist.zeeplist", f"{plname}.zeeplist")
         await cont.edit("The playlist has been generated."
-                        " To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
+                        r" To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
                         " to easily access this directory: (for windows only) press Win+R and paste the directory in the text box.",
                         file=nextcord.File(f'{plname}.zeeplist'))
         os.rename(f"{plname}.zeeplist", "playlist.zeeplist")
@@ -371,6 +395,7 @@ class Mn(nextcord.ui.Modal):
 
 tooold = 0
 makemontly = bool
+
 
 class Monthlyfake(nextcord.ui.Select):
     def __init__(self):
@@ -415,7 +440,7 @@ class Monthlyfake(nextcord.ui.Select):
                 await add_level(lvl)
         os.rename("playlist.zeeplist", f"{plname}.zeeplist")
         await cont.edit("The playlist has been generated."
-                        " To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
+                        r" To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
                         " to easily access this directory: (for windows only) press Win+R and paste the directory in the text box.",
                         file=nextcord.File(f'{plname}.zeeplist'))
         os.rename(f"{plname}.zeeplist", "playlist.zeeplist")
@@ -428,7 +453,10 @@ class Monthly(nextcord.ui.View):
         super().__init__(timeout=60)
         self.add_item(Monthlyfake())
 
+
 plname = ""
+
+
 class Crtpl(nextcord.ui.Modal):
     def __init__(self, guildid: int):
         super().__init__("playlist creation")  # Modal title
@@ -453,7 +481,9 @@ class Crtpl(nextcord.ui.Modal):
                 view=Koc(), ephemeral=True)
             await Koc().wait()
         elif ctx.guild.id == 966694897799286784:
-            await ctx.send("This server is marked as R0nanC's Content server, do you wish to make this playlist compatible for the monthly playlist?", view=Monthly(), ephemeral=True)
+            await ctx.send(
+                "This server is marked as R0nanC's Content server, do you wish to make this playlist compatible for the monthly playlist?",
+                view=Monthly(), ephemeral=True)
             await Monthly().wait()
         cont = ctx
         lvlsamount = 0
@@ -475,7 +505,7 @@ class Crtpl(nextcord.ui.Modal):
                 await add_level(lvl)
         os.rename("playlist.zeeplist", f"{self.name.value}.zeeplist")
         await cont.edit("The playlist has been generated."
-                        " To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
+                        r" To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
                         " to easily access this directory: (for windows only) press Win+R and paste the directory in the text box.",
                         file=nextcord.File(f'{self.name.value}.zeeplist'))
         os.rename(f"{self.name.value}.zeeplist", "playlist.zeeplist")
@@ -485,20 +515,23 @@ class Crtpl(nextcord.ui.Modal):
 
 submissionschannels = []
 leaderboards = {}
+
+
 @bot.event
 async def on_ready():
     global submissionschannels, leaderboards
     log(f"Loaded up! with bot ID: {bot.user.id}")
     log("initializing startup guilds")
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="For level submissions"))
+    await bot.change_presence(
+        activity=discord.Activity(type=discord.ActivityType.watching, name="For level submissions"))
     for guild in bot.guilds:
         print(f"Connected to guild: {guild.name} ({guild.id}) with {guild.member_count} members.")
         log(f"Connected to guild: {guild.name} ({guild.id}) with {guild.member_count} members.")
     log("initializing startup cache for submission channels.")
     # with open("data.json", "r") as f:
-        # data = json.load(f)
-        # submissionschannels = data["submission-channels"]
-        # log(f"submission channels cache succeeded.")
+    # data = json.load(f)
+    # submissionschannels = data["submission-channels"]
+    # log(f"submission channels cache succeeded.")
     log("initializing startup cache for live leaderboards.")
     with open("data.json", "r") as f:
         data = json.load(f)
@@ -508,6 +541,7 @@ async def on_ready():
         await rankingsfunc(fwogutils.getgtruserrankings(limit=100, offset=0))
         log("Process done to the GTR rankings leaderboard.")
         await wrcallback()
+
 
 def updatesubchannels():
     global submissionschannels
@@ -523,7 +557,8 @@ def addlvl(lvl: dict, channelid: int):
     with open("data.json", 'w') as ft:
         for x in data["submission-channels"]:
             if x['channelid'] == channelid:
-                x['levels'].append({"wsid": lvl['wsid'], "lvlname": lvl['lvlname'], "lvluid": lvl['lvluid'], "lvlatn": lvl['lvlatn']})
+                x['levels'].append(
+                    {"wsid": lvl['wsid'], "lvlname": lvl['lvlname'], "lvluid": lvl['lvluid'], "lvlatn": lvl['lvlatn']})
         json.dump(data, ft, indent=2)
 
 
@@ -548,7 +583,7 @@ async def lastmsgsaction(type: int, chan: int, msgs: list):
                 json.dump(data, ft, indent=2)
 
 
-def checkduplicate(data: list, id: int=None):
+def checkduplicate(data: list, id: int = None):
     duplicheck = []
     duplilevels = []
     hasdupli = False
@@ -589,17 +624,20 @@ async def submission_checker():
         try:
             channel = await bot.fetch_channel(info['channelid'])
             logchannel = await bot.fetch_channel(info['logchannel'])
-            checkage = await fetchmessages({"fetchtype":1, "channel":info["channelid"], "customfeature": 1, "fetchobject": 6969})
+            checkage = await fetchmessages(
+                {"fetchtype": 1, "channel": info["channelid"], "customfeature": 1, "fetchobject": 6969})
             if checkage["code"] == 404 and checkage["objectcode"] == 0:
                 pass
             else:
                 for x in checkage['message']['usermessages']:
                     if x["code"] == 404 and x['objectcode'] == 0:
-                        msg = await channel.send(f"<@{x['userid']}>, '{x['message']}' is not a valid submission! Please provide a valid steam workshop link!")
+                        msg = await channel.send(
+                            f"<@{x['userid']}>, '{x['message']}' is not a valid submission! Please provide a valid steam workshop link!")
                         msgs.append(msg.id)
                         await x['rawmessage'].delete()
                     elif x["code"] == 404 and x['objectcode'] == 1:
-                        msg = await channel.send(f"<@{x['userid']}> Your submission has several of the same links. so i did not process it.")
+                        msg = await channel.send(
+                            f"<@{x['userid']}> Your submission has several of the same links. so i did not process it.")
                         msgs.append(msg.id)
                         await x['rawmessage'].delete()
                     elif x['code'] == 200:
@@ -607,25 +645,31 @@ async def submission_checker():
                         req = requests.get(f"https://api.zworpshop.com/levels/workshop/{id[0]}?IncludeReplaced=true")
                         if req.status_code == 404:
                             await x["rawmessage"].add_reaction("❌")
-                            msg = await x['rawmessage'].reply(f":warning: I could not find the level. The playlist creator will have to manually add this level! :warning:")
+                            msg = await x['rawmessage'].reply(
+                                f":warning: I could not find the level. The playlist creator will have to manually add this level! :warning:")
                             msgs.append(msg.id)
-                            await logchannel.send(f"i could not find a submission where this was linked: {x['message']}\nThis is either an invalid level or a level i could not find!")
+                            await logchannel.send(
+                                f"i could not find a submission where this was linked: {x['message']}\nThis is either an invalid level or a level i could not find!")
                         elif req.status_code == 200:
                             lvl = json.loads(req.text)
                             if len(lvl) > 1:
                                 await x["rawmessage"].add_reaction("❌")
-                                msg = await x['rawmessage'].reply(f":warning: This submission has several levels in it! Please stop using level packs and upload all levels separately! :warning:")
+                                msg = await x['rawmessage'].reply(
+                                    f":warning: This submission has several levels in it! Please stop using level packs and upload all levels separately! :warning:")
                                 msgs.append(msg.id)
                             else:
                                 if not checkduplicate(info["levels"], lvl[0]['workshopId']):
-                                    addlvl({"wsid": lvl[0]['workshopId'], "lvlname": lvl[0]['name'], "lvluid": lvl[0]['fileUid'], "lvlatn": lvl[0]['fileAuthor']}, channelid=info['channelid'])
+                                    addlvl({"wsid": lvl[0]['workshopId'], "lvlname": lvl[0]['name'],
+                                            "lvluid": lvl[0]['fileUid'], "lvlatn": lvl[0]['fileAuthor']},
+                                           channelid=info['channelid'])
                                     updatesubchannels()
                                     await x["rawmessage"].add_reaction("✅")
                                     msg = await x['rawmessage'].reply(f"Level '{lvl[0]['name']}' added!")
                                     msgs.append(msg.id)
                                 else:
                                     await x["rawmessage"].add_reaction("❌")
-                                    msg = await x['rawmessage'].reply(":warning: this level is already submitted! :warning:")
+                                    msg = await x['rawmessage'].reply(
+                                        ":warning: this level is already submitted! :warning:")
                                     msgs.append(msg.id)
                     else:
                         await x['rawmessage'].reply(f":warning: Something really wrong happened! :warning:")
@@ -634,7 +678,7 @@ async def submission_checker():
                     await lastmsgsaction(type=1, chan=channel.id, msgs=msgs)
         except Exception as ewwor:
             if isinstance(ewwor, TypeError):
-               pass
+                pass
             else:
                 await logchannel.send(f"{fwogutils.errormessage(ewwor)}")
                 log(str(ewwor))
@@ -658,9 +702,12 @@ async def subchannel(ctx, submissionschannel: nextcord.TextChannel, logchannel: 
         with open("data.json", 'r') as f:
             data = json.load(f)
         with open("data.json", 'w') as ft:
-            data["submission-channels"].append({"guildid": ctx.guild.id, "channelid": submissionschannel.id, "logchannel": logchannel.id, "lastsentmsgs": [], "levels": []})
+            data["submission-channels"].append(
+                {"guildid": ctx.guild.id, "channelid": submissionschannel.id, "logchannel": logchannel.id,
+                 "lastsentmsgs": [], "levels": []})
             json.dump(data, ft, indent=2)
-        await submissionschannel.send("This channel has been set as a submissions channel! all levels that are sent in here will now be automatically moderated")
+        await submissionschannel.send(
+            "This channel has been set as a submissions channel! all levels that are sent in here will now be automatically moderated")
         updatesubchannels()
         await ctx.send(f"Submissions channel set to: <#{submissionschannel.id}>")
     else:
@@ -674,12 +721,12 @@ async def get(ctx):
 
 def create_filepl(name: str):
     playlist = {
-    "name": name,
-    "amountOfLevels": 0,
-    "roundLength": 480.0,
-    "shufflePlaylist": False,
-    "UID": [],
-    "levels": []
+        "name": name,
+        "amountOfLevels": 0,
+        "roundLength": 480.0,
+        "shufflePlaylist": False,
+        "UID": [],
+        "levels": []
     }
     with open("playlist.zeeplist", "w") as file:
         json.dump(playlist, file, indent=2)
@@ -691,7 +738,8 @@ def add_levels(lvl: list):
     lvls = []
     if len(lvl) > 1:
         for x in lvl:
-            code = requests.get(f"https://api.zworpshop.com/levels/uid/{x['lvluid']}?IncludeReplaced=false&IncludeDeleted=false").status_code
+            code = requests.get(
+                f"https://api.zworpshop.com/levels/uid/{x['lvluid']}?IncludeReplaced=false&IncludeDeleted=false").status_code
             if code == 200:
                 lvls.append(
                     {
@@ -702,7 +750,9 @@ def add_levels(lvl: list):
                     }
                 )
             elif code == 404:
-                txt = json.loads(requests.get(f"https://api.zworpshop.com/levels/workshop/{x['wsid']}?IncludeReplaced=false&IncludeDeleted=false").text)[0]
+                txt = json.loads(requests.get(
+                    f"https://api.zworpshop.com/levels/workshop/{x['wsid']}?IncludeReplaced=false&IncludeDeleted=false").text)[
+                    0]
                 lvls.append(
                     {
                         "UID": txt["fileUid"],
@@ -729,14 +779,16 @@ async def getpl(ctx, playlistname: str, channel: nextcord.TextChannel):
                 if add_levels(x['levels']) is not False:
                     os.rename("playlist.zeeplist", f"{playlistname}.zeeplist")
                     await ctx.edit("The playlist has been generated."
-                                   " To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
-                                   " to easily access this directory: (for windows only) press Win+R and paste the directory in the text box.", file=nextcord.File(f'{playlistname}.zeeplist'))
+                                   r" To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
+                                   " to easily access this directory: (for windows only) press Win+R and paste the directory in the text box.",
+                                   file=nextcord.File(f'{playlistname}.zeeplist'))
                     os.rename(f"{playlistname}.zeeplist", "playlist.zeeplist")
                     clearlevels(channel.id)
                     updatesubchannels()
                     return
                 else:
-                    await ctx.edit("The playlist you requested is either empty or only has 1 level. so i did not make it.")
+                    await ctx.edit(
+                        "The playlist you requested is either empty or only has 1 level. so i did not make it.")
                     return
         await ctx.send("The mentioned channel is not a submissions channel.")
     else:
@@ -806,20 +858,27 @@ async def fetchmessages(data: dict):
                     if len(urls) > 1:
                         duplicheck = checkduplicate(urls)
                         if duplicheck:
-                            messages.append({'code': 404, "objectcode":1, 'userid': message.author.id, "message": message.content, 'rawmessage': message})
+                            messages.append(
+                                {'code': 404, "objectcode": 1, 'userid': message.author.id, "message": message.content,
+                                 'rawmessage': message})
                         else:
                             for l in urls:
-                                messages.append({'code': 200, 'userid': message.author.id, "message": l, 'rawmessage': message})
+                                messages.append(
+                                    {'code': 200, 'userid': message.author.id, "message": l, 'rawmessage': message})
                     else:
-                        messages.append({'code': 200, 'userid': message.author.id, "message": urls[0], 'rawmessage': message})
+                        messages.append(
+                            {'code': 200, 'userid': message.author.id, "message": urls[0], 'rawmessage': message})
                 else:
                     if message.author.id == message.guild.owner_id:
                         pass
                     else:
-                        messages.append({'code': 404, "objectcode": 0, 'userid': message.author.id, "message": message.content, 'rawmessage': message})
+                        messages.append(
+                            {'code': 404, "objectcode": 0, 'userid': message.author.id, "message": message.content,
+                             'rawmessage': message})
     except Exception as ewwor:
         await channel.send(fwogutils.errormessage(ewwor))
         log(str(ewwor))
+
 
 emb = nextcord.InteractionResponse
 page = {"page": 1, "limit": 10, "offset": 0}
@@ -830,6 +889,7 @@ async def rankings(ctx):
     global emb, page
     log(f"called by: {ctx.user}")
     page = {"page": 1, "limit": 10, "offset": 0}
+
     class Lbpage(nextcord.ui.View):
         def __init__(self):
             super().__init__(timeout=30)
@@ -841,9 +901,12 @@ async def rankings(ctx):
                 self.page['limit'] -= 10
                 self.page['offset'] -= 10
                 self.page['page'] -= 1
-                lb = json.loads(requests.get(f"https://api.zeepkist-gtr.com/users/rankings?Limit={self.page['limit']}&Offset={self.page['offset']}").text)
-                embed = discord.Embed(title="GTR Rankings", color=nextcord.Color.purple(), timestamp=datetime.datetime.now())
-                embed = discord.Embed.set_footer(self=embed, text=f"page: {page['page']}, Total amount: {lb['totalAmount']}")
+                lb = json.loads(requests.get(
+                    f"https://api.zeepkist-gtr.com/users/rankings?Limit={self.page['limit']}&Offset={self.page['offset']}").text)
+                embed = discord.Embed(title="GTR Rankings", color=nextcord.Color.purple(),
+                                      timestamp=datetime.datetime.now())
+                embed = discord.Embed.set_footer(self=embed,
+                                                 text=f"page: {page['page']}, Total amount: {lb['totalAmount']}")
                 for x in lb["rankings"]:
                     embed.add_field(name=f"{x['position']}. {x['user']['steamName']}", inline=False,
                                     value=f"World Records: {x['amountOfWorldRecords']}\nScore: {x['score']}")
@@ -854,9 +917,12 @@ async def rankings(ctx):
             self.page['limit'] += 10
             self.page['offset'] += 10
             self.page['page'] += 1
-            lb = json.loads(requests.get(f"https://api.zeepkist-gtr.com/users/rankings?Limit={self.page['limit']}&Offset={self.page['offset']}").text)
-            embed = discord.Embed(title="GTR Rankings", color=nextcord.Color.purple(), timestamp=datetime.datetime.now())
-            embed = discord.Embed.set_footer(self=embed, text=f"page: {page['page']}, Total amount: {lb['totalAmount']}")
+            lb = json.loads(requests.get(
+                f"https://api.zeepkist-gtr.com/users/rankings?Limit={self.page['limit']}&Offset={self.page['offset']}").text)
+            embed = discord.Embed(title="GTR Rankings", color=nextcord.Color.purple(),
+                                  timestamp=datetime.datetime.now())
+            embed = discord.Embed.set_footer(self=embed,
+                                             text=f"page: {page['page']}, Total amount: {lb['totalAmount']}")
             for x in lb["rankings"]:
                 embed.add_field(name=f"{x['position']}. {x['user']['steamName']}", inline=False,
                                 value=f"World Records: {x['amountOfWorldRecords']}\nScore: {x['score']}")
@@ -867,7 +933,7 @@ async def rankings(ctx):
     embedd = discord.Embed.set_footer(self=embedd, text=f"page: {page['page']}, Total amount: {lbb['totalAmount']}")
     for x in lbb["rankings"]:
         embedd.add_field(name=f"{x['position']}. {x['user']['steamName']}", inline=False,
-                        value=f"World Records: {x['amountOfWorldRecords']}\nScore: {x['score']}")
+                         value=f"World Records: {x['amountOfWorldRecords']}\nScore: {x['score']}")
     emb = await ctx.send(embed=embedd, view=Lbpage())
 
 
@@ -877,9 +943,14 @@ async def comb(ctx):
 
 
 @comb.subcommand(name="playlists", description="Combine two playlists together!")
-async def combpl(ctx, pla: nextcord.Attachment = nextcord.SlashOption(name="playlist", description="The Playlist you want to combine", required=True),
-                 plb: nextcord.Attachment = nextcord.SlashOption(name="to_playlist", description="The Playlist you want to combine to", required=True),
-                 name: str = nextcord.SlashOption(description="The name you want the combined playlist to be named", required=True)):
+async def combpl(ctx, pla: nextcord.Attachment = nextcord.SlashOption(name="playlist",
+                                                                      description="The Playlist you want to combine",
+                                                                      required=True),
+                 plb: nextcord.Attachment = nextcord.SlashOption(name="to_playlist",
+                                                                 description="The Playlist you want to combine to",
+                                                                 required=True),
+                 name: str = nextcord.SlashOption(description="The name you want the combined playlist to be named",
+                                                  required=True)):
     log(f"called by user: {ctx.user} ({ctx.user.id}) with plname: {name}")
     try:
         if pla.filename.split(".")[1:][0] and plb.filename.split(".")[1:][0] == "zeeplist":
@@ -891,9 +962,9 @@ async def combpl(ctx, pla: nextcord.Attachment = nextcord.SlashOption(name="play
             with open("playlist.zeeplist", 'w') as f:
                 json.dump(plbr, f, indent=2)
             os.rename("playlist.zeeplist", f"{name}.zeeplist")
-            await ctx.send("The playlist has been generated."
-                           " To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`."
-                           " to easily access this directory: (for windows only) press Win+R and paste the directory in the text box.",
+            await ctx.send('The playlist has been generated.'
+                           r' To import the playlist into the host controls simply drag the file below into this specific directory: `%userprofile%\AppData\Roaming\Zeepkist\Playlists`.'
+                           ' to easily access this directory: (for windows only) press Win+R and paste the directory in the text box.',
                            file=nextcord.File(f'{name}.zeeplist'))
             os.rename(f"{name}.zeeplist", "playlist.zeeplist")
         else:
@@ -909,8 +980,10 @@ async def upd(ctx):
 
 
 @upd.subcommand(name="playlist", description="Update outdated levels in a playlist!")
-async def updpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(description="Update this playlist to newer levels!", required=True),
-                removeduplicates: bool=nextcord.SlashOption(description="Removes duplicates if there are any.", required=True)):
+async def updpl(ctx, playlist: nextcord.Attachment = nextcord.SlashOption(
+    description="Update this playlist to newer levels!", required=True),
+                removeduplicates: bool = nextcord.SlashOption(description="Removes duplicates if there are any.",
+                                                              required=True)):
     log(f"reached by {ctx.user} ({ctx.user.id}) with playlist name: {playlist.filename}")
     if playlist.filename.split(".")[1:][0] == "zeeplist":
         ctx = await ctx.send("processing")
@@ -926,9 +999,11 @@ async def updpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(descript
         try:
             for x in pllvls["levels"]:
                 s = x['UID']
-                code = requests.get(f"https://api.zworpshop.com/levels/uid/{urllib.parse.quote_plus(s, encoding='UTF-8')}").status_code
+                code = requests.get(
+                    f"https://api.zworpshop.com/levels/uid/{urllib.parse.quote_plus(s, encoding='UTF-8')}").status_code
                 if code == 404:
-                    req = requests.get(f"https://api.zworpshop.com/levels/workshop/{x['WorkshopID']}?IncludeReplaced=false&IncludeDeleted=false")
+                    req = requests.get(
+                        f"https://api.zworpshop.com/levels/workshop/{x['WorkshopID']}?IncludeReplaced=false&IncludeDeleted=false")
                     if req.status_code == 200:
                         reqtxt = json.loads(req.text)
                         if len(reqtxt) == 1:
@@ -937,8 +1012,9 @@ async def updpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(descript
                                 data['duplilvls'] += 1
                                 data['duplilvlsnames'] += f"> - {x['Name']}\n"
                             else:
-                                pllvlsupd["levels"].append({"UID": f"{reqtxt[0]['fileUid']}", "WorkshopID": int(reqtxt[0]['workshopId']),
-                                                            "Name": f"{reqtxt[0]['name']}", "Author": f"{reqtxt[0]['fileAuthor']}"})
+                                pllvlsupd["levels"].append(
+                                    {"UID": f"{reqtxt[0]['fileUid']}", "WorkshopID": int(reqtxt[0]['workshopId']),
+                                     "Name": f"{reqtxt[0]['name']}", "Author": f"{reqtxt[0]['fileAuthor']}"})
                                 data['duplicheck'].append(x['WorkshopID'])
                             data['updlvls'] += 1
                             data['updlvlsnames'] += f"> - {x['Name']}\n"
@@ -961,11 +1037,12 @@ async def updpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(descript
             with open("playlist.zeeplist", 'w') as f:
                 json.dump(pllvlsupd, f, indent=2)
             os.rename("playlist.zeeplist", f"{name}.zeeplist")
-            await ctx.edit(f"## {data['updlvls']} level(s) were updated.\n> ### Updated level(s):\n{data['updlvlsnames']}\n"
-                           f"## {data['dellvls']} level(s) were deleted from the workshop. (These can manually be added!)\n> ### Deleted level(s):\n{data['dellvlsnames']}\n"
-                           f"## {data['nflvls']} level(s) were not found. (These can manually be added!)\n> ### Not Found level(s):\n{data['nflvlsnames']}\n"
-                           f"## {data['duplilvls']} level(s) were duplicated.\n> ### Duplicated level(s):\n{data['duplilvlsnames']}",
-                           file=nextcord.File(f"{name}.zeeplist"))
+            await ctx.edit(
+                f"## {data['updlvls']} level(s) were updated.\n> ### Updated level(s):\n{data['updlvlsnames']}\n"
+                f"## {data['dellvls']} level(s) were deleted from the workshop. (These can manually be added!)\n> ### Deleted level(s):\n{data['dellvlsnames']}\n"
+                f"## {data['nflvls']} level(s) were not found. (These can manually be added!)\n> ### Not Found level(s):\n{data['nflvlsnames']}\n"
+                f"## {data['duplilvls']} level(s) were duplicated.\n> ### Duplicated level(s):\n{data['duplilvlsnames']}",
+                file=nextcord.File(f"{name}.zeeplist"))
             os.rename(f"{name}.zeeplist", "playlist.zeeplist")
         except Exception as ewwor:
             await ctx.edit(fwogutils.errormessage(ewwor))
@@ -980,7 +1057,8 @@ async def rev(ctx):
 
 
 @rev.subcommand(name="playlist", description="Reverse a playlist!")
-async def revpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(description="The playlist to reverse.", required=True)):
+async def revpl(ctx, playlist: nextcord.Attachment = nextcord.SlashOption(description="The playlist to reverse.",
+                                                                          required=True)):
     log(f"reached by {ctx.user} ({ctx.user.id}) with playlist name: {playlist.filename}")
     if playlist.filename.split(".")[1:][0] == "zeeplist":
         ctx = await ctx.send("processing")
@@ -995,12 +1073,15 @@ async def revpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(descript
     else:
         await ctx.send("Please attach a valid .zeeplist file!")
 
+
 @bot.slash_command(name="shuffle")
 async def shuf(ctx):
     pass
 
+
 @shuf.subcommand(name="playlist", description="Shuffle a playlist!")
-async def shufpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(description="The playlist to Shuffle.", required=True)):
+async def shufpl(ctx, playlist: nextcord.Attachment = nextcord.SlashOption(description="The playlist to Shuffle.",
+                                                                           required=True)):
     log(f"reached by {ctx.user} ({ctx.user.id})")
     if fwogutils.checkzeeplist(playlist.filename):
         ctx = await ctx.send("processing")
@@ -1014,12 +1095,16 @@ async def shufpl(ctx, playlist: nextcord.Attachment=nextcord.SlashOption(descrip
     else:
         await ctx.send("Please attach a valid .zeeplist file!")
 
+
 @get.subcommand(name="top")
 async def gettop(ctx):
     pass
 
+
 @gettop.subcommand(name="levels", description="Get a playlist from levels worth the most points in GTR!")
-async def gettoplvls(ctx, amount: int=nextcord.SlashOption(description="Amount of levels to have in the playlist! (Maximum 999)"), playlistname: str=nextcord.SlashOption(description="The name of the playlist!")):
+async def gettoplvls(ctx, amount: int = nextcord.SlashOption(
+    description="Amount of levels to have in the playlist! (Maximum 999)"),
+                     playlistname: str = nextcord.SlashOption(description="The name of the playlist!")):
     log(f"reached by {ctx.user} ({ctx.user.id})")
     ctx = await ctx.send("processing (this might take a while)")
     toplvls = fwogutils.jsonapi_get_toplevelpoints(limit=amount)
@@ -1041,7 +1126,8 @@ async def gettoplvls(ctx, amount: int=nextcord.SlashOption(description="Amount o
             "levels": levels
         })
         fwogutils.renamepl(playlistname)
-        await ctx.edit(f"Your playlist has been generated! {len(levels)}/{amount} levels were found!", file=nextcord.File(f"{playlistname}.zeeplist"))
+        await ctx.edit(f"Your playlist has been generated! {len(levels)}/{amount} levels were found!",
+                       file=nextcord.File(f"{playlistname}.zeeplist"))
         fwogutils.undorename(playlistname)
     else:
         await ctx.edit("Error! Limit is 999!")
@@ -1049,13 +1135,18 @@ async def gettoplvls(ctx, amount: int=nextcord.SlashOption(description="Amount o
 
 sent = False
 conx = nextcord.Interaction
+
+
 @tasks.loop(seconds=10, reconnect=True)
 async def emb():
     global sent, conx
     chan = await bot.fetch_channel(1144730662000136315)
     try:
-        this = json.loads(requests.get("https://zeepkist-showdown-4215308f4ce4.herokuapp.com/api/qualifier").text)['qualifier']
-        wr = json.loads(requests.get("https://api.zeepkist-gtr.com/records?Level=D94C0982CE0BA4D261DF1A79BF2267B47DFEF715&ValidOnly=true&Limit=1&Offset=0").text)['records'][0]
+        this = json.loads(requests.get("https://zeepkist-showdown-4215308f4ce4.herokuapp.com/api/qualifier").text)[
+            'qualifier']
+        wr = json.loads(requests.get(
+            "https://api.zeepkist-gtr.com/records?Level=D94C0982CE0BA4D261DF1A79BF2267B47DFEF715&ValidOnly=true&Limit=1&Offset=0").text)[
+            'records'][0]
         wruser = json.loads(requests.get(f"https://api.zeepkist-gtr.com/users/{wr['user']}").text)
         embed = discord.Embed(title="Pool 1", description="", color=nextcord.Color.red())
         embeda = discord.Embed(title="Pool 2", description="", color=nextcord.Color.blue())
@@ -1123,6 +1214,8 @@ async def sendteams(ctx):
 
 sentlb = False
 conxlb = nextcord.Interaction
+
+
 @tasks.loop(minutes=5, reconnect=True)
 async def lb():
     global sentlb, conxlb, cache
@@ -1141,7 +1234,8 @@ async def lb():
     embedc.set_footer(text="last updated")
     try:
         for x in sdlvls:
-            records = json.loads(requests.get(f"https://api.zeepkist-gtr.com/records?Level={x['hash']}&ValidOnly=true&Limit=75&Offset=0").text)
+            records = json.loads(requests.get(
+                f"https://api.zeepkist-gtr.com/records?Level={x['hash']}&ValidOnly=true&Limit=75&Offset=0").text)
             data = {"levelrecs": "", "rcount": 0, "users": []}
             for a in records['records']:
                 user = fwogutils.getgtruser(id=a['user'])[1]['steamName']
@@ -1187,6 +1281,7 @@ async def stopemb(ctx):
     else:
         pass
 
+
 @bot.slash_command(name="verify", description="Verify that you are not a bot!", guild_ids=[1200812715527114824])
 async def verify(ctx):
     log(f"called by user: {ctx.user} ({ctx.user.id})")
@@ -1194,6 +1289,7 @@ async def verify(ctx):
         gtrcheck = fwogutils.getgtruser(discid=ctx.user.id)
         if gtrcheck[0]:
             log(f"gtrcheck index 0 returned true")
+
             class YesOrNoButtons(nextcord.ui.View):
                 @nextcord.ui.button(label="Yes", style=nextcord.ButtonStyle.green)
                 async def yes(self, button: nextcord.Button, ctx: nextcord.Interaction):
@@ -1213,9 +1309,10 @@ async def verify(ctx):
                     log(f"verified user {ctx.user} ({ctx.user.id}) without linkage to GTR")
                     await ctx.send("You have been verified!", ephemeral=True)
 
-            await ctx.send(f"Hello there! i have detected that you have a GTR account by the name of **{gtrcheck[1]['steamName']}**,"
-                           f" do you wish to link it to this discord? this will only be used in this discord.",
-                           view=YesOrNoButtons(), ephemeral=True)
+            await ctx.send(
+                f"Hello there! i have detected that you have a GTR account by the name of **{gtrcheck[1]['steamName']}**,"
+                f" do you wish to link it to this discord? this will only be used in this discord.",
+                view=YesOrNoButtons(), ephemeral=True)
         else:
             await ctx.user.add_roles(ctx.guild.get_role(1201928108769554442))
             log(f"verified user {ctx.user} ({ctx.user.id})")
@@ -1223,16 +1320,21 @@ async def verify(ctx):
     else:
         await ctx.send("you are already verified!", ephemeral=True)
 
+
 class Cog(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, ctx):
         if ctx.channel.id == 1201928657703292959 and ctx.author.id not in [785037540155195424, bot.user.id]:
             await ctx.delete()
+
+
 bot.add_cog(Cog())
+
 
 @bot.slash_command(name="link", guild_ids=[1200812715527114824])
 async def link(ctx):
     pass
+
 
 @link.subcommand(name="gtr", description="Link your GTR to this server!")
 async def linkgtr(ctx):
@@ -1256,11 +1358,14 @@ async def linkgtr(ctx):
                 self.stop()
                 await ctx.send("cancelled!", ephemeral=True)
 
-        await ctx.send(f"i have detected a GTR account by the name of **{gtrcheck[1]['steamName']}**, do you wish to link it?",
-                       view=YesOrNoButtons(), ephemeral=True)
+        await ctx.send(
+            f"i have detected a GTR account by the name of **{gtrcheck[1]['steamName']}**, do you wish to link it?",
+            view=YesOrNoButtons(), ephemeral=True)
     else:
-        await ctx.send("I did not find any discord linkage, Please link your discord to your GTR by reproducing the following steps in-game:\n`Settings -> Mods -> Scroll to GTR -> In the 'discord' section, Press 'Link'`",
-                       ephemeral=True)
+        await ctx.send(
+            "I did not find any discord linkage, Please link your discord to your GTR by reproducing the following steps in-game:\n`Settings -> Mods -> Scroll to GTR -> In the 'discord' section, Press 'Link'`",
+            ephemeral=True)
+
 
 async def rankingsfunc(gtrrankings):
     global leaderboards
@@ -1280,8 +1385,11 @@ async def rankingsfunc(gtrrankings):
         if checkrank > userrank:
             log(f"{x} ranked up!! sending notif!")
             channel = await bot.fetch_channel(1207401802769633310)
-            embed = discord.Embed(title="Ranked up!", description=f"You have ranked up to position **{userrank}** in the GTR rankings!!", color=nextcord.Color.blue())
-            embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
+            embed = discord.Embed(title="Ranked up!",
+                                  description=f"You have ranked up to position **{userrank}** in the GTR rankings!!",
+                                  color=nextcord.Color.blue())
+            embed.set_thumbnail(
+                url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
             await channel.send(f"<@{int(x)}>", embed=embed)
             fwogutils.setlinkedranking(user=x, pos=userrank)
     rdusies = fwogutils.getRDusers()
@@ -1291,13 +1399,15 @@ async def rankingsfunc(gtrrankings):
         if checkrank < userrank:
             log(f"{x} ranked down :/ sending notif!")
             channel = await bot.fetch_channel(1207401802769633310)
-            embed = discord.Embed(title="Ranked down :/", description=f"You have ranked down to position **{userrank}** in the GTR rankings :/", color=nextcord.Color.blue())
+            embed = discord.Embed(title="Ranked down :/",
+                                  description=f"You have ranked down to position **{userrank}** in the GTR rankings :/",
+                                  color=nextcord.Color.blue())
             embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
             await channel.send(f"<@{int(x)}>", embed=embed)
             fwogutils.setlinkedranking(user=x, pos=userrank)
 
 
-@tasks.loop(time=fwogutils.all_24hours(), reconnect=True)
+@tasks.loop(time=fwogutils.gtrlb_shedule(), reconnect=True)
 async def rankings():
     gtrrankings = fwogutils.getgtruserrankings(limit=100, offset=0)
     await rankingsfunc(gtrrankings=gtrrankings)
@@ -1308,8 +1418,11 @@ rankings.start()
 async def notif(ctx):
     pass
 
+
 @notif.subcommand(name="add", description="will notify you for what you select!")
-async def notifme(ctx, to: str=nextcord.SlashOption(name="for", description="will notify you for what you select!", choices={"GTR Rank up": "RU", "GTR Rank down": "RD", "World Record stolen": "WRST"})):
+async def notifme(ctx, to: str = nextcord.SlashOption(name="for", description="will notify you for what you select!",
+                                                      choices={"GTR Rank up": "RU", "GTR Rank down": "RD",
+                                                               "World Record stolen": "WRST"})):
     log(f"reached by {ctx.user} ({ctx.user.id})")
     try:
         if fwogutils.userislinked(ctx.user.id):
@@ -1333,8 +1446,12 @@ async def notifme(ctx, to: str=nextcord.SlashOption(name="for", description="wil
         await ctx.send(fwogutils.errormessage(ewwor))
         log(str(ewwor))
 
+
 @notif.subcommand(name="remove", description="will stop notifying you for what you select!")
-async def notifme(ctx, to: str=nextcord.SlashOption(name="for", description="will stop notifying you for what you select!", choices={"GTR Rank up": "RU", "GTR Rank down": "RD", "World Record stolen": "WRST"})):
+async def notifme(ctx,
+                  to: str = nextcord.SlashOption(name="for", description="will stop notifying you for what you select!",
+                                                 choices={"GTR Rank up": "RU", "GTR Rank down": "RD",
+                                                          "World Record stolen": "WRST"})):
     log(f"reached by {ctx.user} ({ctx.user.id})")
     try:
         if fwogutils.userislinked(ctx.user.id):
@@ -1355,15 +1472,6 @@ async def notifme(ctx, to: str=nextcord.SlashOption(name="for", description="wil
         await ctx.send(fwogutils.errormessage(ewwor))
         log(str(ewwor))
 
-async def listen_forever():
-    """Is now obsolete but kept in case needed!"""
-    try:
-        async with websockets.connect("wss://stream.zeepkist-gtr.com/ws") as websocket:
-            websocket.recv = await wrcallback() # won't work to recent change
-            await listen_forever()
-    except Exception as ewwor:
-        log(str(ewwor))
-        await listen_forever()
 
 async def wrcallback(message=None):
     """logging for debug, bug found but not sure, so letting them as comments in case <3"""
@@ -1381,7 +1489,8 @@ async def wrcallback(message=None):
                     #log("setting/fetching WRSTusers")
                     wrstusers = fwogutils.getWRSTusers()
                     #log(f"WRSTusers returned: {wrstusers}")
-                    if str(content['Data']['PreviousUserId']) in wrstusers and content['Data']['PreviousUserId'] != content['Data']['NewUserId'] and content['Type'] == "wr":
+                    if str(content['Data']['PreviousUserId']) in wrstusers and content['Data']['PreviousUserId'] != \
+                            content['Data']['NewUserId'] and content['Type'] == "wr":
                         log("WR is stolen!!")
                         wrstuserinfo = wrstusers[str(content['Data']['PreviousUserId'])]
                         #log(f"wrstuserinfo returned: {wrstuserinfo}")
@@ -1403,7 +1512,8 @@ async def wrcallback(message=None):
                             timenow = datetime.datetime.now()
                             log(f"timenow returned: {timenow}")
                             #log("going trough 10 mins check")
-                            if timenow.date() == recordcreated.date() and int(recordcreated.timestamp())+600 > int(timenow.timestamp()):
+                            if timenow.date() == recordcreated.date() and int(recordcreated.timestamp()) + 600 > int(
+                                    timenow.timestamp()):
                                 log('wr beat before 10 mins, breaking')
                                 break
                             #log("after if reached (getting newrec)")
@@ -1413,12 +1523,16 @@ async def wrcallback(message=None):
                             newuser = fwogutils.getgtruser(content['Data']['NewUserId'])
                             #log(f"newuser returned: {newuser}")
                             #log("creating embed (should work fine if all logs above are valid)")
-                            wrstembed = discord.Embed(title="One of your World Records has been taken!", description=f"Your World Record on **{level[0]['name']}** by **{level[0]['fileAuthor']}** was taken!",
-                                                      color=nextcord.Color.blue(), url=f"https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']}")
-                            wrstembed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
-                            wrstembed.add_field(name="Info", value=f"Previous time: **{fwogutils.format_time(prevrec['time'])}** by **{userlink['steamName']}** set <t:{int(recordcreated.timestamp())}:R>\n"
-                                                                   f"New time: **{fwogutils.format_time(newrec['time'])}** by **{newuser[1]['steamName']}**\n"
-                                                                   f"Level: [{level[0]['name']} by {level[0]['fileAuthor']}](https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']})")
+                            wrstembed = discord.Embed(title="One of your World Records has been taken!",
+                                                      description=f"Your World Record on **{level[0]['name']}** by **{level[0]['fileAuthor']}** was taken!",
+                                                      color=nextcord.Color.blue(),
+                                                      url=f"https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']}")
+                            wrstembed.set_thumbnail(
+                                url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
+                            wrstembed.add_field(name="Info",
+                                                value=f"Previous time: **{fwogutils.format_time(prevrec['time'])}** by **{userlink['steamName']}** set <t:{int(recordcreated.timestamp())}:R>\n"
+                                                      f"New time: **{fwogutils.format_time(newrec['time'])}** by **{newuser[1]['steamName']}**\n"
+                                                      f"Level: [{level[0]['name']} by {level[0]['fileAuthor']}](https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']})")
                             #log("fetching notifchannel (1207401802769633310)")
                             notifchannel = await bot.fetch_channel(1207401802769633310)
                             #log(f"notifchannel name: {notifchannel.name}")
@@ -1433,8 +1547,11 @@ async def wrcallback(message=None):
 async def gethot(ctx):
     pass
 
-@gethot.subcommand(name="levels", description="Get a playlist of the levels that have been played the most in the past 24 hours!")
-async def gethotlvls(ctx, playlistname: str=nextcord.SlashOption(description="The name for the playlist", required=True)):
+
+@gethot.subcommand(name="levels",
+                   description="Get a playlist of the levels that have been played the most in the past 24 hours!")
+async def gethotlvls(ctx,
+                     playlistname: str = nextcord.SlashOption(description="The name for the playlist", required=True)):
     ctx = await ctx.send("processing!")
     hot = GTR.Levels.Hot()
     if hot.status_code != 200:
@@ -1453,17 +1570,18 @@ async def gethotlvls(ctx, playlistname: str=nextcord.SlashOption(description="Th
             except KeyError as notfound:
                 log(f"did not find level: {notfound}")
         fwogutils.dumppl({
-                "name": playlistname,
-                "amountOfLevels": len(levels),
-                "roundLength": 480.0,
-                "shufflePlaylist": False,
-                "UID": [],
-                "levels": levels
-            })
+            "name": playlistname,
+            "amountOfLevels": len(levels),
+            "roundLength": 480.0,
+            "shufflePlaylist": False,
+            "UID": [],
+            "levels": levels
+        })
         fwogutils.renamepl(playlistname)
         await ctx.edit(f"Your playlist has been generated!",
                        file=nextcord.File(f"{playlistname}.zeeplist"))
         fwogutils.undorename(playlistname)
+
 
 # test for learning, not wanted gone but not wanted either, so letting it as comment block in case of future use
 """@bot.slash_command(name="gliderify_level")
@@ -1488,5 +1606,6 @@ async def gliderifylvl(ctx, level: nextcord.Attachment, include_booster: bool, b
     with open("level.zeeplevel", 'w') as fw:
         fw.write(newlvl)
     await ctx.send("It's been generated!", file=nextcord.File("level.zeeplevel"))"""
+
 
 bot.run(privaat.token)

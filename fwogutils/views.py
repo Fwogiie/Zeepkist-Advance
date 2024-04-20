@@ -61,17 +61,17 @@ class LButtons(nextcord.ui.View):
         linked = fwogutils.get_linked_users()
         if str(userid) in linked:
             log(f"user had gtr linked, showing rank!")
-            userrank = fwogutils.getgtruserrank(linked[str(userid)]["id"])
-            closeranks = fwogutils.getgtruserrankings(limit=userrank['position']+5, offset=userrank['position']-6)
+            userrank = fwogutils.getgtruserrank(linked[str(userid)]["id"])["position"]
+            closeranks = fwogutils.jsonapi_getgtrpositions(frompos=userrank-5, amount=11)["data"]
             ranks = ""
-            for x in closeranks["rankings"]:
-                if x['position'] != userrank['position']:
-                    ranks += f"{x['position']}. `{x['user']['steamName']}` with **{x['score']}** points and **{x['amountOfWorldRecords']}** World Records\n"
+            for x in closeranks:
+                x = x['attributes']
+                if x['rank'] != userrank:
+                    ranks += f"{x['rank']}. `{fwogutils.userhandler(userid=x['userId'])["steamName"]}` with **{x['points']}** points and **{x['worldRecords']}** World Records\n"
                 else:
-                    ranks += f"> {x['position']}. `{x['user']['steamName']}` with **{x['score']}** points and **{x['amountOfWorldRecords']}** World Records\n"
+                    ranks += f"> {x['rank']}. `{fwogutils.userhandler(userid=x['userId'])["steamName"]}` with **{x['points']}** points and **{x['worldRecords']}** World Records\n"
             embed = discord.Embed(title="Your Rank", description=ranks, color=nextcord.Color.blue())
             await ctx.edit("", embed=embed)
         else:
-
             log(f"user did not have gtr linked!")
             await ctx.edit("You did not link your GTR! use `/link gtr` to do so!")

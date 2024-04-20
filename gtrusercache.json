@@ -1,0 +1,880 @@
+{
+  "steamName": {
+    "Fwogiie": {
+      "id": 3,
+      "steamId": "76561199230094250",
+      "steamName": "Fwogiie",
+      "discordId": "785037540155195424"
+    },
+    "Thundernerd": {
+      "id": 1,
+      "steamId": "76561198023561976",
+      "steamName": "Thundernerd",
+      "discordId": "217779716289986560"
+    },
+    "Metalted": {
+      "id": 2,
+      "steamId": "76561198932043314",
+      "steamName": "Metalted",
+      "discordId": null
+    },
+    "Lynhardt": {
+      "id": 223,
+      "steamId": "76561198072912743",
+      "steamName": "Lynhardt",
+      "discordId": "287882447721594880"
+    },
+    "Socks242": {
+      "id": 66,
+      "steamId": "76561198290668879",
+      "steamName": "Socks242",
+      "discordId": null
+    },
+    "[CTR] NathWalt": {
+      "id": 49,
+      "steamId": "76561198021974488",
+      "steamName": "[CTR] NathWalt",
+      "discordId": null
+    },
+    "[CTR]TheBamboozler": {
+      "id": 8,
+      "steamId": "76561198082304391",
+      "steamName": "[CTR]TheBamboozler",
+      "discordId": null
+    },
+    "Kernkob": {
+      "id": 93,
+      "steamId": "76561199024808939",
+      "steamName": "Kernkob",
+      "discordId": "702633794024374403"
+    },
+    "Wombat!": {
+      "id": 353,
+      "steamId": "76561198416930050",
+      "steamName": "Wombat!",
+      "discordId": null
+    },
+    "Linzi": {
+      "id": 146,
+      "steamId": "76561198205579857",
+      "steamName": "Linzi",
+      "discordId": "268220358153338880"
+    },
+    "A2 Zecklord": {
+      "id": 52,
+      "steamId": "76561198335037968",
+      "steamName": "A2 Zecklord",
+      "discordId": null
+    },
+    "JobW": {
+      "id": 105,
+      "steamId": "76561198125435428",
+      "steamName": "JobW",
+      "discordId": null
+    },
+    "Not That Guy": {
+      "id": 85,
+      "steamId": "76561198081686672",
+      "steamName": "Not That Guy",
+      "discordId": null
+    },
+    "GuAlexItar": {
+      "id": 489,
+      "steamId": "76561198159073318",
+      "steamName": "GuAlexItar",
+      "discordId": "166738481874206720"
+    },
+    "JoeRobot": {
+      "id": 71,
+      "steamId": "76561197962913845",
+      "steamName": "JoeRobot",
+      "discordId": null
+    },
+    "dangerousdec": {
+      "id": 249,
+      "steamId": "76561198274537933",
+      "steamName": "dangerousdec",
+      "discordId": null
+    },
+    "PoleLord": {
+      "id": 290,
+      "steamId": "76561198810177914",
+      "steamName": "PoleLord",
+      "discordId": null
+    },
+    "R3P": {
+      "id": 330,
+      "steamId": "76561197971853578",
+      "steamName": "R3P",
+      "discordId": null
+    },
+    "Violet": {
+      "id": 24,
+      "steamId": "76561198253376701",
+      "steamName": "Violet",
+      "discordId": null
+    },
+    "FlamingSquid": {
+      "id": 730,
+      "steamId": "76561198082960657",
+      "steamName": "FlamingSquid",
+      "discordId": null
+    },
+    "Forewander": {
+      "id": 287,
+      "steamId": "76561198353575625",
+      "steamName": "Forewander",
+      "discordId": null
+    },
+    "elekvault": {
+      "id": 438,
+      "steamId": "76561198048871045",
+      "steamName": "elekvault",
+      "discordId": null
+    },
+    "True Chaotic Neutral": {
+      "id": 456,
+      "steamId": "76561198034266798",
+      "steamName": "True Chaotic Neutral",
+      "discordId": null
+    },
+    "ZenChimp420": {
+      "id": 705,
+      "steamId": "76561199521440061",
+      "steamName": "ZenChimp420",
+      "discordId": null
+    },
+    "Nicolas_Gamer5476": {
+      "id": 60,
+      "steamId": "76561199043210759",
+      "steamName": "Nicolas_Gamer5476",
+      "discordId": null
+    },
+    "ide": {
+      "id": 641,
+      "steamId": "76561198041670380",
+      "steamName": "ide",
+      "discordId": null
+    },
+    "13Silvers": {
+      "id": 233,
+      "steamId": "76561198107216213",
+      "steamName": "13Silvers",
+      "discordId": null
+    },
+    "Blu": {
+      "id": 211,
+      "steamId": "76561198412663596",
+      "steamName": "Blu",
+      "discordId": null
+    },
+    "https.gh\u00f8st": {
+      "id": 483,
+      "steamId": "76561198894844131",
+      "steamName": "https.gh\u00f8st",
+      "discordId": null
+    },
+    "ZOMAN": {
+      "id": 37,
+      "steamId": "76561199126724675",
+      "steamName": "ZOMAN",
+      "discordId": null
+    },
+    "justMaki": {
+      "id": 19,
+      "steamId": "76561198050792757",
+      "steamName": "justMaki",
+      "discordId": null
+    },
+    "schmxrg": {
+      "id": 99,
+      "steamId": "76561198052077385",
+      "steamName": "schmxrg",
+      "discordId": "784982408906014750"
+    },
+    "R0nanC": {
+      "id": 25,
+      "steamId": "76561198259463003",
+      "steamName": "R0nanC",
+      "discordId": null
+    },
+    "Hydro": {
+      "id": 13,
+      "steamId": "76561199027567424",
+      "steamName": "Hydro",
+      "discordId": "573169135295660050"
+    },
+    "[CTR]OwlPlague": {
+      "id": 7,
+      "steamId": "76561199173536675",
+      "steamName": "[CTR]OwlPlague",
+      "discordId": null
+    },
+    "Renergy": {
+      "id": 87,
+      "steamId": "76561199135775747",
+      "steamName": "Renergy",
+      "discordId": "805114834140135435"
+    },
+    "St Nicholas": {
+      "id": 12,
+      "steamId": "76561198047403251",
+      "steamName": "St Nicholas",
+      "discordId": null
+    },
+    "Lexer": {
+      "id": 70,
+      "steamId": "76561198851912263",
+      "steamName": "Lexer",
+      "discordId": "298933342970052609"
+    },
+    "RoundNzt": {
+      "id": 36,
+      "steamId": "76561198896246339",
+      "steamName": "RoundNzt",
+      "discordId": null
+    },
+    "[CTR] L3it3R": {
+      "id": 306,
+      "steamId": "76561197965640463",
+      "steamName": "[CTR] L3it3R",
+      "discordId": null
+    },
+    "Hate Hater": {
+      "id": 530,
+      "steamId": "76561199037373763",
+      "steamName": "Hate Hater",
+      "discordId": "560107158537240586"
+    },
+    "toast": {
+      "id": 755,
+      "steamId": "76561199150086335",
+      "steamName": "toast",
+      "discordId": null
+    },
+    "Andrei": {
+      "id": 548,
+      "steamId": "76561198115857790",
+      "steamName": "Andrei",
+      "discordId": null
+    },
+    "thenameiwantedwastoolong": {
+      "id": 835,
+      "steamId": "76561199643465013",
+      "steamName": "thenameiwantedwastoolong",
+      "discordId": "-1"
+    }
+  },
+  "userId": {
+    "3": {
+      "id": 3,
+      "steamId": "76561199230094250",
+      "steamName": "Fwogiie",
+      "discordId": "785037540155195424"
+    },
+    "1": {
+      "id": 1,
+      "steamId": "76561198023561976",
+      "steamName": "Thundernerd",
+      "discordId": "217779716289986560"
+    },
+    "2": {
+      "id": 2,
+      "steamId": "76561198932043314",
+      "steamName": "Metalted",
+      "discordId": null
+    },
+    "223": {
+      "id": 223,
+      "steamId": "76561198072912743",
+      "steamName": "Lynhardt",
+      "discordId": "287882447721594880"
+    },
+    "66": {
+      "id": 66,
+      "steamId": "76561198290668879",
+      "steamName": "Socks242",
+      "discordId": null
+    },
+    "49": {
+      "id": 49,
+      "steamId": "76561198021974488",
+      "steamName": "[CTR] NathWalt",
+      "discordId": null
+    },
+    "8": {
+      "id": 8,
+      "steamId": "76561198082304391",
+      "steamName": "[CTR]TheBamboozler",
+      "discordId": null
+    },
+    "93": {
+      "id": 93,
+      "steamId": "76561199024808939",
+      "steamName": "Kernkob",
+      "discordId": "702633794024374403"
+    },
+    "353": {
+      "id": 353,
+      "steamId": "76561198416930050",
+      "steamName": "Wombat!",
+      "discordId": null
+    },
+    "146": {
+      "id": 146,
+      "steamId": "76561198205579857",
+      "steamName": "Linzi",
+      "discordId": "268220358153338880"
+    },
+    "52": {
+      "id": 52,
+      "steamId": "76561198335037968",
+      "steamName": "A2 Zecklord",
+      "discordId": null
+    },
+    "105": {
+      "id": 105,
+      "steamId": "76561198125435428",
+      "steamName": "JobW",
+      "discordId": null
+    },
+    "85": {
+      "id": 85,
+      "steamId": "76561198081686672",
+      "steamName": "Not That Guy",
+      "discordId": null
+    },
+    "489": {
+      "id": 489,
+      "steamId": "76561198159073318",
+      "steamName": "GuAlexItar",
+      "discordId": "166738481874206720"
+    },
+    "71": {
+      "id": 71,
+      "steamId": "76561197962913845",
+      "steamName": "JoeRobot",
+      "discordId": null
+    },
+    "249": {
+      "id": 249,
+      "steamId": "76561198274537933",
+      "steamName": "dangerousdec",
+      "discordId": null
+    },
+    "290": {
+      "id": 290,
+      "steamId": "76561198810177914",
+      "steamName": "PoleLord",
+      "discordId": null
+    },
+    "330": {
+      "id": 330,
+      "steamId": "76561197971853578",
+      "steamName": "R3P",
+      "discordId": null
+    },
+    "24": {
+      "id": 24,
+      "steamId": "76561198253376701",
+      "steamName": "Violet",
+      "discordId": null
+    },
+    "730": {
+      "id": 730,
+      "steamId": "76561198082960657",
+      "steamName": "FlamingSquid",
+      "discordId": null
+    },
+    "287": {
+      "id": 287,
+      "steamId": "76561198353575625",
+      "steamName": "Forewander",
+      "discordId": null
+    },
+    "438": {
+      "id": 438,
+      "steamId": "76561198048871045",
+      "steamName": "elekvault",
+      "discordId": null
+    },
+    "456": {
+      "id": 456,
+      "steamId": "76561198034266798",
+      "steamName": "True Chaotic Neutral",
+      "discordId": null
+    },
+    "705": {
+      "id": 705,
+      "steamId": "76561199521440061",
+      "steamName": "ZenChimp420",
+      "discordId": null
+    },
+    "60": {
+      "id": 60,
+      "steamId": "76561199043210759",
+      "steamName": "Nicolas_Gamer5476",
+      "discordId": null
+    },
+    "641": {
+      "id": 641,
+      "steamId": "76561198041670380",
+      "steamName": "ide",
+      "discordId": null
+    },
+    "233": {
+      "id": 233,
+      "steamId": "76561198107216213",
+      "steamName": "13Silvers",
+      "discordId": null
+    },
+    "211": {
+      "id": 211,
+      "steamId": "76561198412663596",
+      "steamName": "Blu",
+      "discordId": null
+    },
+    "483": {
+      "id": 483,
+      "steamId": "76561198894844131",
+      "steamName": "https.gh\u00f8st",
+      "discordId": null
+    },
+    "37": {
+      "id": 37,
+      "steamId": "76561199126724675",
+      "steamName": "ZOMAN",
+      "discordId": null
+    },
+    "19": {
+      "id": 19,
+      "steamId": "76561198050792757",
+      "steamName": "justMaki",
+      "discordId": null
+    },
+    "99": {
+      "id": 99,
+      "steamId": "76561198052077385",
+      "steamName": "schmxrg",
+      "discordId": "784982408906014750"
+    },
+    "25": {
+      "id": 25,
+      "steamId": "76561198259463003",
+      "steamName": "R0nanC",
+      "discordId": null
+    },
+    "13": {
+      "id": 13,
+      "steamId": "76561199027567424",
+      "steamName": "Hydro",
+      "discordId": "573169135295660050"
+    },
+    "7": {
+      "id": 7,
+      "steamId": "76561199173536675",
+      "steamName": "[CTR]OwlPlague",
+      "discordId": null
+    },
+    "87": {
+      "id": 87,
+      "steamId": "76561199135775747",
+      "steamName": "Renergy",
+      "discordId": "805114834140135435"
+    },
+    "12": {
+      "id": 12,
+      "steamId": "76561198047403251",
+      "steamName": "St Nicholas",
+      "discordId": null
+    },
+    "70": {
+      "id": 70,
+      "steamId": "76561198851912263",
+      "steamName": "Lexer",
+      "discordId": "298933342970052609"
+    },
+    "36": {
+      "id": 36,
+      "steamId": "76561198896246339",
+      "steamName": "RoundNzt",
+      "discordId": null
+    },
+    "306": {
+      "id": 306,
+      "steamId": "76561197965640463",
+      "steamName": "[CTR] L3it3R",
+      "discordId": null
+    },
+    "530": {
+      "id": 530,
+      "steamId": "76561199037373763",
+      "steamName": "Hate Hater",
+      "discordId": "560107158537240586"
+    },
+    "755": {
+      "id": 755,
+      "steamId": "76561199150086335",
+      "steamName": "toast",
+      "discordId": null
+    },
+    "548": {
+      "id": 548,
+      "steamId": "76561198115857790",
+      "steamName": "Andrei",
+      "discordId": null
+    },
+    "835": {
+      "id": 835,
+      "steamId": "76561199643465013",
+      "steamName": "thenameiwantedwastoolong",
+      "discordId": "-1"
+    }
+  },
+  "steamId": {
+    "76561199230094250": {
+      "id": 3,
+      "steamId": "76561199230094250",
+      "steamName": "Fwogiie",
+      "discordId": "785037540155195424"
+    },
+    "76561198023561976": {
+      "id": 1,
+      "steamId": "76561198023561976",
+      "steamName": "Thundernerd",
+      "discordId": "217779716289986560"
+    },
+    "76561198932043314": {
+      "id": 2,
+      "steamId": "76561198932043314",
+      "steamName": "Metalted",
+      "discordId": null
+    },
+    "76561198072912743": {
+      "id": 223,
+      "steamId": "76561198072912743",
+      "steamName": "Lynhardt",
+      "discordId": "287882447721594880"
+    },
+    "76561198290668879": {
+      "id": 66,
+      "steamId": "76561198290668879",
+      "steamName": "Socks242",
+      "discordId": null
+    },
+    "76561198021974488": {
+      "id": 49,
+      "steamId": "76561198021974488",
+      "steamName": "[CTR] NathWalt",
+      "discordId": null
+    },
+    "76561198082304391": {
+      "id": 8,
+      "steamId": "76561198082304391",
+      "steamName": "[CTR]TheBamboozler",
+      "discordId": null
+    },
+    "76561199024808939": {
+      "id": 93,
+      "steamId": "76561199024808939",
+      "steamName": "Kernkob",
+      "discordId": "702633794024374403"
+    },
+    "76561198416930050": {
+      "id": 353,
+      "steamId": "76561198416930050",
+      "steamName": "Wombat!",
+      "discordId": null
+    },
+    "76561198205579857": {
+      "id": 146,
+      "steamId": "76561198205579857",
+      "steamName": "Linzi",
+      "discordId": "268220358153338880"
+    },
+    "76561198335037968": {
+      "id": 52,
+      "steamId": "76561198335037968",
+      "steamName": "A2 Zecklord",
+      "discordId": null
+    },
+    "76561198125435428": {
+      "id": 105,
+      "steamId": "76561198125435428",
+      "steamName": "JobW",
+      "discordId": null
+    },
+    "76561198081686672": {
+      "id": 85,
+      "steamId": "76561198081686672",
+      "steamName": "Not That Guy",
+      "discordId": null
+    },
+    "76561198159073318": {
+      "id": 489,
+      "steamId": "76561198159073318",
+      "steamName": "GuAlexItar",
+      "discordId": "166738481874206720"
+    },
+    "76561197962913845": {
+      "id": 71,
+      "steamId": "76561197962913845",
+      "steamName": "JoeRobot",
+      "discordId": null
+    },
+    "76561198274537933": {
+      "id": 249,
+      "steamId": "76561198274537933",
+      "steamName": "dangerousdec",
+      "discordId": null
+    },
+    "76561198810177914": {
+      "id": 290,
+      "steamId": "76561198810177914",
+      "steamName": "PoleLord",
+      "discordId": null
+    },
+    "76561197971853578": {
+      "id": 330,
+      "steamId": "76561197971853578",
+      "steamName": "R3P",
+      "discordId": null
+    },
+    "76561198253376701": {
+      "id": 24,
+      "steamId": "76561198253376701",
+      "steamName": "Violet",
+      "discordId": null
+    },
+    "76561198082960657": {
+      "id": 730,
+      "steamId": "76561198082960657",
+      "steamName": "FlamingSquid",
+      "discordId": null
+    },
+    "76561198353575625": {
+      "id": 287,
+      "steamId": "76561198353575625",
+      "steamName": "Forewander",
+      "discordId": null
+    },
+    "76561198048871045": {
+      "id": 438,
+      "steamId": "76561198048871045",
+      "steamName": "elekvault",
+      "discordId": null
+    },
+    "76561198034266798": {
+      "id": 456,
+      "steamId": "76561198034266798",
+      "steamName": "True Chaotic Neutral",
+      "discordId": null
+    },
+    "76561199521440061": {
+      "id": 705,
+      "steamId": "76561199521440061",
+      "steamName": "ZenChimp420",
+      "discordId": null
+    },
+    "76561199043210759": {
+      "id": 60,
+      "steamId": "76561199043210759",
+      "steamName": "Nicolas_Gamer5476",
+      "discordId": null
+    },
+    "76561198041670380": {
+      "id": 641,
+      "steamId": "76561198041670380",
+      "steamName": "ide",
+      "discordId": null
+    },
+    "76561198107216213": {
+      "id": 233,
+      "steamId": "76561198107216213",
+      "steamName": "13Silvers",
+      "discordId": null
+    },
+    "76561198412663596": {
+      "id": 211,
+      "steamId": "76561198412663596",
+      "steamName": "Blu",
+      "discordId": null
+    },
+    "76561198894844131": {
+      "id": 483,
+      "steamId": "76561198894844131",
+      "steamName": "https.gh\u00f8st",
+      "discordId": null
+    },
+    "76561199126724675": {
+      "id": 37,
+      "steamId": "76561199126724675",
+      "steamName": "ZOMAN",
+      "discordId": null
+    },
+    "76561198050792757": {
+      "id": 19,
+      "steamId": "76561198050792757",
+      "steamName": "justMaki",
+      "discordId": null
+    },
+    "76561198052077385": {
+      "id": 99,
+      "steamId": "76561198052077385",
+      "steamName": "schmxrg",
+      "discordId": "784982408906014750"
+    },
+    "76561198259463003": {
+      "id": 25,
+      "steamId": "76561198259463003",
+      "steamName": "R0nanC",
+      "discordId": null
+    },
+    "76561199027567424": {
+      "id": 13,
+      "steamId": "76561199027567424",
+      "steamName": "Hydro",
+      "discordId": "573169135295660050"
+    },
+    "76561199173536675": {
+      "id": 7,
+      "steamId": "76561199173536675",
+      "steamName": "[CTR]OwlPlague",
+      "discordId": null
+    },
+    "76561199135775747": {
+      "id": 87,
+      "steamId": "76561199135775747",
+      "steamName": "Renergy",
+      "discordId": "805114834140135435"
+    },
+    "76561198047403251": {
+      "id": 12,
+      "steamId": "76561198047403251",
+      "steamName": "St Nicholas",
+      "discordId": null
+    },
+    "76561198851912263": {
+      "id": 70,
+      "steamId": "76561198851912263",
+      "steamName": "Lexer",
+      "discordId": "298933342970052609"
+    },
+    "76561198896246339": {
+      "id": 36,
+      "steamId": "76561198896246339",
+      "steamName": "RoundNzt",
+      "discordId": null
+    },
+    "76561197965640463": {
+      "id": 306,
+      "steamId": "76561197965640463",
+      "steamName": "[CTR] L3it3R",
+      "discordId": null
+    },
+    "76561199037373763": {
+      "id": 530,
+      "steamId": "76561199037373763",
+      "steamName": "Hate Hater",
+      "discordId": "560107158537240586"
+    },
+    "76561199150086335": {
+      "id": 755,
+      "steamId": "76561199150086335",
+      "steamName": "toast",
+      "discordId": null
+    },
+    "76561198115857790": {
+      "id": 548,
+      "steamId": "76561198115857790",
+      "steamName": "Andrei",
+      "discordId": null
+    },
+    "76561199643465013": {
+      "id": 835,
+      "steamId": "76561199643465013",
+      "steamName": "thenameiwantedwastoolong",
+      "discordId": "-1"
+    }
+  },
+  "discordId": {
+    "785037540155195424": {
+      "id": 3,
+      "steamId": "76561199230094250",
+      "steamName": "Fwogiie",
+      "discordId": "785037540155195424"
+    },
+    "217779716289986560": {
+      "id": 1,
+      "steamId": "76561198023561976",
+      "steamName": "Thundernerd",
+      "discordId": "217779716289986560"
+    },
+    "287882447721594880": {
+      "id": 223,
+      "steamId": "76561198072912743",
+      "steamName": "Lynhardt",
+      "discordId": "287882447721594880"
+    },
+    "702633794024374403": {
+      "id": 93,
+      "steamId": "76561199024808939",
+      "steamName": "Kernkob",
+      "discordId": "702633794024374403"
+    },
+    "268220358153338880": {
+      "id": 146,
+      "steamId": "76561198205579857",
+      "steamName": "Linzi",
+      "discordId": "268220358153338880"
+    },
+    "166738481874206720": {
+      "id": 489,
+      "steamId": "76561198159073318",
+      "steamName": "GuAlexItar",
+      "discordId": "166738481874206720"
+    },
+    "784982408906014750": {
+      "id": 99,
+      "steamId": "76561198052077385",
+      "steamName": "schmxrg",
+      "discordId": "784982408906014750"
+    },
+    "573169135295660050": {
+      "id": 13,
+      "steamId": "76561199027567424",
+      "steamName": "Hydro",
+      "discordId": "573169135295660050"
+    },
+    "805114834140135435": {
+      "id": 87,
+      "steamId": "76561199135775747",
+      "steamName": "Renergy",
+      "discordId": "805114834140135435"
+    },
+    "298933342970052609": {
+      "id": 70,
+      "steamId": "76561198851912263",
+      "steamName": "Lexer",
+      "discordId": "298933342970052609"
+    },
+    "560107158537240586": {
+      "id": 530,
+      "steamId": "76561199037373763",
+      "steamName": "Hate Hater",
+      "discordId": "560107158537240586"
+    },
+    "-1": {
+      "id": 835,
+      "steamId": "76561199643465013",
+      "steamName": "thenameiwantedwastoolong",
+      "discordId": "-1"
+    },
+    "None": {
+      "id": 105,
+      "steamId": "76561198125435428",
+      "steamName": "JobW",
+      "discordId": null
+    }
+  }
+}
