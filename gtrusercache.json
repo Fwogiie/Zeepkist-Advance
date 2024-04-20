@@ -263,6 +263,72 @@
       "steamId": "76561199643465013",
       "steamName": "thenameiwantedwastoolong",
       "discordId": "-1"
+    },
+    "Mark": {
+      "id": 98,
+      "steamId": "76561198064346397",
+      "steamName": "Mark",
+      "discordId": null
+    },
+    "Tritonas1237": {
+      "id": 145,
+      "steamId": "76561198160604987",
+      "steamName": "Tritonas1237",
+      "discordId": null
+    },
+    "F1Y1NGDUTCHM8N": {
+      "id": 224,
+      "steamId": "76561198988960546",
+      "steamName": "F1Y1NGDUTCHM8N",
+      "discordId": null
+    },
+    "Trapdoor": {
+      "id": 97,
+      "steamId": "76561197965180640",
+      "steamName": "Trapdoor",
+      "discordId": null
+    },
+    "koz": {
+      "id": 565,
+      "steamId": "76561198096236961",
+      "steamName": "koz",
+      "discordId": null
+    },
+    "AnIntenseMoist": {
+      "id": 191,
+      "steamId": "76561198080117545",
+      "steamName": "AnIntenseMoist",
+      "discordId": null
+    },
+    "A Broken Forklift": {
+      "id": 27,
+      "steamId": "76561198043268277",
+      "steamName": "A Broken Forklift",
+      "discordId": null
+    },
+    "Sheriff": {
+      "id": 577,
+      "steamId": "76561198871908504",
+      "steamName": "Sheriff",
+      "discordId": "459506265777766422"
+    },
+    "rtyyyyb": {
+      "id": 248,
+      "steamId": "76561199208124083",
+      "steamName": "rtyyyyb",
+      "discordId": "826460112520216586"
+    },
+    "Nails": {
+      "id": 572,
+      "steamId": "76561198072185237",
+      "steamName": "Nails",
+      "discordId": "308018024839905280"
+    },
+    "Mr. Hubub": {
+      "id": 278,
+      "steamId": "76561199051019898",
+      "steamName": "Mr. Hubub",
+      "discordId": null
     }
   },
   "userId": {
@@ -529,6 +595,72 @@
       "steamId": "76561199643465013",
       "steamName": "thenameiwantedwastoolong",
       "discordId": "-1"
+    },
+    "98": {
+      "id": 98,
+      "steamId": "76561198064346397",
+      "steamName": "Mark",
+      "discordId": null
+    },
+    "145": {
+      "id": 145,
+      "steamId": "76561198160604987",
+      "steamName": "Tritonas1237",
+      "discordId": null
+    },
+    "224": {
+      "id": 224,
+      "steamId": "76561198988960546",
+      "steamName": "F1Y1NGDUTCHM8N",
+      "discordId": null
+    },
+    "97": {
+      "id": 97,
+      "steamId": "76561197965180640",
+      "steamName": "Trapdoor",
+      "discordId": null
+    },
+    "565": {
+      "id": 565,
+      "steamId": "76561198096236961",
+      "steamName": "koz",
+      "discordId": null
+    },
+    "191": {
+      "id": 191,
+      "steamId": "76561198080117545",
+      "steamName": "AnIntenseMoist",
+      "discordId": null
+    },
+    "27": {
+      "id": 27,
+      "steamId": "76561198043268277",
+      "steamName": "A Broken Forklift",
+      "discordId": null
+    },
+    "577": {
+      "id": 577,
+      "steamId": "76561198871908504",
+      "steamName": "Sheriff",
+      "discordId": "459506265777766422"
+    },
+    "248": {
+      "id": 248,
+      "steamId": "76561199208124083",
+      "steamName": "rtyyyyb",
+      "discordId": "826460112520216586"
+    },
+    "572": {
+      "id": 572,
+      "steamId": "76561198072185237",
+      "steamName": "Nails",
+      "discordId": "308018024839905280"
+    },
+    "278": {
+      "id": 278,
+      "steamId": "76561199051019898",
+      "steamName": "Mr. Hubub",
+      "discordId": null
     }
   },
   "steamId": {
@@ -795,6 +927,72 @@
       "steamId": "76561199643465013",
       "steamName": "thenameiwantedwastoolong",
       "discordId": "-1"
+    },
+    "76561198064346397": {
+      "id": 98,
+      "steamId": "76561198064346397",
+      "steamName": "Mark",
+      "discordId": null
+    },
+    "76561198160604987": {
+      "id": 145,
+      "steamId": "76561198160604987",
+      "steamName": "Tritonas1237",
+      "discordId": null
+    },
+    "76561198988960546": {
+      "id": 224,
+      "steamId": "76561198988960546",
+      "steamName": "F1Y1NGDUTCHM8N",
+      "discordId": null
+    },
+    "76561197965180640": {
+      "id": 97,
+      "steamId": "76561197965180640",
+      "steamName": "Trapdoor",
+      "discordId": null
+    },
+    "76561198096236961": {
+      "id": 565,
+      "steamId": "76561198096236961",
+      "steamName": "koz",
+      "discordId": null
+    },
+    "76561198080117545": {
+      "id": 191,
+      "steamId": "76561198080117545",
+      "steamName": "AnIntenseMoist",
+      "discordId": null
+    },
+    "76561198043268277": {
+      "id": 27,
+      "steamId": "76561198043268277",
+      "steamName": "A Broken Forklift",
+      "discordId": null
+    },
+    "76561198871908504": {
+      "id": 577,
+      "steamId": "76561198871908504",
+      "steamName": "Sheriff",
+      "discordId": "459506265777766422"
+    },
+    "76561199208124083": {
+      "id": 248,
+      "steamId": "76561199208124083",
+      "steamName": "rtyyyyb",
+      "discordId": "826460112520216586"
+    },
+    "76561198072185237": {
+      "id": 572,
+      "steamId": "76561198072185237",
+      "steamName": "Nails",
+      "discordId": "308018024839905280"
+    },
+    "76561199051019898": {
+      "id": 278,
+      "steamId": "76561199051019898",
+      "steamName": "Mr. Hubub",
+      "discordId": null
     }
   },
   "discordId": {
@@ -871,10 +1069,28 @@
       "discordId": "-1"
     },
     "None": {
-      "id": 105,
-      "steamId": "76561198125435428",
-      "steamName": "JobW",
+      "id": 278,
+      "steamId": "76561199051019898",
+      "steamName": "Mr. Hubub",
       "discordId": null
+    },
+    "459506265777766422": {
+      "id": 577,
+      "steamId": "76561198871908504",
+      "steamName": "Sheriff",
+      "discordId": "459506265777766422"
+    },
+    "826460112520216586": {
+      "id": 248,
+      "steamId": "76561199208124083",
+      "steamName": "rtyyyyb",
+      "discordId": "826460112520216586"
+    },
+    "308018024839905280": {
+      "id": 572,
+      "steamId": "76561198072185237",
+      "steamName": "Nails",
+      "discordId": "308018024839905280"
     }
   }
 }

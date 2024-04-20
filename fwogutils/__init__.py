@@ -437,9 +437,9 @@ def userhandler(userid: str=None, steamid: str=None, steamname: str=None, discor
     with open("gtrusercache.json", 'r') as cacheread:
         cache = json.loads(cacheread.read())
     if userid != None:
-        if userid in cache['userId']:
+        try:
             return cache['userId'][str(userid)]
-        else:
+        except KeyError:
             user = getgtruserv2(userid=userid)
             if user is False:
                 return False
@@ -453,10 +453,10 @@ def userhandler(userid: str=None, steamid: str=None, steamname: str=None, discor
                     json.dump(cache, cachewrite, indent=2)
                 return user
     elif steamid != None:
-        if steamid in cache['steamId']:
+        try:
             return cache['steamId'][str(steamid)]
-        else:
-            user = getgtruserv2(userid=steamid)
+        except KeyError:
+            user = getgtruserv2(steamid=steamid)
             if user is False:
                 return False
             else:
@@ -469,15 +469,15 @@ def userhandler(userid: str=None, steamid: str=None, steamname: str=None, discor
                     json.dump(cache, cachewrite, indent=2)
                 return user
     elif steamname != None:
-        if steamname in cache['steamName']:
+        try:
             return cache['steamName'][str(steamname)]
-        else:
+        except KeyError:
             return False
     elif discordid != None:
-        if discordid in cache['discordId']:
+        try:
             return cache['discordId'][str(discordid)]
-        else:
-            user = getgtruserv2(userid=discordid)
+        except KeyError:
+            user = getgtruserv2(discordid=discordid)
             if user is False:
                 return False
             else:

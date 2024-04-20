@@ -67,9 +67,9 @@ class LButtons(nextcord.ui.View):
             for x in closeranks:
                 x = x['attributes']
                 if x['rank'] != userrank:
-                    ranks += f"{x['rank']}. `{fwogutils.userhandler(userid=x['userId'])["steamName"]}` with **{x['points']}** points and **{x['worldRecords']}** World Records\n"
+                    ranks += f"{x['rank']}. `{fwogutils.userhandler(userid=x['userId'])['steamName']}` with **{x['points']}** points and **{x['worldRecords']}** World Records\n"
                 else:
-                    ranks += f"> {x['rank']}. `{fwogutils.userhandler(userid=x['userId'])["steamName"]}` with **{x['points']}** points and **{x['worldRecords']}** World Records\n"
+                    ranks += f"> {x['rank']}. `{fwogutils.userhandler(userid=x['userId'])['steamName']}` with **{x['points']}** points and **{x['worldRecords']}** World Records\n"
             embed = discord.Embed(title="Your Rank", description=ranks, color=nextcord.Color.blue())
             await ctx.edit("", embed=embed)
         else:
