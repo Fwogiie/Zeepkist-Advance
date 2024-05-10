@@ -12,28 +12,14 @@ from nextcord.errors import HTTPException
 import privaat
 import urllib
 from urllib.parse import quote
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.triggers.cron import CronTrigger
-import inspect
-import pytz
-import calendar
-import subprocess
-import ast
-import copy
-import sys
 import fwogutils
 from fwogutils import bot as bot
 from fwogutils import log as log
 from fwogutils import format_time as format_time
 from fwogutils import views
-from nextcord import webhook, Webhook
 import random
-from nextcord.components import Button
-import asyncio
 import websockets
-from itertools import count
 from fwogutils import GTR as GTR
-from fwogutils import Zworp as Zworp
 
 bot.load_extension("onami")
 
@@ -537,9 +523,10 @@ async def on_ready():
         data = json.load(f)
         leaderboards = data["leaderboards"]
         log(f"leaderboards cache succeeded.")
-        log("updating the live leaderboards cause of start.")
-        await rankingsfunc(fwogutils.getgtruserrankings(limit=100, offset=0))
-        log("Process done to the GTR rankings leaderboard.")
+        if bot.user.id == 1126430942924386315:
+            log("updating the live leaderboards cause of start.")
+            await rankingsfunc(fwogutils.getgtruserrankings(limit=100, offset=0))
+            log("Process done to the GTR rankings leaderboard.")
         await wrcallback()
 
 
@@ -1133,65 +1120,6 @@ async def gettoplvls(ctx, amount: int = nextcord.SlashOption(
         await ctx.edit("Error! Limit is 999!")
 
 
-sent = False
-conx = nextcord.Interaction
-
-
-@tasks.loop(seconds=10, reconnect=True)
-async def emb():
-    global sent, conx
-    chan = await bot.fetch_channel(1144730662000136315)
-    try:
-        this = json.loads(requests.get("https://zeepkist-showdown-4215308f4ce4.herokuapp.com/api/qualifier").text)[
-            'qualifier']
-        wr = json.loads(requests.get(
-            "https://api.zeepkist-gtr.com/records?Level=D94C0982CE0BA4D261DF1A79BF2267B47DFEF715&ValidOnly=true&Limit=1&Offset=0").text)[
-            'records'][0]
-        wruser = json.loads(requests.get(f"https://api.zeepkist-gtr.com/users/{wr['user']}").text)
-        embed = discord.Embed(title="Pool 1", description="", color=nextcord.Color.red())
-        embeda = discord.Embed(title="Pool 2", description="", color=nextcord.Color.blue())
-        embedb = discord.Embed(title="Substitutes", description="", color=nextcord.Color.dark_grey())
-        wrembed = discord.Embed(title="GTR World Record", description="", color=nextcord.Color.purple())
-        count = 1
-        for x in this[:8]:
-            embed.add_field(name=f"{count}. {x['time']}", value=f"by {x['name']}")
-            count += 1
-        embed.add_field(name=f"", value=f"")
-        for x in this[:16][8:]:
-            embeda.add_field(name=f"{count}. {x['time']}", value=f"by {x['name']}")
-            count += 1
-        embeda.add_field(name=f"", value=f"")
-        for x in this[16:41]:
-            embedb.add_field(name=f"{count}. {x['time']}", value=f"by {x['name']}")
-            count += 1
-        wrembed.add_field(name=f"{format_time(wr['time'])}", value=f"by {wruser['steamName']}")
-        if sent:
-            await conx.edit(f"# Showdown Qualifier Season 2", embeds=[embed, embeda, embedb, wrembed])
-        else:
-            conx = await chan.send(f"# Showdown Qualifier Season 2", embeds=[embed, embeda, embedb, wrembed])
-            sent = True
-    except Exception as ewwor:
-        await chan.send(f"an error occurred.\n\n```{ewwor}```")
-
-
-@bot.command(name="startemb")
-async def startemb(ctx):
-    if ctx.author.id in [785037540155195424, 257321046611329026]:
-        emb.start()
-    else:
-        pass
-
-
-@bot.command(name="stopemb")
-async def stopemb(ctx):
-    global sent
-    if ctx.author.id in [785037540155195424, 257321046611329026]:
-        emb.stop()
-        sent = False
-    else:
-        pass
-
-
 @bot.slash_command(name='crtteam', guild_ids=[1127321762686836798])
 async def crtteam(ctx, teamname: str, teamtag: str, pa: str, pb: str, color: str):
     color = fwogutils.hex_to_rgb(color)
@@ -1434,11 +1362,6 @@ async def notifme(ctx, to: str = nextcord.SlashOption(name="for", description="w
                 return
             log(f"setting {to} to True")
             fwogutils.setlinkedusersetting(setting=to, value=True, user=ctx.user.id)
-            if to == "WRST":
-                log("setting user wrs for WRST notif")
-                user = fwogutils.get_linked_users()[str(ctx.user.id)]
-                allwrs = fwogutils.gtr_getalluserwrs(user['id'])
-                fwogutils.loc_setuserwrs(user['id'], allwrs)
             await ctx.send(f"You will now be notified for what you selected!")
         else:
             await ctx.send("You are not linked! use the `/link gtr` command to link your GTR to this server!")
@@ -1474,71 +1397,66 @@ async def notifme(ctx,
 
 
 async def wrcallback(message=None):
-    """logging for debug, bug found but not sure, so letting them as comments in case <3"""
-    #log("entering while 1 (also wrcallback called)")
     while True:
-        #log("while 1 went, going to try connecting")
         try:
             log('connecting to gtr wss')
             async with websockets.connect("wss://stream.zeepkist-gtr.com/ws") as ws:
-                #log("connected, entering while 2")
                 while True:
-                    #log(f"(while 2), waiting for content, debug count: {count}")
                     content = json.loads(await ws.recv())
-                    #log(content)
-                    #log("setting/fetching WRSTusers")
+                    log(content)
                     wrstusers = fwogutils.getWRSTusers()
-                    #log(f"WRSTusers returned: {wrstusers}")
                     if str(content['Data']['PreviousUserId']) in wrstusers and content['Data']['PreviousUserId'] != \
                             content['Data']['NewUserId'] and content['Type'] == "wr":
                         log("WR is stolen!!")
                         wrstuserinfo = wrstusers[str(content['Data']['PreviousUserId'])]
-                        #log(f"wrstuserinfo returned: {wrstuserinfo}")
-                        #log("getting userlink")
                         userlink = fwogutils.get_linked_users()[str(wrstuserinfo['discid'])]
-                        #log(f"userlink returned: {userlink}")
-                        #log("getting level")
                         level = fwogutils.zworp_getlevel(content['Data']['LevelHash'])
-                        #log(f"level returned: {level}")
                         if level is not False:
                             log("level was not false")
-                            #log("getting prevrec")
                             prevrec = fwogutils.jsonapi_getrecord(content['Data']['PreviousRecordId'])
-                            #log(f"prevrec returned: {prevrec}")
-                            #log("getting recordcreated")
                             recordcreated = datetime.datetime.strptime(prevrec["dateCreated"], '%Y-%m-%dT%H:%M:%S.%fZ')
-                            #log(f"recordcreated returned: {recordcreated}")
-                            #log("getting timenow")
                             timenow = datetime.datetime.now()
-                            log(f"timenow returned: {timenow}")
-                            #log("going trough 10 mins check")
                             if timenow.date() == recordcreated.date() and int(recordcreated.timestamp()) + 600 > int(
                                     timenow.timestamp()):
                                 log('wr beat before 10 mins, breaking')
                                 break
-                            #log("after if reached (getting newrec)")
-                            newrec = fwogutils.getgtrrecord(content['Data']['NewRecordId'])
-                            #log(f"newrec returned: {newrec}")
-                            #log("getting newuser")
-                            newuser = fwogutils.getgtruser(content['Data']['NewUserId'])
-                            #log(f"newuser returned: {newuser}")
-                            #log("creating embed (should work fine if all logs above are valid)")
-                            wrstembed = discord.Embed(title="One of your World Records has been taken!",
-                                                      description=f"Your World Record on **{level[0]['name']}** by **{level[0]['fileAuthor']}** was taken!",
+                            prevrec, prevuser = fwogutils.jsonapi_getrecord(content['Data']['PreviousRecordId']), fwogutils.getgtruser(content['Data']["PreviousUserId"])
+                            recordcreated = datetime.datetime.strptime(prevrec["dateCreated"], '%Y-%m-%dT%H:%M:%S.%fZ')
+                            newrecordcreated = datetime.datetime.strptime(newrec["dateCreated"], '%Y-%m-%dT%H:%M:%S.%fZ')
+                            newrec, newuser = fwogutils.jsonapi_getrecord(content['Data']['NewRecordId']), fwogutils.getgtruser(content['Data']['NewUserId'])
+                            wrstembed = discord.Embed(title="New World Record!",
+                                                      description=f"New World Record on **{level[0]['name']}** by **{level[0]['fileAuthor']}**",
                                                       color=nextcord.Color.blue(),
                                                       url=f"https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']}")
-                            wrstembed.set_thumbnail(
-                                url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
+                            wrstembed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
                             wrstembed.add_field(name="Info",
-                                                value=f"Previous time: **{fwogutils.format_time(prevrec['time'])}** by **{userlink['steamName']}** set <t:{int(recordcreated.timestamp())}:R>\n"
-                                                      f"New time: **{fwogutils.format_time(newrec['time'])}** by **{newuser[1]['steamName']}**\n"
+                                                value=f"Previous time: **{fwogutils.format_time(prevrec['time'])}** by **{prevuser[1]['steamName']}** set <t:{int(recordcreated.timestamp())}:R>\n"
+                                                      f"New time: **{fwogutils.format_time(newrec['time'])}** by **{newuser[1]['steamName']}** set <t:{int(newrecordcreated.timestamp())}:R>\n"
                                                       f"Level: [{level[0]['name']} by {level[0]['fileAuthor']}](https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']})")
-                            #log("fetching notifchannel (1207401802769633310)")
                             notifchannel = await bot.fetch_channel(1207401802769633310)
-                            #log(f"notifchannel name: {notifchannel.name}")
-                            #log("sending notif (should be fine if channel name fetched correctly in log above)")
                             await notifchannel.send(f"<@{wrstuserinfo['discid']}>", embed=wrstembed)
-                            #log("notif sent")
+                            feedchannel = await bot.fetch_channel(1231992230529601647)
+                            await feedchannel.send("", embed=wrstembed)
+                    else:
+                        log("WR getting sent into feed channel")
+                        level = fwogutils.zworp_getlevel(content['Data']['LevelHash'])
+                        if level is not False:
+                            log("level was not false")
+                            prevrec, prevuser = fwogutils.jsonapi_getrecord(content['Data']['PreviousRecordId']), fwogutils.getgtruser(content['Data']["PreviousUserId"])
+                            newrec, newuser = fwogutils.jsonapi_getrecord(content['Data']['NewRecordId']), fwogutils.getgtruser(content['Data']['NewUserId'])
+                            recordcreated = datetime.datetime.strptime(prevrec["dateCreated"], '%Y-%m-%dT%H:%M:%S.%fZ')
+                            newrecordcreated = datetime.datetime.strptime(newrec["dateCreated"], '%Y-%m-%dT%H:%M:%S.%fZ')
+                            wrstembed = discord.Embed(title="New World Record!",
+                                                      description=f"New World Record on **{level[0]['name']}** by **{level[0]['fileAuthor']}**",
+                                                      color=nextcord.Color.blue(),
+                                                      url=f"https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']}")
+                            wrstembed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
+                            wrstembed.add_field(name="Info",
+                                                value=f"Previous time: **{fwogutils.format_time(prevrec['time'])}** by **{prevuser[1]['steamName']}** set <t:{int(recordcreated.timestamp())}:R>\n"
+                                                      f"New time: **{fwogutils.format_time(newrec['time'])}** by **{newuser[1]['steamName']}** set <t:{int(newrecordcreated.timestamp())}:R>\n"
+                                                      f"Level: [{level[0]['name']} by {level[0]['fileAuthor']}](https://steamcommunity.com/sharedfiles/filedetails/?id={level[0]['workshopId']})")
+                            feedchannel = await bot.fetch_channel(1231992230529601647)
+                            await feedchannel.send("", embed=wrstembed)
         except Exception as ex:
             print(ex)
             log(str(ex))
@@ -1606,6 +1524,140 @@ async def gliderifylvl(ctx, level: nextcord.Attachment, include_booster: bool, b
     with open("level.zeeplevel", 'w') as fw:
         fw.write(newlvl)
     await ctx.send("It's been generated!", file=nextcord.File("level.zeeplevel"))"""
+
+@bot.slash_command(name="register", description="Register to play in the Showdown competition!", guild_ids=[1127321762686836798])
+async def sd_register(ctx):
+    linkeds = fwogutils.get_linked_users()
+    user = str(ctx.user.id)
+    with open("showdownusers.json", 'r') as read:
+        sdusers = json.loads(read.read())
+    if int(user) in sdusers['registered_users']:
+        await ctx.send("You are already registered!", ephemeral=True)
+        return
+    if user in linkeds:
+        linkeduser = linkeds[user]
+        async def btn_yes(ctx: nextcord.Interaction):
+            newuser = {"id": linkeduser['id'], "steamId": linkeduser['steamId'], "steamName": linkeduser['steamName'], "discordId": linkeduser['discordId'], "registered": True}
+            sdusers["s4"].append(newuser)
+            sdusers["registered_users"].append(int(user))
+            with open("showdownusers.json", 'w') as write:
+                json.dump(sdusers, write, indent=2)
+            requests.post("https://zeepkist-showdown-4215308f4ce4.herokuapp.com/api/v2/qualifier/register", json=newuser)
+            await ctx.edit(content="Thank you for participating!", view=None)
+            await ctx.channel.send(f"{ctx.user.mention} has joined the competition!")
+        async def btn_no(ctx: nextcord.Interaction):
+            await ctx.edit(content="Alrighty!", view=None)
+            return
+        agreebtns = nextcord.ui.View(timeout=60)
+        btnyes = nextcord.ui.Button(label="Yes", style=nextcord.ButtonStyle.green)
+        btnyes.callback = btn_yes
+        btnno = nextcord.ui.Button(label="No", style=nextcord.ButtonStyle.red)
+        btnno.callback = btn_no
+        agreebtns.add_item(btnyes)
+        agreebtns.add_item(btnno)
+        await ctx.send(f"I have found a steam account by the name of **{linkeduser['steamName']}**\nDo you wish to register?\n\n"
+                       f"**By registering you accept that we need to gather your steam ID, your steam Name and your GTR user ID for organizational and technical reasons**", ephemeral=True, view=agreebtns)
+    else:
+        user = fwogutils.userhandler(discordid=str(ctx.user.id))
+        async def btn_yes(ctx: nextcord.Interaction):
+            newuser = {"id": user['id'], "steamId": user['steamId'], "steamName": user['steamName'], "discordId": user['discordId'], "registered": True}
+            sdusers["s4"].append(newuser)
+            sdusers["registered_users"].append(int(ctx.user.id))
+            with open("showdownusers.json", 'w') as write:
+                json.dump(sdusers, write, indent=2)
+            requests.post("https://zeepkist-showdown-4215308f4ce4.herokuapp.com/api/v2/qualifier/register", json=newuser)
+            await ctx.edit(content="Thank you for participating!", view=None)
+            await ctx.channel.send(f"{ctx.user.mention} has joined the competition!")
+        async def btn_no(ctx: nextcord.Interaction):
+            await ctx.edit(content="Alrighty!", view=None)
+            return
+        agreebtns = nextcord.ui.View(timeout=60)
+        btnyes = nextcord.ui.Button(label="Yes", style=nextcord.ButtonStyle.green)
+        btnyes.callback = btn_yes
+        btnno = nextcord.ui.Button(label="No", style=nextcord.ButtonStyle.red)
+        btnno.callback = btn_no
+        agreebtns.add_item(btnyes)
+        agreebtns.add_item(btnno)
+        await ctx.send(f"I have found a steam account by the name of **{user['steamName']}**\nDo you wish to register?\n\n"
+                       f"**By registering you accept that we need to gather your steam ID, your steam Name and your GTR user ID for organizational and technical reasons**", ephemeral=True, view=agreebtns)
+
+
+@bot.slash_command(name="unregister", description="Unregister from the Showdown Competition", guild_ids=[1127321762686836798])
+async def sd_unregister(ctx):
+    await ctx.response.defer(ephemeral=True)
+    with open("showdownusers.json", 'r') as read:
+        sdusers = json.loads(read.read())
+    index = 0
+    for x in sdusers["registered_users"]:
+        if x == ctx.user.id:
+            user = sdusers["s4"][index]
+            user["registered"] = False
+            postfalse = requests.post("https://zeepkist-showdown-4215308f4ce4.herokuapp.com/api/v2/qualifier/register", json=user)
+            log(f"postfalse returned: {postfalse.text}")
+            log(f"popping {ctx.user.id}")
+            log(sdusers["s4"].pop(index))
+            log(sdusers["registered_users"].pop(index))
+            with open("showdownusers.json", 'w') as write:
+                json.dump(sdusers, write, indent=2)
+            await ctx.followup.send("You have been successfully unregistered!")
+            await ctx.channel.send(f"{ctx.user.mention} Has left the competition :/")
+            return
+        index += 1
+    await ctx.followup.send("You arent registered!")
+
+
+sent = False
+conx = nextcord.Interaction
+
+
+@tasks.loop(seconds=3, minutes=1, reconnect=True)
+async def emb():
+    global sent, conx
+    chan = await bot.fetch_channel(1144730662000136315)
+    try:
+        this = json.loads(requests.get("https://zeepkist-showdown-4215308f4ce4.herokuapp.com/api/qualifier").text)['qualifier']
+        wr = json.loads(requests.get(
+            "https://api.zeepkist-gtr.com/records?Level=D94C0982CE0BA4D261DF1A79BF2267B47DFEF715&ValidOnly=true&Limit=1&Offset=0").text)[
+            'records'][0]
+        wruser = json.loads(requests.get(f"https://api.zeepkist-gtr.com/users/{wr['user']}").text)
+        embed = discord.Embed(title="Pool 1", description="", color=nextcord.Color.red())
+        embeda = discord.Embed(title="Pool 2", description="", color=nextcord.Color.blue())
+        embedb = discord.Embed(title="Substitutes", description="", color=nextcord.Color.dark_grey())
+        wrembed = discord.Embed(title="GTR World Record", description="", color=nextcord.Color.purple())
+        count = 1
+        for x in this[:8]:
+            embed.add_field(name=f"{count}. {x['time']}", value=f"by {x['name']}")
+            count += 1
+        embed.add_field(name=f"", value=f"")
+        for x in this[:16][8:]:
+            embeda.add_field(name=f"{count}. {x['time']}", value=f"by {x['name']}")
+            count += 1
+        embeda.add_field(name=f"", value=f"")
+        for x in this[16:41]:
+            embedb.add_field(name=f"{count}. {x['time']}", value=f"by {x['name']}")
+            count += 1
+        wrembed.add_field(name=f"{format_time(wr['time'])}", value=f"by {wruser['steamName']}")
+        if sent:
+            await conx.edit(f"# Showdown Qualifier Season 3", embeds=[embed, embeda, embedb, wrembed])
+        else:
+            conx = await chan.send(f"# Showdown Qualifier Season 3", embeds=[embed, embeda, embedb, wrembed])
+            sent = True
+    except Exception as ewwor:
+        await chan.send(f"an error occurred.\n\n```{ewwor}```")
+
+
+@bot.command(name="startemb")
+async def startemb(ctx):
+    if ctx.author.id in [785037540155195424, 257321046611329026]:
+        emb.start()
+
+
+@bot.command(name="stopemb")
+async def stopemb(ctx):
+    global sent
+    if ctx.author.id in [785037540155195424, 257321046611329026]:
+        emb.stop()
+        sent = False
 
 
 bot.run(privaat.token)
