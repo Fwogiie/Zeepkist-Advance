@@ -1623,8 +1623,7 @@ async def emb():
         users = json.loads(read.read())["s4"]
         for x in users:
             userpb = json.loads(requests.get(
-                f"https://jsonapi.zeepkist-gtr.com/records?filter=and(equals(userId,%27{x['id']}%27),equals(level,%27C1911F2EB2B9787C5592DC48BFEEDE23F70ED169%27))&sort=time&page[size]=1").text)[
-                "data"][0]["attributes"]
+                f"https://jsonapi.zeepkist-gtr.com/personalbests?filter=and(equals(userId,%27{x['id']}%27),equals(level,%27C1911F2EB2B9787C5592DC48BFEEDE23F70ED169%27))&include=record").text)["included"][0]["attributes"]
             iden[str(fwogutils.format_time(userpb['time']))] = x['steamName']
             sort.append(fwogutils.format_time(userpb['time']))
         sort.sort()
@@ -1675,6 +1674,5 @@ async def stopemb(ctx):
     if ctx.author.id in [785037540155195424, 257321046611329026]:
         emb.stop()
         sent = False
-
 
 bot.run(privaat.token)
