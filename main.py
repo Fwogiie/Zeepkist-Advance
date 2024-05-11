@@ -1624,11 +1624,11 @@ async def emb():
         for x in users:
             userpb = json.loads(requests.get(
                 f"https://jsonapi.zeepkist-gtr.com/personalbests?filter=and(equals(userId,%27{x['id']}%27),equals(level,%27C1911F2EB2B9787C5592DC48BFEEDE23F70ED169%27))&include=record").text)["included"][0]["attributes"]
-            iden[str(fwogutils.format_time(userpb['time']))] = x['steamName']
-            sort.append(fwogutils.format_time(userpb['time']))
+            iden[str(userpb['time'])] = x['steamName']
+            sort.append(userpb['time'])
         sort.sort()
         for x in sort:
-            this.append({"time": str(x), "name": iden[str(x)]})
+            this.append({"time": str(fwogutils.format_time(x)), "name": iden[str(x)]})
     chan = await bot.fetch_channel(1144730662000136315)
     try:
         # this = json.loads(requests.get("https://zeepkist-showdown-4215308f4ce4.herokuapp.com/api/qualifier").text)['qualifier']
@@ -1645,7 +1645,7 @@ async def emb():
             embed.add_field(name=f"{count}. {x['time']}", value=f"by {x['name']}")
             count += 1
         embed.add_field(name=f"", value=f"")
-        for x in this[:16][8:]:
+        for x in this[8:16]:
             embeda.add_field(name=f"{count}. {x['time']}", value=f"by {x['name']}")
             count += 1
         embeda.add_field(name=f"", value=f"")
