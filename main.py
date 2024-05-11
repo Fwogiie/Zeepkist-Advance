@@ -1616,11 +1616,25 @@ conx = nextcord.Interaction
 @tasks.loop(seconds=3, minutes=1, reconnect=True)
 async def emb():
     global sent, conx
+    this = []
+    sort = []
+    iden = {}
+    with open("showdownusers.json", 'r') as read:
+        users = json.loads(read.read())["s4"]
+        for x in users:
+            userpb = json.loads(requests.get(
+                f"https://jsonapi.zeepkist-gtr.com/records?filter=and(equals(userId,%27{x['id']}%27),equals(level,%27C1911F2EB2B9787C5592DC48BFEEDE23F70ED169%27))&sort=time&page[size]=1").text)[
+                "data"][0]["attributes"]
+            iden[str(fwogutils.format_time(userpb['time']))] = x['steamName']
+            sort.append(fwogutils.format_time(userpb['time']))
+        sort.sort()
+        for x in sort:
+            this.append({"time": str(x), "name": iden[str(x)]})
     chan = await bot.fetch_channel(1144730662000136315)
     try:
-        this = json.loads(requests.get("https://zeepkist-showdown-4215308f4ce4.herokuapp.com/api/qualifier").text)['qualifier']
+        # this = json.loads(requests.get("https://zeepkist-showdown-4215308f4ce4.herokuapp.com/api/qualifier").text)['qualifier']
         wr = json.loads(requests.get(
-            "https://api.zeepkist-gtr.com/records?Level=D94C0982CE0BA4D261DF1A79BF2267B47DFEF715&ValidOnly=true&Limit=1&Offset=0").text)[
+            "https://api.zeepkist-gtr.com/records?Level=C1911F2EB2B9787C5592DC48BFEEDE23F70ED169&ValidOnly=true&Limit=1&Offset=0").text)[
             'records'][0]
         wruser = json.loads(requests.get(f"https://api.zeepkist-gtr.com/users/{wr['user']}").text)
         embed = discord.Embed(title="Pool 1", description="", color=nextcord.Color.red())
