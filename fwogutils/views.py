@@ -60,8 +60,12 @@ class LButtons(nextcord.ui.View):
         ctx = await ctx.send("processing", ephemeral=True)
         linked = fwogutils.get_linked_users()
         if str(userid) in linked:
+            linked = linked[str(userid)]
             log(f"user had gtr linked, showing rank!")
-            userrank = fwogutils.getgtruserrank(linked[str(userid)]["id"])["position"]
+            if linked["userdata"]["position"] != 6969:
+                userrank = linked["userdata"]["position"]
+            else:
+                userrank = fwogutils.getgtruserrank(linked["id"])["position"]
             closeranks = fwogutils.jsonapi_getgtrpositions(frompos=userrank-5, amount=11)["data"]
             ranks = ""
             for x in closeranks:

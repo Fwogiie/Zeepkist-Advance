@@ -269,7 +269,7 @@ def jsonapi_get_toplevelpoints(limit: int):
 def converturlsepperations(data: list):
     returndata = ""
     for x in data:
-        returndata += f"{x},"
+        returndata += f"{x}%2C"
     return returndata
 
 def zworp_getlevelsbyhashlist(levels: str):
