@@ -134,7 +134,8 @@ async def create_pl(ctx, msg: nextcord.Message):
             pl = {"name": plname, "amountOfLevels": 1, "roundLength": 480.0, "shufflePlaylist": False, "UID": [], "levels": levels}
             fwogutils.dumppl(pl)
             fwogutils.renamepl(plname)
-            await ctxe.edit(f"# Your playlist has been generated!\n### Failed levels (These levels failed and would need to be added manually):\n{levelfails}\n### Level packs (Might need manual adjustments):\n{packlvls}", file=nextcord.File(f"{plname}.zeeplist"))
+            await ctxe.edit(f"# Your playlist has been generated!\n### Failed levels (These levels failed and would need to be added manually):\n{levelfails}\n"
+                            f"### Level packs (Might need manual adjustments):\n{packlvls}", file=nextcord.File(f"{plname}.zeeplist"))
             fwogutils.undorename(plname)
     modal = nextcord.ui.Modal(title="Playlist creation")
     textinput = nextcord.ui.TextInput(label="Playlist name", min_length=1, max_length=50)
@@ -404,77 +405,6 @@ async def sendteams(ctx):
                                     description=f"{x['participants'][0]['steamName']}\n{x['participants'][1]['steamName']}",
                                     color=nextcord.Color.from_rgb(color[0], color[1], color[2])))
     await ctx.send(embeds=embeds)
-
-
-sentlb = False
-conxlb = nextcord.Interaction
-
-
-@tasks.loop(minutes=5, reconnect=True)
-async def lb():
-    global sentlb, conxlb, cache
-    sdlvls = [{'hash': "6CCAB651EC9FD760D1BE0E71C453290C2A2CD16D", 'name': "Abyssal Windows"},
-              {'hash': "2D9CDA53B58EA5FB3E4D62F9DB1A60DE3DB201A1", 'name': "Crystal Sands"},
-              {'hash': "FE488367F99D07F1D795381E6726C5603495EF6F", 'name': "OOoOoooOooOOOO stairs"},
-              {'hash': "05BD3B69BD469BC9DC24DC89C1E7929445E46D0C", 'name': "Other Green Hills"},
-              {'hash': "29036E8F39B3682BA1576F4268C9BBA278D88C21", 'name': "Schmetterling"},
-              {'hash': "544EF863C7740AEB32D708EE269C3C5D03FF8E9A", 'name': "The Red One"},
-              {'hash': "11ED3D54B27698564A6499B6FEEE996B1D13CE0B", 'name': "Whirlpool"}]
-    chan = await bot.fetch_channel(1198606669123424357)
-    embed = discord.Embed(title="Showdown Levels", description=" ", color=nextcord.Color.purple())
-    embeda = discord.Embed(color=nextcord.Color.purple(), description=" ")
-    embedb = discord.Embed(color=nextcord.Color.purple(), description=" ")
-    embedc = discord.Embed(color=nextcord.Color.purple(), description=" ", timestamp=datetime.datetime.now())
-    embedc.set_footer(text="last updated")
-    try:
-        for x in sdlvls:
-            records = json.loads(requests.get(
-                f"https://api.zeepkist-gtr.com/records?Level={x['hash']}&ValidOnly=true&Limit=75&Offset=0").text)
-            data = {"levelrecs": "", "rcount": 0, "users": []}
-            for a in records['records']:
-                user = fwogutils.getgtruser(id=a['user'])[1]['steamName']
-                if user not in data['users']:
-                    data['levelrecs'] += f"1. `{format_time(a['time'])}` by **{user}**\n"
-                    data['users'].append(user)
-                    data['rcount'] += 1
-                    if data["rcount"] == 5:
-                        break
-            if x['name'] in ['Abyssal Windows', 'Crystal Sands']:
-                embed.add_field(name=x['name'], value=data['levelrecs'], inline=True)
-            elif x['name'] in ['OOoOoooOooOOOO stairs', 'Other Green Hills']:
-                embeda.add_field(name=x['name'], value=data['levelrecs'], inline=True)
-            elif x['name'] in ['Schmetterling', 'The Red One']:
-                embedb.add_field(name=x['name'], value=data['levelrecs'], inline=True)
-            elif x['name'] in ['Whirlpool']:
-                embedc.add_field(name=x['name'], value=data['levelrecs'], inline=True)
-        if sentlb is not True:
-            embedc.timestamp = datetime.datetime.now()
-            conxlb = await chan.send(embeds=[embed, embeda, embedb, embedc])
-            sentlb = True
-        else:
-            embedc.timestamp = datetime.datetime.now()
-            await conxlb.edit(embeds=[embed, embeda, embedb, embedc])
-    except Exception as ewwor:
-        log(str(ewwor))
-
-
-@bot.command(name="startlb")
-async def startemb(ctx):
-    if ctx.author.id in [785037540155195424, 257321046611329026]:
-        lb.start()
-    else:
-        pass
-
-
-@bot.command(name="stoplb")
-async def stopemb(ctx):
-    global sentlb
-    if ctx.author.id in [785037540155195424, 257321046611329026]:
-        lb.stop()
-        sentlb = False
-    else:
-        pass
-
 
 @bot.slash_command(name="verify", description="Verify that you are not a bot!", guild_ids=[1200812715527114824])
 async def verify(ctx):
@@ -915,5 +845,74 @@ async def stopemb(ctx):
     if ctx.author.id in [785037540155195424, 257321046611329026]:
         emb.stop()
         sent = False
+
+sentlb = False
+conxlb = nextcord.Interaction
+
+
+@tasks.loop(minutes=5, reconnect=True)
+async def lb():
+    global sentlb, conxlb, cache
+    sdlvls = [{'hash': "10E58AD6D56644967ABC385701D245B1C9D63153", 'name': "Malfunction"},
+              {'hash': "E802E67815634AE7CE072B92A48BB34A1DE0E604", 'name': "Breakup"},
+              {'hash': "583D91B9454460B062A7D2A9195F812325EAEB87", 'name': "Impact"},
+              {'hash': "741A69742F3F6787682B3E79AD4136CD4780BD91", 'name': "Crimson Course"},
+              {'hash': "E48EF5181176449F9DBE9F45926CCBFDBD67B0D4", 'name': "Island Serenity"},
+              {'hash': "F81CD65D7823A686C476DFFAC3289CF8FD27459E", 'name': "Orange Strands"},
+              {'hash': "5BAA18F8423AA864F7CB15E94AF11150E66F7A04", 'name': "Jungle Run"}]
+    chan = await bot.fetch_channel(1198606669123424357)
+    embed = discord.Embed(title="Showdown Levels", description=" ", color=nextcord.Color.purple())
+    embeda = discord.Embed(color=nextcord.Color.purple(), description=" ")
+    embedb = discord.Embed(color=nextcord.Color.purple(), description=" ")
+    embedc = discord.Embed(color=nextcord.Color.purple(), description=" ", timestamp=datetime.datetime.now())
+    embedc.set_footer(text="last updated")
+    try:
+        for x in sdlvls:
+            records = json.loads(requests.get(
+                f"https://api.zeepkist-gtr.com/records?Level={x['hash']}&ValidOnly=true&Limit=75&Offset=0").text)
+            data = {"levelrecs": "", "rcount": 0, "users": []}
+            for a in records['records']:
+                user = fwogutils.getgtruser(id=a['user'])[1]['steamName']
+                if user not in data['users']:
+                    data['levelrecs'] += f"1. `{format_time(a['time'])}` by **{user}**\n"
+                    data['users'].append(user)
+                    data['rcount'] += 1
+                    if data["rcount"] == 5:
+                        break
+            if x['name'] in ['Abyssal Windows', 'Crystal Sands']:
+                embed.add_field(name=x['name'], value=data['levelrecs'], inline=True)
+            elif x['name'] in ['OOoOoooOooOOOO stairs', 'Other Green Hills']:
+                embeda.add_field(name=x['name'], value=data['levelrecs'], inline=True)
+            elif x['name'] in ['Schmetterling', 'The Red One']:
+                embedb.add_field(name=x['name'], value=data['levelrecs'], inline=True)
+            elif x['name'] in ['Whirlpool']:
+                embedc.add_field(name=x['name'], value=data['levelrecs'], inline=True)
+        if sentlb is not True:
+            embedc.timestamp = datetime.datetime.now()
+            conxlb = await chan.send(embeds=[embed, embeda, embedb, embedc])
+            sentlb = True
+        else:
+            embedc.timestamp = datetime.datetime.now()
+            await conxlb.edit(embeds=[embed, embeda, embedb, embedc])
+    except Exception as ewwor:
+        log(str(ewwor))
+
+
+@bot.command(name="startlb")
+async def startemb(ctx):
+    if ctx.author.id in [785037540155195424, 257321046611329026]:
+        lb.start()
+    else:
+        pass
+
+
+@bot.command(name="stoplb")
+async def stopemb(ctx):
+    global sentlb
+    if ctx.author.id in [785037540155195424, 257321046611329026]:
+        lb.stop()
+        sentlb = False
+    else:
+        pass
 
 bot.run(privaat.token)
