@@ -861,31 +861,35 @@ async def lb():
               {'hash': "F81CD65D7823A686C476DFFAC3289CF8FD27459E", 'name': "Orange Strands"},
               {'hash': "5BAA18F8423AA864F7CB15E94AF11150E66F7A04", 'name': "Jungle Run"}]
     chan = await bot.fetch_channel(1198606669123424357)
-    embed = discord.Embed(title="Showdown Levels", description=" ", color=nextcord.Color.purple())
-    embeda = discord.Embed(color=nextcord.Color.purple(), description=" ")
-    embedb = discord.Embed(color=nextcord.Color.purple(), description=" ")
-    embedc = discord.Embed(color=nextcord.Color.purple(), description=" ", timestamp=datetime.datetime.now())
+    embed = discord.Embed(title="Showdown Season 3 Levels", description=None, color=nextcord.Color.purple())
+    embeda = discord.Embed(color=nextcord.Color.purple(), description=None)
+    embedb = discord.Embed(color=nextcord.Color.purple(), description=None)
+    embedc = discord.Embed(color=nextcord.Color.purple(), description=None, timestamp=datetime.datetime.now())
     embedc.set_footer(text="last updated")
+    sort, iden = [], {}
     try:
         for x in sdlvls:
-            records = json.loads(requests.get(
-                f"https://api.zeepkist-gtr.com/records?Level={x['hash']}&ValidOnly=true&Limit=75&Offset=0").text)
+            records = json.loads(requests.get(f"https://jsonapi.zeepkist-gtr.com/personalbests?filter=equals(level,%27{x['hash']}%27)&page[size]=100&include=record").text)
+            for e in records["included"]:
+                iden[str(e['attributes']['time'])] = fwogutils.userhandler(e["attributes"]['userId'])['steamName']
+                sort.append(e['attributes']['time'])
+            sort.sort()
             data = {"levelrecs": "", "rcount": 0, "users": []}
-            for a in records['records']:
-                user = fwogutils.getgtruser(id=a['user'])[1]['steamName']
+            for a in sort:
+                user = iden[str(a)]
                 if user not in data['users']:
-                    data['levelrecs'] += f"1. `{format_time(a['time'])}` by **{user}**\n"
+                    data['levelrecs'] += f"1. `{format_time(a)}` by **{user}**\n"
                     data['users'].append(user)
                     data['rcount'] += 1
                     if data["rcount"] == 5:
                         break
-            if x['name'] in ['Abyssal Windows', 'Crystal Sands']:
+            if x['name'] in ['Malfunction', 'Breakup']:
                 embed.add_field(name=x['name'], value=data['levelrecs'], inline=True)
-            elif x['name'] in ['OOoOoooOooOOOO stairs', 'Other Green Hills']:
+            elif x['name'] in ['Impact', 'Crimson Course']:
                 embeda.add_field(name=x['name'], value=data['levelrecs'], inline=True)
-            elif x['name'] in ['Schmetterling', 'The Red One']:
+            elif x['name'] in ['Island Serenity', 'Orange Strands']:
                 embedb.add_field(name=x['name'], value=data['levelrecs'], inline=True)
-            elif x['name'] in ['Whirlpool']:
+            elif x['name'] in ['Jungle Run']:
                 embedc.add_field(name=x['name'], value=data['levelrecs'], inline=True)
         if sentlb is not True:
             embedc.timestamp = datetime.datetime.now()
@@ -903,7 +907,7 @@ async def startemb(ctx):
     if ctx.author.id in [785037540155195424, 257321046611329026]:
         lb.start()
     else:
-        pass
+        print("invalid user")
 
 
 @bot.command(name="stoplb")
@@ -913,6 +917,6 @@ async def stopemb(ctx):
         lb.stop()
         sentlb = False
     else:
-        pass
+        print("invalid user")
 
 bot.run(privaat.token)
