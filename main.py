@@ -107,6 +107,7 @@ async def create_pl(ctx, msg: nextcord.Message):
         for x in msgs:
             workshop_urls = re.findall('https://steamcommunity\.com/sharedfiles/filedetails/\?id=\d+', x)
             if workshop_urls:
+                workshop_urls.reverse()
                 for url in workshop_urls:
                     wsids += f"{(url.split('=')[1])}%2C"
         if not wsids:
