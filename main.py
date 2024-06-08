@@ -1,6 +1,5 @@
 import datetime
 import time
-import aiohttp
 import requests
 import json
 import os
@@ -94,8 +93,7 @@ async def ownlog(ctx, type: str, *, text: str = None):
 
 @bot.message_command(name="create-playlist")
 async def create_pl(ctx, msg: nextcord.Message):
-    chan = await bot.fetch_channel(ctx.channel.id)
-    msgs = []
+    chan, msgs = await bot.fetch_channel(ctx.channel.id), []
     async for x in chan.history(limit=500):
         msgs.append(x.content)
         if x.id == msg.id:
@@ -131,11 +129,96 @@ async def create_pl(ctx, msg: nextcord.Message):
                 except KeyError:
                     levelfails += f"- [Workshop ID: {x}](<https://steamcommunity.com/sharedfiles/filedetails/?id={x}>)\n"
             plname = textinput.value
-            pl = {"name": plname, "amountOfLevels": 1, "roundLength": 480.0, "shufflePlaylist": False, "UID": [], "levels": levels}
+            async def btn_add_level(ctx):
+                view = fwogutils.views.LevelSelect()
+                await ctx.send(view=view, ephemeral=True)
+                await bot.wait_for("interaction", check=lambda interaction: interaction.data['custom_id'] == "thisisalevelsub", timeout=120)
+                level = fwogutils.get_returnlist()[0]
+                pl["levels"].append(level)
+                fwogutils.dumppl(pl)
+                fwogutils.renamepl(plname)
+                await ctxe.edit(file=nextcord.File(f"{plname}.zeeplist"))
+                fwogutils.undorename(plname)
+                await ctx.send(f"added **{level['Name']}** to the playlist", ephemeral=True)
+            async def btn_remove_duplicates(ctx):
+                duplicheck, updlvls, duplicount = [], [], 0
+                outdatedlvls = pl["levels"]
+                for x in outdatedlvls:
+                    if x not in duplicheck:
+                        updlvls.append(x)
+                        duplicheck.append(x)
+                    else:
+                        duplicount += 1
+                pl["levels"] = updlvls
+                pl["amountOfLevels"] = len(updlvls)
+                fwogutils.dumppl(pl)
+                fwogutils.renamepl(plname)
+                await ctxe.edit(file=nextcord.File(f"{plname}.zeeplist"))
+                fwogutils.undorename(plname)
+                await ctx.send(f"{duplicount} Duplicates removed.", ephemeral=True)
+            async def btn_shuffle_pl(ctx):
+                random.shuffle(pl["levels"])
+                fwogutils.dumppl(pl)
+                fwogutils.renamepl(plname)
+                await ctxe.edit(file=nextcord.File(f"{plname}.zeeplist"))
+                fwogutils.undorename(plname)
+                await ctx.send("Playlist has been shuffled.", ephemeral=True)
+            async def btn_make_koc(ctx):
+                newlvls = []
+                async def btn_continue(ctx):
+                    for x in pl['levels']:
+                        newlvls.append({"UID": "09052023-112732077-[CTR]OwlPlague-249589054336-368", "WorkshopID": "2973690373",
+                                        "Name": "KICK OR CLUTCH VOTING LEVEL", "Author": "[CTR]OwlPlague"})
+                        newlvls.append(x)
+                        newlvls.append({"UID": "09052023-112732077-[CTR]OwlPlague-249589054336-368", "WorkshopID": "2973690373",
+                                        "Name": "KICK OR CLUTCH VOTING LEVEL", "Author": "[CTR]OwlPlague"})
+                    pl['levels'] = newlvls
+                    fwogutils.dumppl(pl)
+                    fwogutils.renamepl(plname)
+                    await ctxe.edit(file=nextcord.File(f"{plname}.zeeplist"))
+                    fwogutils.undorename(plname)
+                    await ctx.send("Done!", ephemeral=True)
+                async def btn_edit_level(ctx):
+                    view = fwogutils.views.LevelSelect()
+                    await ctx.send(view=view, ephemeral=True)
+                    await bot.wait_for("interaction", check=lambda interaction: interaction.data['custom_id'] == "thisisalevelsub", timeout=120)
+                    level = fwogutils.get_returnlist()[0]
+                    for x in pl['levels']:
+                        newlvls.append(level)
+                        newlvls.append(x)
+                        newlvls.append(level)
+                    pl['levels'] = newlvls
+                    fwogutils.dumppl(pl)
+                    fwogutils.renamepl(plname)
+                    await ctxe.edit(file=nextcord.File(f"{plname}.zeeplist"))
+                    fwogutils.undorename(plname)
+                    await ctx.send("Done!", ephemeral=True)
+                kocview = nextcord.ui.View(timeout=60)
+                btncontinue = nextcord.ui.Button(label="Continue", style=nextcord.ButtonStyle.green)
+                btncontinue.callback = btn_continue
+                btneditlvl = nextcord.ui.Button(label="Edit Level", style=nextcord.ButtonStyle.grey)
+                btneditlvl.callback = btn_edit_level
+                kocview.add_item(btncontinue)
+                kocview.add_item(btneditlvl)
+                await ctx.send("Make this playlist Koc-Like?\n*Continuing Would use the default voting level*", view=kocview, ephemeral=True)
+            editbtns = nextcord.ui.View(timeout=60)
+            btnaddlvl = nextcord.ui.Button(label="Add Level", style=nextcord.ButtonStyle.green)
+            btnaddlvl.callback = btn_add_level
+            btnremdupelvls = nextcord.ui.Button(label="Remove Duplicate Levels", style=nextcord.ButtonStyle.red)
+            btnremdupelvls.callback = btn_remove_duplicates
+            btnshufflvls = nextcord.ui.Button(label="Shuffle Levels", style=nextcord.ButtonStyle.grey)
+            btnshufflvls.callback = btn_shuffle_pl
+            btnmakekoc = nextcord.ui.Button(label="Make Koc", style=nextcord.ButtonStyle.grey)
+            btnmakekoc.callback = btn_make_koc
+            editbtns.add_item(btnaddlvl)
+            editbtns.add_item(btnremdupelvls)
+            editbtns.add_item(btnshufflvls)
+            editbtns.add_item(btnmakekoc)
+            pl = {"name": plname, "amountOfLevels": len(levels), "roundLength": 480.0, "shufflePlaylist": False, "UID": [], "levels": levels}
             fwogutils.dumppl(pl)
             fwogutils.renamepl(plname)
             await ctxe.edit(f"# Your playlist has been generated!\n### Failed levels (These levels failed and would need to be added manually):\n{levelfails}\n"
-                            f"### Level packs (Might need manual adjustments):\n{packlvls}", file=nextcord.File(f"{plname}.zeeplist"))
+                            f"### Level packs (Might need manual adjustments):\n{packlvls}", file=nextcord.File(f"{plname}.zeeplist"), view=editbtns)
             fwogutils.undorename(plname)
     modal = nextcord.ui.Modal(title="Playlist creation")
     textinput = nextcord.ui.TextInput(label="Playlist name", min_length=1, max_length=50)
@@ -730,7 +813,7 @@ async def sd_register(ctx):
                        f"**By registering you accept that we need to gather your steam ID, your steam Name and your GTR user ID for organizational and technical reasons**", ephemeral=True, view=agreebtns)
     else:
         user = fwogutils.userhandler(discordid=str(ctx.user.id))
-        if user != False:
+        if user:
             async def btn_yes(ctx: nextcord.Interaction):
                 newuser = {"id": user['id'], "steamId": user['steamId'], "steamName": user['steamName'], "discordId": user['discordId'], "registered": True}
                 sdusers["s4"].append(newuser)
@@ -850,10 +933,6 @@ sentlb = False
 conxlb = nextcord.Interaction
 
 
-sentlb = False
-conxlb = nextcord.Interaction
-
-
 @tasks.loop(minutes=5, reconnect=True)
 async def lb():
     global sentlb, conxlb, cache
@@ -865,7 +944,7 @@ async def lb():
               {'hash': "F81CD65D7823A686C476DFFAC3289CF8FD27459E", 'name': "Orange Strands"},
               {'hash': "5BAA18F8423AA864F7CB15E94AF11150E66F7A04", 'name': "Jungle Run"}]
     chan = await bot.fetch_channel(1198606669123424357)
-    embed = discord.Embed(title="Showdown Levels", description=" ", color=nextcord.Color.purple())
+    embed = discord.Embed(title="Showdown Season 3 Levels", description=" ", color=nextcord.Color.purple())
     embeda = discord.Embed(color=nextcord.Color.purple(), description=" ")
     embedb = discord.Embed(color=nextcord.Color.purple(), description=" ")
     embedc = discord.Embed(color=nextcord.Color.purple(), description=" ", timestamp=datetime.datetime.now())
@@ -918,5 +997,9 @@ async def stoplb(ctx):
         sentlb = False
     else:
         print("invalid user")
+
+@bot.command(name="testlvl")
+async def levelselect_test(ctx):
+    await ctx.send("message content", view=views.LevelSelect(max=1))
 
 bot.run(privaat.token)

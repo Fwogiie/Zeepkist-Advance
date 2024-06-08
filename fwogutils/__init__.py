@@ -1,6 +1,5 @@
 import datetime
 import time
-
 import nextcord
 import tzlocal
 from discord.ext import commands, tasks
@@ -436,7 +435,7 @@ def getgtruserv2(userid: int=None, steamid: int=None, discordid: int=None):
 def userhandler(userid: str=None, steamid: str=None, steamname: str=None, discordid: str=None):
     with open("gtrusercache.json", 'r') as cacheread:
         cache = json.loads(cacheread.read())
-    if userid != None:
+    if userid:
         try:
             return cache['userId'][str(userid)]
         except KeyError:
@@ -452,7 +451,7 @@ def userhandler(userid: str=None, steamid: str=None, steamname: str=None, discor
                 with open("gtrusercache.json", 'w') as cachewrite:
                     json.dump(cache, cachewrite, indent=2)
                 return user
-    elif steamid != None:
+    elif steamid:
         try:
             return cache['steamId'][str(steamid)]
         except KeyError:
@@ -468,12 +467,12 @@ def userhandler(userid: str=None, steamid: str=None, steamname: str=None, discor
                 with open("gtrusercache.json", 'w') as cachewrite:
                     json.dump(cache, cachewrite, indent=2)
                 return user
-    elif steamname != None:
+    elif steamname:
         try:
             return cache['steamName'][str(steamname)]
         except KeyError:
             return False
-    elif discordid != None:
+    elif discordid:
         try:
             return cache['discordId'][str(discordid)]
         except KeyError:
@@ -489,3 +488,41 @@ def userhandler(userid: str=None, steamid: str=None, steamname: str=None, discor
                 with open("gtrusercache.json", 'w') as cachewrite:
                     json.dump(cache, cachewrite, indent=2)
                 return user
+
+def convert_jsonapi_att(att):
+    return {"UID": att['fileUid'],"WorkshopID": att['workshopId'],"Name": att['name'],"Author": att['fileAuthor']}
+
+def get_returnlist():
+    with open("fwogutils/returnlist.txt", 'r') as read:
+        return json.loads(read.read())["returnlist"]
+
+def dump_returnlist(dump):
+    with open("fwogutils/returnlist.txt", 'w') as write:
+        dump = {"returnlist": dump}
+        json.dump(dump, write)
+
+# kept comment for now
+"""for temp in range(15):
+    num = 1
+    req = requests.get(f"https://jsonapi.zworpshop.com/levels?page[size]=100&page[number]={num}")
+    if req.status_code != 200:
+        print(f"got status code {req.status_code} at num {num}.\ndata: {req.text}")
+        break
+    data = json.loads(req.text)
+    if data['data']:
+        lb, inituser = {}, []
+        for x in data['data']:
+            x = x['attributes']
+            if x['fileAuthor'] not in inituser:
+                lb[str(x['fileAuthor'])] = 1
+                inituser.append(x['fileAuthor'])
+            else:
+                lb[str(x['fileAuthor'])] += 1
+            print(f"{x['fileAuthor']} is assumed to have made a level.\ntheir level count is now: {lb[x['fileAuthor']]}")
+        num += 1
+    else:
+        print("Scrape is assumed to be finished.")
+        break
+print(f"final assumed LB:")
+for x in lb:
+    print(x)"""
