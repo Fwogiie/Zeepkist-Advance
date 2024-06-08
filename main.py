@@ -173,6 +173,7 @@ async def create_pl(ctx, msg: nextcord.Message):
                         newlvls.append({"UID": "09052023-112732077-[CTR]OwlPlague-249589054336-368", "WorkshopID": "2973690373",
                                         "Name": "KICK OR CLUTCH VOTING LEVEL", "Author": "[CTR]OwlPlague"})
                     pl['levels'] = newlvls
+                    pl["amountOfLevels"] = len(newlvls)
                     fwogutils.dumppl(pl)
                     fwogutils.renamepl(plname)
                     await ctxe.edit(file=nextcord.File(f"{plname}.zeeplist"))
@@ -188,6 +189,7 @@ async def create_pl(ctx, msg: nextcord.Message):
                         newlvls.append(x)
                         newlvls.append(level)
                     pl['levels'] = newlvls
+                    pl["amountOfLevels"] = len(newlvls)
                     fwogutils.dumppl(pl)
                     fwogutils.renamepl(plname)
                     await ctxe.edit(file=nextcord.File(f"{plname}.zeeplist"))
