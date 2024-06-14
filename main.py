@@ -107,9 +107,13 @@ async def create_pl(ctx, msg: nextcord.Message):
         for x in msgs:
             workshop_urls = re.findall('https://steamcommunity\.com/sharedfiles/filedetails/\?id=\d+', x)
             if workshop_urls:
-                workshop_urls.reverse()
-                for url in workshop_urls:
-                    wsids += f"{(url.split('=')[1])}%2C"
+                if len(workshop_urls) == 1:
+                    for url in workshop_urls:
+                        wsids += f"{(url.split('=')[1])}%2C"
+                else:
+                    workshop_urls.reverse()
+                    for url in workshop_urls:
+                        wsids += f"{(url.split('=')[1])}%2C"
         if not wsids:
             await ctx.send("Your playlist would be empty, so i dint create any!", ephemeral=True)
             return
@@ -337,11 +341,9 @@ async def updpl(ctx, playlist: nextcord.Attachment = nextcord.SlashOption(descri
         try:
             for x in pllvls["levels"]:
                 s = x['UID']
-                code = requests.get(
-                    f"https://api.zworpshop.com/levels/uid/{urllib.parse.quote_plus(s, encoding='UTF-8')}").status_code
+                code = requests.get(f"https://api.zworpshop.com/levels/uid/{urllib.parse.quote_plus(s, encoding='UTF-8')}").status_code
                 if code == 404:
-                    req = requests.get(
-                        f"https://api.zworpshop.com/levels/workshop/{x['WorkshopID']}?IncludeReplaced=false&IncludeDeleted=false")
+                    req = requests.get(f"https://api.zworpshop.com/levels/workshop/{x['WorkshopID']}?IncludeReplaced=false&IncludeDeleted=false")
                     if req.status_code == 200:
                         reqtxt = json.loads(req.text)
                         if len(reqtxt) == 1:
@@ -375,14 +377,12 @@ async def updpl(ctx, playlist: nextcord.Attachment = nextcord.SlashOption(descri
             with open("playlist.zeeplist", 'w') as f:
                 json.dump(pllvlsupd, f, indent=2)
             os.rename("playlist.zeeplist", f"{name}.zeeplist")
-            await ctx.edit(
-                f"## {data['updlvls']} level(s) were updated.\n> ### Updated level(s):\n{data['updlvlsnames']}\n"
-                f"## {data['dellvls']} level(s) were deleted from the workshop. (These can manually be added!)\n> ### Deleted level(s):\n{data['dellvlsnames']}\n"
-                f"## {data['nflvls']} level(s) were not found. (These can manually be added!)\n> ### Not Found level(s):\n{data['nflvlsnames']}\n"
-                f"## {data['duplilvls']} level(s) were duplicated.\n> ### Duplicated level(s):\n{data['duplilvlsnames']}",
-                file=nextcord.File(f"{name}.zeeplist"))
+            await ctx.edit(f"## {data['updlvls']} level(s) were updated.\n> ### Updated level(s):\n{data['updlvlsnames']}\n"
+                           f"## {data['dellvls']} level(s) were deleted from the workshop. (These can manually be added!)\n> ### Deleted level(s):\n{data['dellvlsnames']}\n"
+                           f"## {data['nflvls']} level(s) were not found. (These can manually be added!)\n> ### Not Found level(s):\n{data['nflvlsnames']}\n"
+                           f"## {data['duplilvls']} level(s) were duplicated.\n> ### Duplicated level(s):\n{data['duplilvlsnames']}", file=nextcord.File(f"{name}.zeeplist"))
             os.rename(f"{name}.zeeplist", "playlist.zeeplist")
-        except Exception as ewwor:
+        except HTTPException as ewwor:
             await ctx.edit(fwogutils.errormessage(ewwor))
             log(ewwor)
     else:
@@ -1001,8 +1001,23 @@ async def stoplb(ctx):
     else:
         print("invalid user")
 
-@bot.command(name="testlvl")
-async def levelselect_test(ctx):
-    await ctx.send("message content", view=views.LevelSelect(max=1))
+@bot.slash_command(name="search")
+async def search(ctx):
+    pass
+
+@search.subcommand(name="level", description="Search A level for its records and info!")
+async def search_lvl(ctx):
+    view = fwogutils.views.LevelSelect()
+    await ctx.send(view=view, ephemeral=True)
+    await bot.wait_for("interaction", check=lambda interaction: interaction.data['custom_id'] == "thisisalevelsub", timeout=120)
+    level = fwogutils.get_returnlist()[0]
+    req = requests.get(f"https://jsonapi.zeepkist-gtr.com/personalbests/?filter=equals(level,%27{level['Hash']}%27)&include=record&page[size]=100")
+    if req.status_code != 200:
+        log(f'recieved {req.status_code} in search_lvl')
+        await ctx.send("An error occurred. please try again")
+    else:
+        pbs, sortlist = json.loads(req.text), []
+        for x in pbs['included']:
+            print(x)
 
 bot.run(privaat.token)
