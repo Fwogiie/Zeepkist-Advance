@@ -107,13 +107,8 @@ async def create_pl(ctx, msg: nextcord.Message):
         for x in msgs:
             workshop_urls = re.findall('https://steamcommunity\.com/sharedfiles/filedetails/\?id=\d+', x)
             if workshop_urls:
-                if len(workshop_urls) == 1:
-                    for url in workshop_urls:
-                        wsids += f"{(url.split('=')[1])}%2C"
-                else:
-                    workshop_urls.reverse()
-                    for url in workshop_urls:
-                        wsids += f"{(url.split('=')[1])}%2C"
+                for url in workshop_urls:
+                    wsids += f"{(url.split('=')[1])}%2C"
         if not wsids:
             await ctx.send("Your playlist would be empty, so i dint create any!", ephemeral=True)
             return
@@ -1001,11 +996,11 @@ async def stoplb(ctx):
     else:
         print("invalid user")
 
-@bot.slash_command(name="search")
+"""@bot.slash_command(name="search")
 async def search(ctx):
-    pass
+    pass"""
 
-@search.subcommand(name="level", description="Search A level for its records and info!")
+"""@search.subcommand(name="level", description="Search A level for its records and info!")
 async def search_lvl(ctx):
     view = fwogutils.views.LevelSelect()
     await ctx.send(view=view, ephemeral=True)
@@ -1018,6 +1013,6 @@ async def search_lvl(ctx):
     else:
         pbs, sortlist = json.loads(req.text), []
         for x in pbs['included']:
-            print(x)
+            print(x)"""
 
 bot.run(privaat.token)
