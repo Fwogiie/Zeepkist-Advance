@@ -123,15 +123,16 @@ async def create_pl(ctx, msg: nextcord.Message):
                 elif id in antipack and id not in duplicheck:
                     packlvls += f"- [{x['name']} - {id}](<https://steamcommunity.com/sharedfiles/filedetails/?id={id}>)\n"
                     duplicheck.append(id)
-                if x not in dupliwarn:
-                    dupliwarn.append(x)
-                else:
-                    dupliwarnlvls += f"- [{x['name']} - {id}](<https://steamcommunity.com/sharedfiles/filedetails/?id={id}>)\n"
             for x in wsids[:-3].split("%2C"):
                 try:
                     levels.append(sorting[x])
                 except KeyError:
                     levelfails += f"- [Workshop ID: {x}](<https://steamcommunity.com/sharedfiles/filedetails/?id={x}>)\n"
+            for x in levels:
+                if x not in dupliwarn:
+                    dupliwarn.append(x)
+                else:
+                    dupliwarnlvls += f"- [{x['name']} - {x['workshopId']}](<https://steamcommunity.com/sharedfiles/filedetails/?id={x['workshopId']}>)\n"
             plname = textinput.value
             async def btn_add_level(ctx):
                 view = fwogutils.views.LevelSelect()
