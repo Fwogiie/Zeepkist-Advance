@@ -103,7 +103,7 @@ async def create_pl(ctx, msg: nextcord.Message):
         await ctx.send("You need at least 2 levels to create a playlist!", ephemeral=True)
         return
     async def modal_sub(ctx):
-        wsids, levels, sorting, levelfails, antipack, duplicheck, packlvls = "", [], {}, "", [], [], ""
+        wsids, levels, sorting, levelfails, antipack, duplicheck, packlvls, dupliwarn, dupliwarnlvls = "", [], {}, "", [], [], "", [], ""
         for x in msgs:
             workshop_urls = re.findall('https://steamcommunity\.com/sharedfiles/filedetails/\?id=\d+', x)
             if workshop_urls:
@@ -123,6 +123,10 @@ async def create_pl(ctx, msg: nextcord.Message):
                 elif id in antipack and id not in duplicheck:
                     packlvls += f"- [{x['name']} - {id}](<https://steamcommunity.com/sharedfiles/filedetails/?id={id}>)\n"
                     duplicheck.append(id)
+                if id not in dupliwarn:
+                    dupliwarn.append(id)
+                else:
+                    dupliwarnlvls += f"- [{x['name']} - {id}](<https://steamcommunity.com/sharedfiles/filedetails/?id={id}>)\n"
             for x in wsids[:-3].split("%2C"):
                 try:
                     levels.append(sorting[x])
@@ -220,7 +224,7 @@ async def create_pl(ctx, msg: nextcord.Message):
             fwogutils.dumppl(pl)
             fwogutils.renamepl(plname)
             await ctxe.edit(f"# Your playlist has been generated!\n### Failed levels (These levels failed and would need to be added manually):\n{levelfails}\n"
-                            f"### Level packs (Might need manual adjustments):\n{packlvls}", file=nextcord.File(f"{plname}.zeeplist"), view=editbtns)
+                            f"### Level packs (Might need manual adjustments):\n{packlvls}\n### Duplicate Levels:\n{dupliwarnlvls}", file=nextcord.File(f"{plname}.zeeplist"), view=editbtns)
             fwogutils.undorename(plname)
     modal = nextcord.ui.Modal(title="Playlist creation")
     textinput = nextcord.ui.TextInput(label="Playlist name", min_length=1, max_length=50)
