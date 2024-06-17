@@ -248,12 +248,9 @@ async def rankings(ctx):
                 self.page['limit'] -= 10
                 self.page['offset'] -= 10
                 self.page['page'] -= 1
-                lb = json.loads(requests.get(
-                    f"https://api.zeepkist-gtr.com/users/rankings?Limit={self.page['limit']}&Offset={self.page['offset']}").text)
-                embed = discord.Embed(title="GTR Rankings", color=nextcord.Color.purple(),
-                                      timestamp=datetime.datetime.now())
-                embed = discord.Embed.set_footer(self=embed,
-                                                 text=f"page: {page['page']}, Total amount: {lb['totalAmount']}")
+                lb = json.loads(requests.get( f"https://api.zeepkist-gtr.com/users/rankings?Limit={self.page['limit']}&Offset={self.page['offset']}").text)
+                embed = discord.Embed(title="GTR Rankings", color=nextcord.Color.purple(), timestamp=datetime.datetime.now())
+                embed = discord.Embed.set_footer(self=embed, text=f"page: {page['page']}, Total amount: {lb['totalAmount']}")
                 for x in lb["rankings"]:
                     embed.add_field(name=f"{x['position']}. {x['user']['steamName']}", inline=False,
                                     value=f"World Records: {x['amountOfWorldRecords']}\nScore: {x['score']}")
@@ -264,11 +261,9 @@ async def rankings(ctx):
             self.page['limit'] += 10
             self.page['offset'] += 10
             self.page['page'] += 1
-            lb = json.loads(requests.get(
-                f"https://api.zeepkist-gtr.com/users/rankings?Limit={self.page['limit']}&Offset={self.page['offset']}").text)
+            lb = json.loads(requests.get(f"https://api.zeepkist-gtr.com/users/rankings?Limit={self.page['limit']}&Offset={self.page['offset']}").text)
             embed = discord.Embed(title="GTR Rankings", color=nextcord.Color.purple(), timestamp=datetime.datetime.now())
-            embed = discord.Embed.set_footer(self=embed,
-                                             text=f"page: {page['page']}, Total amount: {lb['totalAmount']}")
+            embed = discord.Embed.set_footer(self=embed, text=f"page: {page['page']}, Total amount: {lb['totalAmount']}")
             for x in lb["rankings"]:
                 embed.add_field(name=f"{x['position']}. {x['user']['steamName']}", inline=False, value=f"World Records: {x['amountOfWorldRecords']}\nScore: {x['score']}")
             await emb.edit(embed=embed, view=Lbpage())
@@ -331,8 +326,7 @@ async def updpl(ctx, playlist: nextcord.Attachment = nextcord.SlashOption(descri
                      "shufflePlaylist": bool(pllvls["shufflePlaylist"]),
                      "UID": [],
                      "levels": []}
-        data = {'updlvls': 0, 'updlvlsnames': "", 'dellvls': 0, 'dellvlsnames': "", 'nflvls': 0, 'nflvlsnames': "",
-                'duplilvls': 0, 'duplilvlsnames': "", 'duplicheck': []}
+        data = {'updlvls': 0, 'updlvlsnames': "", 'dellvls': 0, 'dellvlsnames': "", 'nflvls': 0, 'nflvlsnames': "", 'duplilvls': 0, 'duplilvlsnames': "", 'duplicheck': []}
         try:
             for x in pllvls["levels"]:
                 s = x['UID']
@@ -372,9 +366,9 @@ async def updpl(ctx, playlist: nextcord.Attachment = nextcord.SlashOption(descri
             with open("playlist.zeeplist", 'w') as f:
                 json.dump(pllvlsupd, f, indent=2)
             os.rename("playlist.zeeplist", f"{name}.zeeplist")
-            await ctx.edit(f"## {data['updlvls']} level(s) were updated.\n> ### Updated level(s):\n{data['updlvlsnames']}\n"
-                           f"## {data['dellvls']} level(s) were deleted from the workshop. (These can manually be added!)\n> ### Deleted level(s):\n{data['dellvlsnames']}\n"
-                           f"## {data['nflvls']} level(s) were not found. (These can manually be added!)\n> ### Not Found level(s):\n{data['nflvlsnames']}\n"
+            await ctx.edit(f"## {data['updlvls']} level(s) were updated.\n> ### Updated level(s):\n{data['updlvlsnames'][:15]}\n"
+                           f"## {data['dellvls']} level(s) were deleted from the workshop. (These can manually be added!)\n> ### Deleted level(s):\n{data['dellvlsnames'][:15]}\n"
+                           f"## {data['nflvls']} level(s) were not found. (These can manually be added!)\n> ### Not Found level(s):\n{data['nflvlsnames'][:15]}\n"
                            f"## {data['duplilvls']} level(s) were duplicated.\n> ### Duplicated level(s):\n{data['duplilvlsnames']}", file=nextcord.File(f"{name}.zeeplist"))
             os.rename(f"{name}.zeeplist", "playlist.zeeplist")
         except HTTPException as ewwor:
@@ -458,11 +452,9 @@ async def gettoplvls(ctx, amount: int = nextcord.SlashOption(
             "roundLength": 480.0,
             "shufflePlaylist": False,
             "UID": [],
-            "levels": levels
-        })
+            "levels": levels})
         fwogutils.renamepl(playlistname)
-        await ctx.edit(f"Your playlist has been generated! {len(levels)}/{amount} levels were found!",
-                       file=nextcord.File(f"{playlistname}.zeeplist"))
+        await ctx.edit(f"Your playlist has been generated! {len(levels)}/{amount} levels were found!", file=nextcord.File(f"{playlistname}.zeeplist"))
         fwogutils.undorename(playlistname)
     else:
         await ctx.edit("Error! Limit is 999!")
@@ -471,8 +463,7 @@ async def gettoplvls(ctx, amount: int = nextcord.SlashOption(
 @bot.slash_command(name='crtteam', guild_ids=[1127321762686836798])
 async def crtteam(ctx, teamname: str, teamtag: str, pa: str, pb: str, color: str):
     color = fwogutils.hex_to_rgb(color)
-    embed = discord.Embed(title=f"[{teamtag}] {teamname}", description=f"{pa}\n{pb}",
-                          color=nextcord.Color.from_rgb(color[0], color[1], color[2]))
+    embed = discord.Embed(title=f"[{teamtag}] {teamname}", description=f"{pa}\n{pb}", color=nextcord.Color.from_rgb(color[0], color[1], color[2]))
     await ctx.send(embed=embed)
 
 
@@ -563,13 +554,11 @@ async def linkgtr(ctx):
                 self.stop()
                 await ctx.send("cancelled!", ephemeral=True)
 
-        await ctx.send(
-            f"i have detected a GTR account by the name of **{gtrcheck[1]['steamName']}**, do you wish to link it?",
+        await ctx.send(f"i have detected a GTR account by the name of **{gtrcheck[1]['steamName']}**, do you wish to link it?",
             view=YesOrNoButtons(), ephemeral=True)
     else:
-        await ctx.send(
-            "I did not find any discord linkage, Please link your discord to your GTR by reproducing the following steps in-game:\n`Settings -> Mods -> Scroll to GTR -> In the 'discord' section, Press 'Link'`",
-            ephemeral=True)
+        await ctx.send("I did not find any discord linkage, Please link your discord to your GTR by reproducing the following steps in-game:\n"
+                       "`Settings -> Mods -> Scroll to GTR -> In the 'discord' section, Press 'Link'`", ephemeral=True)
 
 
 async def rankingsfunc(gtrrankings):
@@ -578,8 +567,7 @@ async def rankingsfunc(gtrrankings):
     stringedrankings = ""
     for x in gtrrankings["rankings"][:20]:
         stringedrankings += f"{x['position']}. `{x['user']['steamName']}` with **{x['score']}** points and **{x['amountOfWorldRecords']}** World Records\n"
-    embed = discord.Embed(title="GTR Rankings", description=stringedrankings, color=nextcord.Color.blue(),
-                          timestamp=datetime.datetime.now())
+    embed = discord.Embed(title="GTR Rankings", description=stringedrankings, color=nextcord.Color.blue(), timestamp=datetime.datetime.now())
     embed.set_footer(text="last updated")
     await leaderboard.edit(embed=embed, view=fwogutils.views.LButtons(gtrrankings))
     ruusies = fwogutils.getRUusers()
@@ -590,11 +578,8 @@ async def rankingsfunc(gtrrankings):
         if checkrank > userrank:
             log(f"{x} ranked up!! sending notif!")
             channel = await bot.fetch_channel(1207401802769633310)
-            embed = discord.Embed(title="Ranked up!",
-                                  description=f"You have ranked up to position **{userrank}** in the GTR rankings!!",
-                                  color=nextcord.Color.blue())
-            embed.set_thumbnail(
-                url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
+            embed = discord.Embed(title="Ranked up!", description=f"You have ranked up to position **{userrank}** in the GTR rankings!!", color=nextcord.Color.blue())
+            embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
             await channel.send(f"<@{int(x)}>", embed=embed)
             fwogutils.setlinkedranking(user=x, pos=userrank)
     rdusies = fwogutils.getRDusers()
@@ -680,10 +665,8 @@ async def wrcallback(message=None):
             async with websockets.connect("wss://stream.zeepkist-gtr.com/ws") as ws:
                 while True:
                     content = json.loads(await ws.recv())
-                    log(content)
                     wrstusers = fwogutils.getWRSTusers()
-                    if str(content['Data']['PreviousUserId']) in wrstusers and content['Data']['PreviousUserId'] != \
-                            content['Data']['NewUserId'] and content['Type'] == "wr":
+                    if str(content['Data']['PreviousUserId']) in wrstusers and content['Data']['PreviousUserId'] != content['Data']['NewUserId'] and content['Type'] == "wr":
                         log("WR is stolen!!")
                         wrstuserinfo = wrstusers[str(content['Data']['PreviousUserId'])]
                         userlink = fwogutils.get_linked_users()[str(wrstuserinfo['discid'])]
@@ -743,10 +726,8 @@ async def gethot(ctx):
     pass
 
 
-@gethot.subcommand(name="levels",
-                   description="Get a playlist of the levels that have been played the most in the past 24 hours!")
-async def gethotlvls(ctx,
-                     playlistname: str = nextcord.SlashOption(description="The name for the playlist", required=True)):
+@gethot.subcommand(name="levels", description="Get a playlist of the levels that have been played the most in the past 24 hours!")
+async def gethotlvls(ctx, playlistname: str = nextcord.SlashOption(description="The name for the playlist", required=True)):
     ctx = await ctx.send("processing!")
     hot = GTR.Levels.Hot()
     if hot.status_code != 200:
@@ -770,11 +751,9 @@ async def gethotlvls(ctx,
             "roundLength": 480.0,
             "shufflePlaylist": False,
             "UID": [],
-            "levels": levels
-        })
+            "levels": levels})
         fwogutils.renamepl(playlistname)
-        await ctx.edit(f"Your playlist has been generated!",
-                       file=nextcord.File(f"{playlistname}.zeeplist"))
+        await ctx.edit(f"Your playlist has been generated!", file=nextcord.File(f"{playlistname}.zeeplist"))
         fwogutils.undorename(playlistname)
 
 @bot.slash_command(name="register", description="Register to play in the Showdown competition!", guild_ids=[1127321762686836798])
