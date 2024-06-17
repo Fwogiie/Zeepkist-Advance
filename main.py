@@ -123,8 +123,8 @@ async def create_pl(ctx, msg: nextcord.Message):
                 elif id in antipack and id not in duplicheck:
                     packlvls += f"- [{x['name']} - {id}](<https://steamcommunity.com/sharedfiles/filedetails/?id={id}>)\n"
                     duplicheck.append(id)
-                if id not in dupliwarn:
-                    dupliwarn.append(id)
+                if x['name'] not in dupliwarn:
+                    dupliwarn.append(x['name'])
                 else:
                     dupliwarnlvls += f"- [{x['name']} - {id}](<https://steamcommunity.com/sharedfiles/filedetails/?id={id}>)\n"
             for x in wsids[:-3].split("%2C"):
