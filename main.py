@@ -132,7 +132,7 @@ async def create_pl(ctx, msg: nextcord.Message):
                 if x not in dupliwarn:
                     dupliwarn.append(x)
                 else:
-                    dupliwarnlvls += f"- [{x['Name']} - {x['workshopID']}](<https://steamcommunity.com/sharedfiles/filedetails/?id={x['workshopID']}>)\n"
+                    dupliwarnlvls += f"- [{x['Name']} - {x['WorkshopID']}](<https://steamcommunity.com/sharedfiles/filedetails/?id={x['WorkshopID']}>)\n"
             plname = textinput.value
             async def btn_add_level(ctx):
                 view = fwogutils.views.LevelSelect()
