@@ -128,11 +128,11 @@ async def create_pl(ctx, msg: nextcord.Message):
                     levels.append(sorting[x])
                 except KeyError:
                     levelfails += f"- [Workshop ID: {x}](<https://steamcommunity.com/sharedfiles/filedetails/?id={x}>)\n"
-            for x in levels:
+            """for x in levels:
                 if x not in dupliwarn:
                     dupliwarn.append(x)
                 else:
-                    dupliwarnlvls += f"- [{x['Name']} - {x['WorkshopID']}](<https://steamcommunity.com/sharedfiles/filedetails/?id={x['WorkshopID']}>)\n"
+                    dupliwarnlvls += f"- [{x['Name']} - {x['WorkshopID']}](<https://steamcommunity.com/sharedfiles/filedetails/?id={x['WorkshopID']}>)\n""""
             plname = textinput.value
             async def btn_add_level(ctx):
                 view = fwogutils.views.LevelSelect()
@@ -225,7 +225,8 @@ async def create_pl(ctx, msg: nextcord.Message):
             fwogutils.dumppl(pl)
             fwogutils.renamepl(plname)
             await ctxe.edit(f"# Your playlist has been generated!\n### Failed levels (These levels failed and would need to be added manually):\n{levelfails}\n"
-                            f"### Level packs (Might need manual adjustments):\n{packlvls}\n### Duplicate Levels:\n{dupliwarnlvls}", file=nextcord.File(f"{plname}.zeeplist"), view=editbtns)
+                            f"### Level packs (Might need manual adjustments):\n{packlvls}\n### Duplicate Levels (Press the remove duplicates button to remove them):\n{dupliwarnlvls}",
+                            file=nextcord.File(f"{plname}.zeeplist"), view=editbtns)
             fwogutils.undorename(plname)
     modal = nextcord.ui.Modal(title="Playlist creation")
     textinput = nextcord.ui.TextInput(label="Playlist name", min_length=1, max_length=50)
