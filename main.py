@@ -227,8 +227,8 @@ async def create_pl(ctx, msg: nextcord.Message):
             pl = {"name": plname, "amountOfLevels": len(levels), "roundLength": 480.0, "shufflePlaylist": False, "UID": [], "levels": levels}
             fwogutils.dumppl(pl)
             fwogutils.renamepl(plname)
-            await ctxe.edit(f"# Your playlist has been generated!\n### Failed levels (These levels failed and would need to be added manually):\n{levelfails}\n"
-                            f"### Level packs (Might need manual adjustments):\n{packlvls}\n### Duplicate Levels (Press the remove duplicates button to remove them):\n{dupliwarnlvls}",
+            await ctxe.edit(f"# Your playlist has been generated!\n### Failed levels (These levels failed and would need to be added manually):\n{levelfails[:500]}\n"
+                            f"### Level packs (Might need manual adjustments):\n{packlvls[:500]}\n### Duplicate Levels (Press the remove duplicates button to remove them):\n{dupliwarnlvls[:500]}",
                             file=nextcord.File(f"{plname}.zeeplist"), view=editbtns)
             fwogutils.undorename(plname)
     modal = nextcord.ui.Modal(title="Playlist creation")
