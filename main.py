@@ -110,6 +110,7 @@ async def create_pl(ctx, msg: nextcord.Message):
                 for url in workshop_urls:
                     wsids += f"{(url.split('=')[1])}%2C"
         if not wsids:
+            log("Playlist would be empty, warning and returning")
             await ctx.send("Your playlist would be empty, so i dint create any!", ephemeral=True)
             return
         else:
@@ -118,21 +119,26 @@ async def create_pl(ctx, msg: nextcord.Message):
             for x in reqlevels:
                 id = x['workshopId']
                 if id not in antipack:
+                    log(f"{id} wasnt in antipack, adding and appending to antipack")
                     sorting[id] = {"UID": x['fileUid'], "WorkshopID": x['workshopId'], "Name": x['name'], "Author": x['fileAuthor']}
                     antipack.append(id)
                 elif id in antipack and id not in duplicheck:
+                    log(f"{id} is pack, adding to pack list for warn")
                     packlvls += f"- [{x['name']} - {id}](<https://steamcommunity.com/sharedfiles/filedetails/?id={id}>)\n"
                     duplicheck.append(id)
             for x in wsids[:-3].split("%2C"):
                 try:
+                    log(f"Trying for {x} in for wsids")
                     levels.append(sorting[x])
+                    log("Level Appended.")
                 except KeyError:
+                    log(f"{x} is assumed to have failed the try, KeyError was raised")
                     levelfails += f"- [Workshop ID: {x}](<https://steamcommunity.com/sharedfiles/filedetails/?id={x}>)\n"
-            """for x in levels:
+            for x in levels:
                 if x not in dupliwarn:
                     dupliwarn.append(x)
                 else:
-                    dupliwarnlvls += f"- [{x['Name']} - {x['WorkshopID']}](<https://steamcommunity.com/sharedfiles/filedetails/?id={x['WorkshopID']}>)\n""""
+                    dupliwarnlvls += f"- [{x['Name']} - {x['WorkshopID']}](<https://steamcommunity.com/sharedfiles/filedetails/?id={x['WorkshopID']}>)\n"
             plname = textinput.value
             async def btn_add_level(ctx):
                 view = fwogutils.views.LevelSelect()
@@ -172,8 +178,6 @@ async def create_pl(ctx, msg: nextcord.Message):
                 newlvls = []
                 async def btn_continue(ctx):
                     for x in pl['levels']:
-                        newlvls.append({"UID": "09052023-112732077-[CTR]OwlPlague-249589054336-368", "WorkshopID": "2973690373",
-                                        "Name": "KICK OR CLUTCH VOTING LEVEL", "Author": "[CTR]OwlPlague"})
                         newlvls.append(x)
                         newlvls.append({"UID": "09052023-112732077-[CTR]OwlPlague-249589054336-368", "WorkshopID": "2973690373",
                                         "Name": "KICK OR CLUTCH VOTING LEVEL", "Author": "[CTR]OwlPlague"})
@@ -190,7 +194,6 @@ async def create_pl(ctx, msg: nextcord.Message):
                     await bot.wait_for("interaction", check=lambda interaction: interaction.data['custom_id'] == "thisisalevelsub", timeout=120)
                     level = fwogutils.get_returnlist()[0]
                     for x in pl['levels']:
-                        newlvls.append(level)
                         newlvls.append(x)
                         newlvls.append(level)
                     pl['levels'] = newlvls
