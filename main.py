@@ -1095,4 +1095,4 @@ async def delpl(ctx, plcode: str):
         req = requests.post(f"https://fwogiiedev.com/api/playlists?customcode={plcode}&delete=True", json={})
         await ctx.send(f"`{req.status_code}` {req.text}")
 
-bot.run(privaat.ttoken)
+bot.run(privaat.token)
