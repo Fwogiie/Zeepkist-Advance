@@ -56,7 +56,7 @@ async def on_ready():
             log("updating the live leaderboards cause of start.")
             await rankingsfunc(fwogutils.getgtruserrankings(limit=100, offset=0))
             log("Process done to the GTR rankings leaderboard.")
-        await wrcallback()
+    #await wrcallback()
 
 @bot.is_owner
 @bot.command(name="log")
@@ -103,20 +103,22 @@ async def create_pl(ctx, msg: nextcord.Message):
         await ctx.send("You need at least 2 levels to create a playlist!", ephemeral=True)
         return
     async def modal_sub(ctx):
-        wsids, levels, sorting, levelfails, antipack, duplicheck, packlvls, dupliwarn, dupliwarnlvls = "", [], {}, "", [], [], "", [], ""
+        wsids, levels, sorting, levelfails, antipack, duplicheck, packlvls, dupliwarn, dupliwarnlvls = [], [], {}, "", [], [], "", [], ""
         for x in msgs:
             workshop_urls = re.findall('https://steamcommunity\.com/sharedfiles/filedetails/\?id=\d+', x)
             if workshop_urls:
                 for url in workshop_urls:
-                    wsids += f"{(url.split('=')[1])}%2C"
+                    wsids.append(url.split('=')[1])
         if not wsids:
             log("Playlist would be empty, warning and returning")
             await ctx.send("Your playlist would be empty, so i dint create any!", ephemeral=True)
             return
         else:
             ctxe = await ctx.send("processing", ephemeral=True)
-            reqlevels = json.loads(requests.get(f"https://api.zworpshop.com/levels/workshops/{wsids[:-3]}?includeReplaced=false&includeDeleted=false").text)
-            for x in reqlevels:
+            print(wsids)
+            reqlevels = json.loads(requests.post(f"https://graphql.zeepkist-gtr.com", json={"query": "query GetLevels($workshopIds: [BigFloat!]) { allLevelItems(filter: { workshopId: { in: $workshopIds } }) { nodes { name fileAuthor fileUid workshopId } } }", "variables": {"workshopIds": wsids}}).text)
+            print(reqlevels)
+            for x in reqlevels["data"]["allLevelItems"]["nodes"]:
                 id = x['workshopId']
                 if id not in antipack:
                     log(f"{id} wasnt in antipack, adding and appending to antipack")
@@ -126,7 +128,7 @@ async def create_pl(ctx, msg: nextcord.Message):
                     log(f"{id} is pack, adding to pack list for warn")
                     packlvls += f"- [{x['name']} - {id}](<https://steamcommunity.com/sharedfiles/filedetails/?id={id}>)\n"
                     duplicheck.append(id)
-            for x in wsids[:-3].split("%2C"):
+            for x in wsids:
                 try:
                     log(f"Trying for {x} in for wsids")
                     levels.append(sorting[x])
@@ -532,9 +534,7 @@ class Cog(commands.Cog):
         if ctx.channel.id == 1201928657703292959 and ctx.author.id not in [785037540155195424, bot.user.id]:
             await ctx.delete()
 
-
 bot.add_cog(Cog())
-
 
 @bot.slash_command(name="link", guild_ids=[1200812715527114824])
 async def link(ctx):
@@ -572,6 +572,7 @@ async def linkgtr(ctx):
 
 async def rankingsfunc(gtrrankings):
     global leaderboards
+    print("called")
     leaderboard = await bot.get_channel(1203645881279184948).fetch_message(leaderboards['rankings'])
     stringedrankings = ""
     for x in gtrrankings["rankings"][:20]:
@@ -984,23 +985,114 @@ async def stoplb(ctx):
     else:
         print("invalid user")
 
-"""@bot.slash_command(name="search")
-async def search(ctx):
-    pass"""
+@bot.slash_command("upload")
+async def upload(ctx):
+    pass
 
-"""@search.subcommand(name="level", description="Search A level for its records and info!")
-async def search_lvl(ctx):
-    view = fwogutils.views.LevelSelect()
-    await ctx.send(view=view, ephemeral=True)
-    await bot.wait_for("interaction", check=lambda interaction: interaction.data['custom_id'] == "thisisalevelsub", timeout=120)
-    level = fwogutils.get_returnlist()[0]
-    req = requests.get(f"https://jsonapi.zeepkist-gtr.com/personalbests/?filter=equals(level,%27{level['Hash']}%27)&include=record&page[size]=100")
-    if req.status_code != 200:
-        log(f'recieved {req.status_code} in search_lvl')
-        await ctx.send("An error occurred. please try again")
+code, author, desc, password = "The code used to import this playlist into zeepkist", "The person who made this playlist", "The description of this playlist", "This password is needed to manage this playlist later on"
+@upload.subcommand(name="playlist", description="Upload a playlist to fwogiiedev to be importable via code!")
+async def upload_pl(ctx, playlist: nextcord.Attachment):
+    if fwogutils.checkzeeplist(playlist.filename):
+        def embed():
+            embed = discord.Embed(title="Playlist Upload", description="This is where you can edit your playlist before uploading it!", color=nextcord.Color.blue())
+            embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png?ex=65ce46ad&is=65bbd1ad&hm=42cf06915022254aee2647a53d62d3814c8397d034e8232381c4d6b7e95d299e&")
+            embed.add_field(name="Code (required)", value=code, inline=False)
+            embed.add_field(name="Author (required)", value=author, inline=False)
+            embed.add_field(name="Description (optional)", value=desc, inline=False)
+            embed.add_field(name="Password (required)", value=password, inline=False)
+            return embed
+
+        async def set_code(ctx):
+            async def modalcallback(ctx):
+                global code
+                code = txtinput.value
+                await ctxe.edit(embed=embed(), view=editbtns)
+            modal = nextcord.ui.Modal(title="Set Code", auto_defer=True)
+            txtinput = nextcord.ui.TextInput(label="Code", max_length=15, placeholder=code)
+            modal.add_item(txtinput)
+            modal.callback = modalcallback
+            await ctx.response.send_modal(modal)
+
+        async def set_author(ctx):
+            async def modalcallback(ctx):
+                global author
+                author = txtinput.value
+                await ctxe.edit(embed=embed(), view=editbtns)
+
+            modal = nextcord.ui.Modal(title="Set Author", auto_defer=True)
+            txtinput = nextcord.ui.TextInput(label="Author", max_length=30, placeholder=author)
+            modal.add_item(txtinput)
+            modal.callback = modalcallback
+            await ctx.response.send_modal(modal)
+        async def set_desc(ctx):
+            async def modalcallback(ctx):
+                global desc
+                desc = txtinput.value
+                await ctxe.edit(embed=embed(), view=editbtns)
+
+            modal = nextcord.ui.Modal(title="Set Description", auto_defer=True)
+            txtinput = nextcord.ui.TextInput(label="Description", max_length=256, placeholder=desc)
+            modal.add_item(txtinput)
+            modal.callback = modalcallback
+            await ctx.response.send_modal(modal)
+        async def set_psw(ctx):
+            async def modalcallback(ctx):
+                global password
+                password = txtinput.value
+                await ctxe.edit(embed=embed(), view=editbtns)
+
+            modal = nextcord.ui.Modal(title="Set Password", auto_defer=True)
+            txtinput = nextcord.ui.TextInput(label="Password", max_length=30, placeholder=password)
+            modal.add_item(txtinput)
+            modal.callback = modalcallback
+            await ctx.response.send_modal(modal)
+        async def upload(ctx):
+            global code, author, password, desc
+            await ctx.response.defer()
+            if code and author and password:
+                pl = json.loads(await playlist.read())
+                pl["amountOfLevels"] = len(pl["levels"])
+                req = requests.post(f"https://fwogiiedev.com/api/playlists?customcode={code}&author={author}&description={desc}&password={password}", json=pl)
+                if req.status_code == 409:
+                    await ctx.followup.send("This code already exists, please pick another one!", ephemeral=True)
+                    return
+                if req.status_code != 200:
+                    await ctx.followup.send(f"unexpected error, code: {req.status_code}")
+                with open("fwogiiedev.json", 'r') as read:
+                    data = json.loads(read.read())
+                data[str(ctx.user.id)] = {"code": code, "password": password, "author": author}
+                data[author] = {"code": code, "password": password, "author": author}
+                with open("fwogiiedev.json", 'w') as write:
+                    json.dump(data, write, indent=2)
+                await ctx.followup.send(f"All set! You can now share this code: {code}", ephemeral=True)
+                code, author, desc, password = "The code used to import this playlist into zeepkist", "The person who made this playlist", "The description of this playlist", "This password is needed to manage this playlist later on"
+            else:
+                await ctx.followup.send("Missing required Information!", ephemeral=True)
+
+        editbtns = nextcord.ui.View(timeout=120, auto_defer=True)
+        setcodebtn = nextcord.ui.Button(label="Set Code", style=nextcord.ButtonStyle.grey)
+        setcodebtn.callback = set_code
+        editbtns.add_item(setcodebtn)
+        setauthorbtn = nextcord.ui.Button(label="Set Author", style=nextcord.ButtonStyle.grey)
+        setauthorbtn.callback = set_author
+        editbtns.add_item(setauthorbtn)
+        setdescbtn = nextcord.ui.Button(label="Set Description", style=nextcord.ButtonStyle.grey)
+        setdescbtn.callback = set_desc
+        editbtns.add_item(setdescbtn)
+        setpswbtn = nextcord.ui.Button(label="Set Password", style=nextcord.ButtonStyle.grey)
+        setpswbtn.callback = set_psw
+        editbtns.add_item(setpswbtn)
+        uploadbtn = nextcord.ui.Button(label="Upload", style=nextcord.ButtonStyle.green)
+        uploadbtn.callback = upload
+        editbtns.add_item(uploadbtn)
+        ctxe = await ctx.send(embed=embed(), view=editbtns, ephemeral=True)
     else:
-        pbs, sortlist = json.loads(req.text), []
-        for x in pbs['included']:
-            print(x)"""
+        await ctx.send("Please attach a valid .zeeplist file", ephemeral=True)
 
-bot.run(privaat.token)
+@bot.command()
+async def delpl(ctx, plcode: str):
+    if ctx.author.id == 785037540155195424:
+        req = requests.post(f"https://fwogiiedev.com/api/playlists?customcode={plcode}&delete=True", json={})
+        await ctx.send(f"`{req.status_code}` {req.text}")
+
+bot.run(privaat.ttoken)

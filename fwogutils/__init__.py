@@ -51,7 +51,7 @@ def hex_to_rgb(hex):
 
 def getgtruser(id: int=None, discid: int=None):
     """
-    remember fwogiie,
+    remember naomi,
     to get username: steamName
     to get user steam ID: steamId
     to get user discord ID: discordId
@@ -410,7 +410,9 @@ def jsonapi_getrecord(id: int):
     return json.loads(requests.get(f"https://jsonapi.zeepkist-gtr.com/records/{id}").text)['data']['attributes']
 
 def jsonapi_getgtrpositions(frompos: int, amount: int):
-    return json.loads(requests.get(f"https://jsonapi.zeepkist-gtr.com/playerpoints?filter=greaterOrEqual(rank,%27{frompos}%27)&page[size]={amount}&fields[playerPoints]=rank,userId,worldRecords,points&sort=rank").text)
+    return json.loads(requests.get(f"https://jsonapi.zeepkist-gtr.com/playerpoints"
+                                   f"?filter=greaterOrEqual(rank,%27{frompos}%27)&page[size]={amount}"
+                                   f"&fields[playerPoints]=rank,userId,worldRecords,points&sort=rank").text)
 
 def getgtruserv2(userid: int=None, steamid: int=None, discordid: int=None):
     if userid != None:
@@ -490,7 +492,7 @@ def userhandler(userid: str=None, steamid: str=None, steamname: str=None, discor
                 return user
 
 def convert_jsonapi_att(att):
-    return {"UID": att['fileUid'],"WorkshopID": att['workshopId'],"Name": att['name'],"Author": att['fileAuthor']}
+    return {"UID": att['fileUid'],"WorkshopID": att['workshopId'],"Name": att['name'],"Author": att['fileAuthor'], "Hash": att['fileHash']}
 
 def get_returnlist():
     with open("fwogutils/returnlist.txt", 'r') as read:
