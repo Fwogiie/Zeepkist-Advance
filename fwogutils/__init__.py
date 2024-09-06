@@ -416,23 +416,24 @@ def jsonapi_getgtrpositions(frompos: int, amount: int):
 
 def getgtruserv2(userid: int=None, steamid: int=None, discordid: int=None):
     if userid != None:
-        req = requests.get(f"https://api.zeepkist-gtr.com/users/{userid}")
+        req = requests.post(f"https://graphql.zeepkist-gtr.com", json={"query": "query MyQuery($id: Int) { allUsers(condition: {id: $id}) { edges { node { id discordId steamId steamName}}}}", "variables": {"id": userid}})
         if req.status_code != 200:
             return False
         else:
             return json.loads(req.text)
     elif steamid != None:
-        req = requests.get(f"https://api.zeepkist-gtr.com/users/steam/{steamid}")
+        req = requests.post(f"https://graphql.zeepkist-gtr.com", json={"query": "query MyQuery($steamId: BigFloat) { allUsers(condition: {steamId: $steamId}) { edges { node { id discordId steamId steamName}}}}", "variables": {"steamId": str(steamid)}})
         if req.status_code != 200:
             return False
         else:
             return json.loads(req.text)
     elif discordid != None:
-        req = requests.get(f"https://api.zeepkist-gtr.com/users/discord/{discordid}")
+        req = requests.post(f"https://graphql.zeepkist-gtr.com", json={"query": "query MyQuery($discordId: BigFloat) { allUsers(condition: {discordId: $discordId}) { edges { node { id discordId steamId steamName}}}}", "variables": {"discordId": str(discordid)}})
         if req.status_code != 200:
+            log(req.status_code)
             return False
         else:
-            return json.loads(req.text)
+            return json.loads(req.text)["data"]["allUsers"]["edges"][0]["node"]
 
 def userhandler(userid: str=None, steamid: str=None, steamname: str=None, discordid: str=None):
     with open("gtrusercache.json", 'r') as cacheread:
@@ -472,16 +473,17 @@ def userhandler(userid: str=None, steamid: str=None, steamname: str=None, discor
     elif steamname:
         try:
             return cache['steamName'][str(steamname)]
-        except KeyError:
+        except TypeError:
             return False
     elif discordid:
         try:
             return cache['discordId'][str(discordid)]
-        except KeyError:
+        except TypeError:
             user = getgtruserv2(discordid=discordid)
             if user is False:
                 return False
             else:
+                print(user)
                 cache["userId"][str(user["id"])] = user
                 cache["steamId"][str(user["steamId"])] = user
                 cache["steamName"][str(user["steamName"])] = user

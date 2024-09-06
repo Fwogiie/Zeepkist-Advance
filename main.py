@@ -22,14 +22,14 @@ from fwogutils import GTR as GTR
 
 bot.load_extension("onami")
 
-@bot.event
+"""@bot.event
 async def on_application_command_error(ctx, error):
     log(error)
     print(error)
     try:
         await ctx.send(f"{fwogutils.errormessage(error)}", ephemeral=True)
     except nextcord.errors.InteractionResponded:
-        pass
+        pass"""
 
 
 @bot.event
@@ -115,9 +115,7 @@ async def create_pl(ctx, msg: nextcord.Message):
             return
         else:
             ctxe = await ctx.send("processing", ephemeral=True)
-            print(wsids)
             reqlevels = json.loads(requests.post(f"https://graphql.zeepkist-gtr.com", json={"query": "query GetLevels($workshopIds: [BigFloat!]) { allLevelItems(filter: { workshopId: { in: $workshopIds } }) { nodes { name fileAuthor fileUid workshopId } } }", "variables": {"workshopIds": wsids}}).text)
-            print(reqlevels)
             for x in reqlevels["data"]["allLevelItems"]["nodes"]:
                 id = x['workshopId']
                 if id not in antipack:
@@ -779,11 +777,10 @@ async def sd_register(ctx):
         linkeduser = linkeds[user]
         async def btn_yes(ctx: nextcord.Interaction):
             newuser = {"id": linkeduser['id'], "steamId": linkeduser['steamId'], "steamName": linkeduser['steamName'], "discordId": linkeduser['discordId'], "registered": True}
-            sdusers["s4"].append(newuser)
+            sdusers["s5"].append(newuser)
             sdusers["registered_users"].append(int(user))
             with open("showdownusers.json", 'w') as write:
                 json.dump(sdusers, write, indent=2)
-            requests.post("https://zeepkist-showdown-4215308f4ce4.herokuapp.com/api/v2/qualifier/register", json=newuser)
             await ctx.edit(content="Thank you for participating!", view=None)
             await ctx.channel.send(f"{ctx.user.mention} has joined the competition!")
         async def btn_no(ctx: nextcord.Interaction):
@@ -799,15 +796,14 @@ async def sd_register(ctx):
         await ctx.send(f"I have found a steam account by the name of **{linkeduser['steamName']}**\nDo you wish to register?\n\n"
                        f"**By registering you accept that we need to gather your steam ID, your steam Name and your GTR user ID for organizational and technical reasons**", ephemeral=True, view=agreebtns)
     else:
-        user = fwogutils.userhandler(discordid=str(ctx.user.id))
+        user = fwogutils.getgtruserv2(discordid=ctx.user.id)
         if user:
             async def btn_yes(ctx: nextcord.Interaction):
                 newuser = {"id": user['id'], "steamId": user['steamId'], "steamName": user['steamName'], "discordId": user['discordId'], "registered": True}
-                sdusers["s4"].append(newuser)
+                sdusers["s5"].append(newuser)
                 sdusers["registered_users"].append(int(ctx.user.id))
                 with open("showdownusers.json", 'w') as write:
                     json.dump(sdusers, write, indent=2)
-                requests.post("https://zeepkist-showdown-4215308f4ce4.herokuapp.com/api/v2/qualifier/register", json=newuser)
                 await ctx.edit(content="Thank you for participating!", view=None)
                 await ctx.channel.send(f"{ctx.user.mention} has joined the competition!")
             async def btn_no(ctx: nextcord.Interaction):
@@ -834,12 +830,10 @@ async def sd_unregister(ctx):
     index = 0
     for x in sdusers["registered_users"]:
         if x == ctx.user.id:
-            user = sdusers["s4"][index]
+            user = sdusers["s5"][index]
             user["registered"] = False
-            postfalse = requests.post("https://zeepkist-showdown-4215308f4ce4.herokuapp.com/api/v2/qualifier/register", json=user)
-            log(f"postfalse returned: {postfalse.text}")
             log(f"popping {ctx.user.id}")
-            log(sdusers["s4"].pop(index))
+            log(sdusers["s5"].pop(index))
             log(sdusers["registered_users"].pop(index))
             with open("showdownusers.json", 'w') as write:
                 json.dump(sdusers, write, indent=2)
