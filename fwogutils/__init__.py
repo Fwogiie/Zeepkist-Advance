@@ -467,7 +467,7 @@ def jsonapi_getrecord(id: int):
 
 def jsonapi_getgtrpositions(frompos: int, amount: int):
     return json.loads(requests.post("https://graphql.zeepkist-gtr.com", json={"query": """query MyQuery($offset: Int, $first: Int) {
-  allUserPoints(offset: $offset, first: $first) {
+  allUserPoints(offset: $offset, first: $first, orderBy: RANK_ASC) {
     edges {
       node { id points rank worldRecords
         userByIdUser { steamName }
