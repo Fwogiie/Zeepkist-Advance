@@ -56,6 +56,7 @@ async def on_ready():
             log("updating the live leaderboards cause of start.")
             await rankingsfunc(fwogutils.getgtruserrankings(limit=100, offset=0))
             log("Process done to the GTR rankings leaderboard.")
+        await rankingsfunc(fwogutils.getgtruserrankings(limit=100, offset=0))
     #await wrcallback()
 
 @bot.is_owner
@@ -570,19 +571,18 @@ async def linkgtr(ctx):
 
 async def rankingsfunc(gtrrankings):
     global leaderboards
-    print("called")
     leaderboard = await bot.get_channel(1203645881279184948).fetch_message(leaderboards['rankings'])
     stringedrankings = ""
-    for x in gtrrankings["rankings"][:20]:
-        stringedrankings += f"{x['position']}. `{x['user']['steamName']}` with **{x['score']}** points and **{x['amountOfWorldRecords']}** World Records\n"
+    for x in gtrrankings[:20]:
+        stringedrankings += f"{x['node']['rank']}. `{x['node']['userByIdUser']['steamName']}` with **{x['node']['points']}** points and **{x['node']['worldRecords']}** World Records\n"
     embed = discord.Embed(title="GTR Rankings", description=stringedrankings, color=nextcord.Color.blue(), timestamp=datetime.datetime.now())
     embed.set_footer(text="last updated")
     await leaderboard.edit(embed=embed, view=fwogutils.views.LButtons(gtrrankings))
     ruusies = fwogutils.getRUusers()
     linkeds = fwogutils.get_linked_users()
     for x in ruusies:
-        checkrank = fwogutils.getlinkeduserdata(x)["position"]
-        userrank = fwogutils.jsonapi_get_playerrank(linkeds[x]["id"])
+        checkrank = fwogutils.getlinkeduserdata(x)['position']
+        userrank = fwogutils.getgtruserrank(linkeds[x]["id"])['rank']
         if checkrank > userrank:
             log(f"{x} ranked up!! sending notif!")
             channel = await bot.fetch_channel(1207401802769633310)
@@ -592,8 +592,8 @@ async def rankingsfunc(gtrrankings):
             fwogutils.setlinkedranking(user=x, pos=userrank)
     rdusies = fwogutils.getRDusers()
     for x in rdusies:
-        checkrank = fwogutils.getlinkeduserdata(x)["position"]
-        userrank = fwogutils.jsonapi_get_playerrank(linkeds[x]["id"])
+        checkrank = fwogutils.getlinkeduserdata(x)['position']
+        userrank = fwogutils.getgtruserrank(linkeds[x]["id"])['rank']
         if checkrank < userrank:
             log(f"{x} ranked down :/ sending notif!")
             channel = await bot.fetch_channel(1207401802769633310)

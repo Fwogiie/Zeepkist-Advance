@@ -18,12 +18,15 @@ class LButtons(nextcord.ui.View):
         stringedrankings = ""
         stringranks = ""
         strranks = ""
-        for x in gtrrankings["rankings"][:30]:
-            stringedrankings += f"{x['position']}. `{x['user']['steamName']}` with **{x['score']}** points and **{x['amountOfWorldRecords']}** World Records\n"
-        for x in gtrrankings["rankings"][30:60]:
-            stringranks += f"{x['position']}. `{x['user']['steamName']}` with **{x['score']}** points and **{x['amountOfWorldRecords']}** World Records\n"
-        for x in gtrrankings["rankings"][60:90]:
-            strranks += f"{x['position']}. `{x['user']['steamName']}` with **{x['score']}** points and **{x['amountOfWorldRecords']}** World Records\n"
+        for x in gtrrankings[:30]:
+            x = x['node']
+            stringedrankings += f"{x['rank']}. `{x['userByIdUser']['steamName']}` with **{x['points']}** points and **{x['worldRecords']}** World Records\n"
+        for x in gtrrankings[30:60]:
+            x = x['node']
+            stringranks += f"{x['rank']}. `{x['userByIdUser']['steamName']}` with **{x['points']}** points and **{x['worldRecords']}** World Records\n"
+        for x in gtrrankings[60:90]:
+            x = x['node']
+            strranks += f"{x['rank']}. `{x['userByIdUser']['steamName']}` with **{x['points']}** points and **{x['worldRecords']}** World Records\n"
         embed = discord.Embed(title="GTR Rankings", description=stringedrankings, color=nextcord.Color.blue())
         embeda = discord.Embed(title=" ", description=stringranks, color=nextcord.Color.blue())
         embedb = discord.Embed(title=" ", description=strranks, color=nextcord.Color.blue())
@@ -41,15 +44,17 @@ class LButtons(nextcord.ui.View):
             if linked["userdata"]["position"] != 6969:
                 userrank = linked["userdata"]["position"]
             else:
-                userrank = fwogutils.getgtruserrank(linked["id"])["position"]
-            closeranks = fwogutils.jsonapi_getgtrpositions(frompos=userrank-5, amount=11)["data"]
+                print("e")
+                print(fwogutils.getgtruserrank(linked["id"]))
+                userrank = fwogutils.getgtruserrank(linked["id"])["rank"]
+            closeranks = fwogutils.jsonapi_getgtrpositions(frompos=userrank-5, amount=11)
             ranks = ""
             for x in closeranks:
-                x = x['attributes']
+                x = x['node']
                 if x['rank'] != userrank:
-                    ranks += f"{x['rank']}. `{fwogutils.userhandler(userid=x['userId'])['steamName']}` with **{x['points']}** points and **{x['worldRecords']}** World Records\n"
+                    ranks += f"{x['rank']}. `{x['userByIdUser']['steamName']}` with **{x['points']}** points and **{x['worldRecords']}** World Records\n"
                 else:
-                    ranks += f"> {x['rank']}. `{fwogutils.userhandler(userid=x['userId'])['steamName']}` with **{x['points']}** points and **{x['worldRecords']}** World Records\n"
+                    ranks += f"> {x['rank']}. `{x['userByIdUser']['steamName']}` with **{x['points']}** points and **{x['worldRecords']}** World Records\n"
             embed = discord.Embed(title="Your Rank", description=ranks, color=nextcord.Color.blue())
             await ctx.edit("", embed=embed)
         else:
@@ -145,8 +150,7 @@ class LevelSelect(nextcord.ui.View):
 
     async def search_wsid_callback(self, ctx):
         self.searchcache = {}
-        req = requests.get(
-            f"https://jsonapi.zworpshop.com/levels?filter=equals(workshopId,%27{self.modal_txtinput.value}%27)")
+        req = requests.get(f"https://jsonapi.zworpshop.com/levels?filter=equals(workshopId,%27{self.modal_txtinput.value}%27)")
         if req.status_code != 200:
             log(f"From LevelSelect received status code {req.status_code} in Level author Search, that's bad :/")
             await ctx.send("An error occurred. Please try again", ephemeral=True)

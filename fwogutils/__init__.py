@@ -59,17 +59,45 @@ def getgtruser(id: int=None, discid: int=None):
     stay awesome girl <3
     """
     if id != None:
-        req = requests.get(f"https://api.zeepkist-gtr.com/users/{id}")
+        req = requests.post(f"https://graphql.zeepkist-gtr.com", json={"query": """
+        query MyQuery($id: Int) {
+  allUsers(condition: {id: $id}) {
+    edges {
+      node {
+        id
+        steamName
+        steamId
+        discordId
+      }
+    }
+  }
+}""", "variables": {"id": id}})
         if req.status_code != 200:
             return [False, req.status_code]
         else:
             return [True, json.loads(req.text)]
     elif discid != None:
-        req = requests.get(f"https://api.zeepkist-gtr.com/users/discord/{discid}")
+        req = requests.post(f"https://graphql.zeepkist-gtr.com", json={"query": """
+        query MyQuery($discid: BigFloat) {
+  allUsers(condition: {discordId: $discid}) {
+    edges {
+      node {
+        id
+        steamName
+        steamId
+        discordId
+      }
+    }
+  }
+}""", "variables": {"discid": str(discid)}})
         if req.status_code != 200:
             return [False, req.status_code]
+        user = json.loads(req.text)
+        user = user['data']['allUsers']['edges']
+        if not user:
+            return[False, 404]
         else:
-            return [True, json.loads(req.text)]
+            return [True, user[0]['node']]
 
 
 def getgtrrecord(id: int):
@@ -112,19 +140,49 @@ def getgtruserrankings(limit: int, offset: int):
 
 good girl :>
     """
-    return json.loads(requests.get(f"https://api.zeepkist-gtr.com/users/rankings?Limit={limit}&Offset={offset}").text)
+    jsontxt = json.loads(requests.post(f"https://graphql.zeepkist-gtr.com", json={"query": """
+    query MyQuery($first: Int = 100, $offset: Int = 0) {
+  allUserPoints(first: $first, offset: $offset) {
+    edges {
+      node {
+        rank
+        worldRecords
+        points
+        userByIdUser {
+          steamName
+        }
+      }
+    }
+  }
+}""", "variables": {"first": limit, "offset": int(offset)}}).text)
+    return jsontxt['data']['allUserPoints']['edges']
 
 def getgtruserrank(id: int):
     """
     {
-  "amountOfWorldRecords": 0,
-  "position": 0,
-  "score": 0
+  "worldRecords": 0,
+  "rank": 0,
+  "points": 0
 }
 
 girl!
     """
-    return json.loads(requests.get(f"https://api.zeepkist-gtr.com/users/ranking/{id}").text)
+    return json.loads(requests.post("https://graphql.zeepkist-gtr.com", json={"query": """
+    query MyQuery($user: Int) {
+  allUsers(condition: {id: $user}) {
+    edges {
+      node {
+        userPointsByIdUser {
+          nodes {
+            rank
+            worldRecords
+            points
+          }
+        }
+      }
+    }
+  }
+}""", "variables": {"user": id}}).text)['data']['allUsers']['edges'][0]['node']['userPointsByIdUser']['nodes'][0]
 
 def checkzeeplist(filename: str):
     """
@@ -185,10 +243,10 @@ def setlinkedusersetting(setting: str, value, user):
         data["linked"][str(user)]["settings"]["notifs"][str(setting)] = value
         if setting == 'RU' and value is True:
             data["usercache"]["RUusers"].append(str(user))
-            data["linked"][str(user)]["userdata"]["position"] = jsonapi_get_playerrank(data["linked"][str(user)]["id"])
+            data["linked"][str(user)]["userdata"]["position"] = getgtruserrank(data["linked"][str(user)]["id"])['rank']
         if setting == 'RD' and value is True:
             data["usercache"]["RDusers"].append(str(user))
-            data["linked"][str(user)]["userdata"]["position"] = jsonapi_get_playerrank(data["linked"][str(user)]["id"])
+            data["linked"][str(user)]["userdata"]["position"] = getgtruserrank(data["linked"][str(user)]["id"])['rank']
         if setting == 'WRST' and value is True:
             data["usercache"]["WRSTusers"][str(data["linked"][str(user)]["id"])] = {"discid": str(user)}
         if setting == 'RU' and value is False:
@@ -308,9 +366,6 @@ def zworp_getlevel(hash: str):
     else:
         return json.loads(req.text)
 
-def jsonapi_get_playerrank(user: int):
-    return json.loads(requests.get(f"https://jsonapi.zeepkist-gtr.com/users/{user}/playerPoints").text)['data'][0]['attributes']['rank']
-
 def gtr_getalluserwrs(gtruserid: int):
     amount = json.loads(requests.get(f"https://api.zeepkist-gtr.com/wrs/user/{gtruserid}?Limit=0&Offset=0").text)["totalAmount"]
     pages = int(amount / 100)
@@ -410,9 +465,15 @@ def jsonapi_getrecord(id: int):
     return json.loads(requests.get(f"https://jsonapi.zeepkist-gtr.com/records/{id}").text)['data']['attributes']
 
 def jsonapi_getgtrpositions(frompos: int, amount: int):
-    return json.loads(requests.get(f"https://jsonapi.zeepkist-gtr.com/playerpoints"
-                                   f"?filter=greaterOrEqual(rank,%27{frompos}%27)&page[size]={amount}"
-                                   f"&fields[playerPoints]=rank,userId,worldRecords,points&sort=rank").text)
+    return json.loads(requests.post("https://graphql.zeepkist-gtr.com", json={"query": """query MyQuery($offset: Int, $first: Int) {
+  allUserPoints(offset: $offset, first: $first) {
+    edges {
+      node { id points rank worldRecords
+        userByIdUser { steamName }
+      }
+    }
+  }
+}""", "variables": {"offset": frompos - 1, "first": amount}}).text)['data']['allUserPoints']['edges']
 
 def getgtruserv2(userid: int=None, steamid: int=None, discordid: int=None):
     if userid != None:
