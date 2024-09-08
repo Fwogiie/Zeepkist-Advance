@@ -233,8 +233,9 @@ def get_linked_users():
         return data['linked']
 
 def gtrlb_shedule():
-    times = [datetime.time(hour=0, minute=5), datetime.time(hour=6, minute=5), datetime.time(hour=12, minute=5),
-             datetime.time(hour=18, minute=5)]
+    times = []
+    for x in range(24):
+        times.append(datetime.time(hour=x, minute=5))
     return times
 
 def setlinkedusersetting(setting: str, value, user):
