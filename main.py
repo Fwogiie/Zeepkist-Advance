@@ -56,7 +56,6 @@ async def on_ready():
             log("updating the live leaderboards cause of start.")
             await rankingsfunc(fwogutils.getgtruserrankings(limit=100, offset=0))
             log("Process done to the GTR rankings leaderboard.")
-        await rankingsfunc(fwogutils.getgtruserrankings(limit=100, offset=0))
     #await wrcallback()
 
 @bot.is_owner
