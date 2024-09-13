@@ -1148,7 +1148,7 @@ async def qualifier_lb():
         subs = discord.Embed(title="Substitutes", description=strlb, color=nextcord.Colour.light_gray())
         embeds.append(subs)
         records, strlb = "", ""
-    embed = await bot.get_channel(1144730662000136315).fetch_message(1284247928113729630)
+    embed = await bot.get_channel(1198606669123424357).fetch_message(1284247928113729630)
     await embed.edit("# Showdown Qualifier Season 3", embeds=embeds)
 
 @tasks.loop(minutes=5)
@@ -1175,7 +1175,7 @@ async def showdown_lbs():
             strlb += f"`{mwah[0]}` by **{mwah[1]}**\n"
         embeds.append(discord.Embed(title=level["name"], description=strlb, color=nextcord.Colour.purple()))
         records, sort, strlb = "", [], ""
-    embed = await bot.get_channel(1144730662000136315).fetch_message(1284249415367786627)
+    embed = await bot.get_channel(1198606669123424357).fetch_message(1284249415367786627)
     await embed.edit(embeds=embeds)
 
 
