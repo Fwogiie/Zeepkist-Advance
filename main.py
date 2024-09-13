@@ -1088,4 +1088,95 @@ async def delpl(ctx, plcode: str):
         req = requests.post(f"https://fwogiiedev.com/api/playlists?customcode={plcode}&delete=True", json={})
         await ctx.send(f"`{req.status_code}` {req.text}")
 
+@bot.command()
+async def start(ctx, lb: str):
+    if ctx.author.id in [257321046611329026, 785037540155195424, 106800154664792064, 483611064974704653, 403942829656899587]:
+        if lb == "quali":
+            qualifier_lb.start()
+            await ctx.send("started :3")
+        if lb == "lbs":
+            showdown_lbs.start()
+            await ctx.send("started :3")
+    else:
+        await ctx.send("You do not have the permissions to use this command :3")
+
+@bot.command()
+async def stop(ctx, lb: str):
+    if ctx.author.id in [257321046611329026, 785037540155195424, 106800154664792064, 483611064974704653, 403942829656899587]:
+        if lb == "quali":
+            qualifier_lb.stop()
+            await ctx.send("stopped :3")
+        if lb == "lbs":
+            showdown_lbs.stop()
+            await ctx.send("stopped :3")
+    else:
+        await ctx.send("You do not have the permissions to use this command :3")
+
+@tasks.loop(minutes=5)
+async def qualifier_lb():
+    level, users, records, strlb, embeds, count = {"id": 6667}, [], "", "", [], 1
+    with open("showdownusers.json", 'r') as read:
+        contents = json.loads(read.read())
+        for x in contents['s5']:
+            users.append(x['id'])
+        levelpbs = json.loads(requests.post(url= "https://graphql.zeepkist-gtr.com", json={"query": "query MyQuery($ids: [Int!], $level: Int) { allPersonalBestGlobals ( filter: { idLevel: { equalTo: $level }, idUser: { in: $ids } } ) { edges { node { id recordByIdRecord { time userByIdUser { steamName } } } } } }", "variables": {"ids": users, "level": level["id"]} }).text)
+        print(levelpbs)
+        for x in levelpbs["data"]["allPersonalBestGlobals"]["edges"]:
+            x = x["node"]["recordByIdRecord"]
+            records += f'{fwogutils.format_time(x["time"])}={x["userByIdUser"]["steamName"]}\n'
+        sort = records.split("\n")
+        sort.sort()
+        print(sort)
+        for x in sort[1:9]:
+            mwah = x.split("=")
+            strlb += f"{count}. `{mwah[0]}` by **{mwah[1]}**\n"
+            count += 1
+        poolone = discord.Embed(title="Pool 1", description=strlb, color=nextcord.Colour.red())
+        embeds.append(poolone)
+        records, strlb = "", ""
+        for x in sort[9:17]:
+            mwah = x.split("=")
+            strlb += f"{count}. `{mwah[0]}` by **{mwah[1]}**\n"
+            count += 1
+        pool = discord.Embed(title="Pool 2", description=strlb, color=nextcord.Colour.blue())
+        embeds.append(pool)
+        records, strlb = "", ""
+        for x in sort[17:]:
+            mwah = x.split("=")
+            strlb += f"{count}. `{mwah[0]}` by **{mwah[1]}**\n"
+            count += 1
+        subs = discord.Embed(title="Substitutes", description=strlb, color=nextcord.Colour.light_gray())
+        embeds.append(subs)
+        records, strlb = "", ""
+    embed = await bot.get_channel(1144730662000136315).fetch_message(1284247928113729630)
+    await embed.edit("# Showdown Qualifier Season 3", embeds=embeds)
+
+@tasks.loop(minutes=5)
+async def showdown_lbs():
+    levels, users, records, strlb, embeds = [{"id": 32, "name": "Santorini"}, {"id": 33, "name": "Dawns is a cutie :3"},
+                                             {"id": 34, "name": "NYEHEHE"}], [], "", "", []
+    with open("showdownusers.json", 'r') as read:
+        contents = json.loads(read.read())
+        for x in contents['s5']:
+            users.append(x['id'])
+    for level in levels:
+        levelpbs = json.loads(requests.post(url="https://graphql.zeepkist-gtr.com", json={
+            "query": "query MyQuery($ids: [Int!], $level: Int) { allPersonalBestGlobals ( filter: { idLevel: { equalTo: $level }, idUser: { in: $ids } } ) { edges { node { id recordByIdRecord { time userByIdUser { steamName } } } } } }",
+            "variables": {"ids": users, "level": level["id"]}}).text)
+        print(levelpbs)
+        for x in levelpbs["data"]["allPersonalBestGlobals"]["edges"]:
+            x = x["node"]["recordByIdRecord"]
+            records += f'{fwogutils.format_time(x["time"])}={x["userByIdUser"]["steamName"]}\n'
+        sort = records.split("\n")
+        sort.sort()
+        print(sort)
+        for x in sort[1:]:
+            mwah = x.split("=")
+            strlb += f"`{mwah[0]}` by **{mwah[1]}**\n"
+        embeds.append(discord.Embed(title=level["name"], description=strlb, color=nextcord.Colour.purple()))
+        records, sort, strlb = "", [], ""
+    embed = await bot.get_channel(1144730662000136315).fetch_message(1284249415367786627)
+    await embed.edit(embeds=embeds)
+
+
 bot.run(privaat.token)
