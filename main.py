@@ -1174,7 +1174,7 @@ async def showdown_lbs():
             strlb += f"`{mwah[0]}` by **{mwah[1]}**\n"
         embeds.append(discord.Embed(title=level["name"], description=strlb, color=nextcord.Colour.purple()))
         records, sort, strlb = "", [], ""
-    embed = await bot.get_channel(1198606669123424357).fetch_message(1284249415367786627)
+    embed = await bot.get_channel(1198606669123424357).fetch_message(1284251355573129256)
     await embed.edit(embeds=embeds)
 
 
