@@ -1153,7 +1153,7 @@ async def qualifier_lb():
 
 @tasks.loop(minutes=5)
 async def showdown_lbs():
-    levels, users, records, strlb, embeds = [{"id": 39374, "name": "Quasarion"}, {"id": 39375, "name": "Stellar Slip"}, {"id": 39376, "name": "Signalum"}, {"id": 39378, "name": "Derelict Rally"}, {"id": 39377, "name": "Broken Dreams"}, {"id": 39379, "name": "Magical Forest"}, {"id": 39380, "name": "Shurima Desert"}], [], "", "", []
+    levels, users, records, strlb, embeds = [{"id": 39460, "name": "Quasarion"}, {"id": 39461, "name": "Stellar Slip"}, {"id": 39376, "name": "Signalum"}, {"id": 39378, "name": "Derelict Rally"}, {"id": 39377, "name": "Broken Dreams"}, {"id": 39379, "name": "Magical Forest"}, {"id": 39380, "name": "Shurima Desert"}], [], "", "", []
     with open("showdownusers.json", 'r') as read:
         contents = json.loads(read.read())
         for x in contents['s5']:
