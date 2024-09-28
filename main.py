@@ -19,6 +19,9 @@ from fwogutils import views
 import random
 import websockets
 from fwogutils import GTR as GTR
+import flask
+from flask import Flask, render_template, request, send_from_directory, abort
+
 
 bot.load_extension("onami")
 
@@ -763,6 +766,18 @@ async def gethotlvls(ctx, playlistname: str = nextcord.SlashOption(description="
         await ctx.edit(f"Your playlist has been generated!", file=nextcord.File(f"{playlistname}.zeeplist"))
         fwogutils.undorename(playlistname)
 
+async def submissionsend(channel, level):
+    while True:
+        log('connecting to gtr wss')
+        async with websockets.connect("wss://naomi.fwogiiedev.com/ws") as ws:
+            while True:
+                print(ws.recv())
+
+@bot.command()
+async def startws(ctx):
+    await submissionsend(1,1)
+    await ctx.send("cutie :3")
+
 @bot.slash_command(name="register", description="Register to play in the Showdown competition!", guild_ids=[1127321762686836798])
 async def sd_register(ctx):
     linkeds = fwogutils.get_linked_users()
@@ -1153,7 +1168,7 @@ async def qualifier_lb():
 
 @tasks.loop(minutes=5)
 async def showdown_lbs():
-    levels, users, records, strlb, embeds = [{"id": 39460, "name": "Quasarion"}, {"id": 39461, "name": "Stellar Slip"}, {"id": 39376, "name": "Signalum"}, {"id": 39378, "name": "Derelict Rally"}, {"id": 39377, "name": "Broken Dreams"}, {"id": 39469, "name": "Magical Forest"}, {"id": 39380, "name": "Shurima Desert"}], [], "", "", []
+    levels, users, records, strlb, embeds = [{"id": 992, "name": "Quasarion"}, {"id": 982, "name": "Stellar Slip"}, {"id": 708, "name": "Signalum"}, {"id": 972, "name": "Derelict Rally"}, {"id": 962, "name": "Broken Dreams"}, {"id": 5119, "name": "Magical Forest"}, {"id": 1242, "name": "Shurima Desert"}], [], "", "", []
     with open("showdownusers.json", 'r') as read:
         contents = json.loads(read.read())
         for x in contents['s5']:
@@ -1176,6 +1191,5 @@ async def showdown_lbs():
         records, sort, strlb = "", [], ""
     embed = await bot.get_channel(1198606669123424357).fetch_message(1284251355573129256)
     await embed.edit(embeds=embeds)
-
 
 bot.run(privaat.token)
