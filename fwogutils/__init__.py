@@ -142,7 +142,7 @@ good girl :>
     """
     jsontxt = json.loads(requests.post(f"https://graphql.zeepkist-gtr.com", json={"query": """
     query MyQuery($first: Int = 100, $offset: Int = 0) {
-  allUserPoints(first: $first, offset: $offset) {
+  allUserPoints(first: $first, offset: $offset, orderBy: POINTS_DESC) {
     edges {
       node {
         rank
@@ -154,7 +154,8 @@ good girl :>
       }
     }
   }
-}""", "variables": {"first": limit, "offset": int(offset)}}).text)
+}
+""", "variables": {"first": limit, "offset": int(offset)}}).text)
     return jsontxt['data']['allUserPoints']['edges']
 
 def getgtruserrank(id: int):
@@ -592,3 +593,4 @@ def dump_returnlist(dump):
 print(f"final assumed LB:")
 for x in lb:
     print(x)"""
+
