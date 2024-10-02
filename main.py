@@ -48,7 +48,6 @@ async def on_ready():
     log("initializing startup guilds")
     #await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="For level submissions"))
     for guild in bot.guilds:
-        print(f"Connected to guild: {guild.name} ({guild.id}) with {guild.member_count} members.")
         log(f"Connected to guild: {guild.name} ({guild.id}) with {guild.member_count} members.")
     log("initializing startup cache for live leaderboards.")
     with open("data.json", "r") as f:
@@ -60,6 +59,9 @@ async def on_ready():
             await rankingsfunc(fwogutils.getgtruserrankings(limit=100, offset=0))
             log("Process done to the GTR rankings leaderboard.")
     #await wrcallback()
+    log("setting up level submissions stuff")
+    bot.load_extension("levelsubmissions")
+    log("level submissions are assumably loaded in :3")
 
 @bot.is_owner
 @bot.command(name="log")
@@ -108,7 +110,7 @@ async def create_pl(ctx, msg: nextcord.Message):
     async def modal_sub(ctx):
         wsids, levels, sorting, levelfails, antipack, duplicheck, packlvls, dupliwarn, dupliwarnlvls = [], [], {}, "", [], [], "", [], ""
         for x in msgs:
-            workshop_urls = re.findall('https://steamcommunity\.com/sharedfiles/filedetails/\?id=\d+', x)
+            workshop_urls = re.findall("https://steamcommunity\.com/sharedfiles/filedetails/\?id=\d+", x)
             if workshop_urls:
                 for url in workshop_urls:
                     wsids.append(url.split('=')[1])
@@ -1191,5 +1193,7 @@ async def showdown_lbs():
         records, sort, strlb = "", [], ""
     embed = await bot.get_channel(1198606669123424357).fetch_message(1284251355573129256)
     await embed.edit(embeds=embeds)
+
+
 
 bot.run(privaat.token)

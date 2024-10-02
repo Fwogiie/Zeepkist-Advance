@@ -30,6 +30,7 @@ def log(text: str, type: str=None):
             logging.truncate(0)
             logging.seek(0)
             logging.write(f"{txt}\nin {inspect.stack()[1].function} @ {datetime.datetime.now(tz=pytz.timezone('Europe/Brussels')).strftime('%m/%d, %H:%M:%S')} : {text}")
+            print(text)
 
 
 def errormessage(error):
