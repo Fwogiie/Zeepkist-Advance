@@ -1,9 +1,11 @@
 from fwogutils import bot
 from fwogutils import log
 import re
-import requests
+import http3
 import json
 from nextcord.ext import commands
+
+requests = http3.AsyncClient()
 
 class LevelSubmissionsHandler(commands.Cog):
 
@@ -21,7 +23,7 @@ class LevelSubmissionsHandler(commands.Cog):
     async def submissionhandler(self, workshop_urls: list, channel: int):
         gamelevels = []
         for x in workshop_urls:
-            levelrequest = requests.post("https://graphql.zeepkist-gtr.com",
+            levelrequest = await requests.post("https://graphql.zeepkist-gtr.com",
             json={"query": "query MyQuery($level: BigFloat) {allLevelItems(filter: {workshopId: {equalTo: $level}}) {edges{node { id name fileUid fileAuthor deleted workshopId}}}}",
                   "variables": {"level": int(x.split('?id=')[1])}})
             if levelrequest.status_code != 200:
@@ -33,7 +35,7 @@ class LevelSubmissionsHandler(commands.Cog):
                 if level["deleted"] is True:
                     return
                 gamelevels.append({"UID": level['fileUid'], "WorkshopID": level['workshopId'], "Name": level['name'], "Author": level['fileAuthor']})
-        requests.post("https://fwogiiedev.com/api/levelsubmissions", json={"levels": gamelevels, "channel": str(channel)})
+        await requests.post("https://fwogiiedev.com/api/levelsubmissions", json={"levels": gamelevels, "channel": str(channel)})
 
 @bot.message_command(name="resubmit-level")
 async def resub_level(ctx, message):
