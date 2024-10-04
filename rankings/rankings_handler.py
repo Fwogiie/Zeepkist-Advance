@@ -5,6 +5,7 @@ import discord
 import datetime
 import nextcord
 
+leaderboards = {}
 async def rankingsfunc(gtrrankings):
     global leaderboards
     leaderboard = await bot.get_channel(1203645881279184948).fetch_message(leaderboards['rankings'])
