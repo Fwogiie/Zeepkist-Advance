@@ -2,12 +2,15 @@ import datetime
 import time
 import nextcord
 import tzlocal
+from aiohttp.web_response import Response
 from discord.ext import commands, tasks
 import inspect
 import pytz
 import requests
 import json
 import os
+
+from flask import request
 
 intents = nextcord.Intents.default()
 intents.message_content = True
@@ -17,7 +20,6 @@ bot = commands.Bot(command_prefix='!',
                    owner_id=785037540155195424)
 
 bot_ids = [1143521016031744025, 1126430942924386315]
-
 
 def log(text: str, type: str=None):
     with open("log.txt", mode="r+") as logging:
@@ -48,6 +50,12 @@ def format_time(time: float):
 
 def hex_to_rgb(hex):
   return tuple(int(hex[i:i+2], 16) for i in (0, 2, 4))
+
+async def post(url: str, json=False) -> requests.Response():
+    if json:
+        return requests.post(url, json=json)
+    else:
+        return requests.post(url)
 
 
 def getgtruser(id: int=None, discid: int=None):
