@@ -19,6 +19,7 @@ from fwogutils import views
 import random
 import websockets
 from fwogutils import GTR as GTR
+import levelsubmissions
 import flask
 from flask import Flask, render_template, request, send_from_directory, abort
 
