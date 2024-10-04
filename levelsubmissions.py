@@ -1,11 +1,10 @@
 from fwogutils import bot
 from fwogutils import log
 import re
-import http3
+import requests_async as requests
 import json
 from nextcord.ext import commands
 
-requests = http3.AsyncClient()
 
 class LevelSubmissionsHandler(commands.Cog):
 
