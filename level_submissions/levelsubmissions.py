@@ -1,5 +1,4 @@
-from fwogutils import bot
-from fwogutils import log
+from fwogutils import bot, log
 import re
 import requests
 import json
@@ -46,6 +45,5 @@ async def resub_level(ctx, message):
         await LevelSubmissionsHandler.submissionhandler(LevelSubmissionsHandler(), workshop_urls=workshop_urls, channel=message.channel.id)
         await ctx.followup.send("Successfully Submitted the Level(s)")
 
-async def setup(bot):
-    bot.add_cog(LevelSubmissionsHandler())
-    print("Level submissions Cog successfully loaded in :3")
+bot.add_cog(LevelSubmissionsHandler())
+print(f"| {__name__} loaded in")
