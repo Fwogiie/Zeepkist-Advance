@@ -51,13 +51,6 @@ def format_time(time: float):
 def hex_to_rgb(hex):
   return tuple(int(hex[i:i+2], 16) for i in (0, 2, 4))
 
-async def post(url: str, json=False) -> requests.Response():
-    if json:
-        return requests.post(url, json=json)
-    else:
-        return requests.post(url)
-
-
 def getgtruser(id: int=None, discid: int=None):
     """
     remember naomi,
