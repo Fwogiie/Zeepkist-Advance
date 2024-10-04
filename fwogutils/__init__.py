@@ -210,12 +210,12 @@ def undorename(name):
     os.rename(f"{name}.zeeplist", "playlist.zeeplist")
 
 def addgtruser(discid: str, user: str):
-    with open("../storage/users.json", 'r') as f:
+    with open("storage/users.json", 'r') as f:
         data = json.loads(f.read())
         data["linked"][discid] = user
         data["linked"][discid]["settings"] = {"notifs": {"RU": False, "RD": False, "WRST": False}}
         data["linked"][discid]["userdata"] = {"position": 6969}
-    with open("../storage/users.json", 'w') as ft:
+    with open("storage/users.json", 'w') as ft:
         json.dump(data, ft, indent=2)
 
 def add_usercache(id: int):
@@ -224,14 +224,14 @@ def add_usercache(id: int):
     """
     user = getgtruser(id=id)
     if user[0]:
-        with open("../storage/users.json", 'r') as f:
+        with open("storage/users.json", 'r') as f:
             data = json.loads(f.read())
             data["usercache"][str(id)] = user[1]
-        with open("../storage/users.json", 'w') as ft:
+        with open("storage/users.json", 'w') as ft:
             json.dump(data, ft, indent=2)
 
 def get_linked_users():
-    with open("../storage/users.json", 'r') as f:
+    with open("storage/users.json", 'r') as f:
         data = json.loads(f.read())
         return data['linked']
 
@@ -242,7 +242,7 @@ def gtrlb_shedule():
     return times
 
 def setlinkedusersetting(setting: str, value, user):
-    with open("../storage/users.json", 'r') as f:
+    with open("storage/users.json", 'r') as f:
         data = json.loads(f.read())
         data["linked"][str(user)]["settings"]["notifs"][str(setting)] = value
         if setting == 'RU' and value is True:
@@ -259,11 +259,11 @@ def setlinkedusersetting(setting: str, value, user):
             data["usercache"]["RDusers"].remove(str(user))
         if setting == 'WRST' and value is False:
             data["usercache"]["WRSTusers"].pop(str(data["linked"][str(user)]["id"]))
-    with open("../storage/users.json", 'w') as ft:
+    with open("storage/users.json", 'w') as ft:
         json.dump(data, ft, indent=2)
 
 def getlinkedusersettings(user):
-    with open("../storage/users.json", 'r') as f:
+    with open("storage/users.json", 'r') as f:
         data = json.loads(f.read())
         return data["linked"][str(user)]["settings"]
 
