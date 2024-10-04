@@ -29,7 +29,6 @@ import verify
 
 bot.load_extension("onami")
 
-leaderboards = {}
 @bot.event
 async def on_ready():
     global submissionschannels, leaderboards
@@ -40,7 +39,7 @@ async def on_ready():
     log("initializing startup cache for live leaderboards.")
     with open("storage/data.json", "r") as f:
         data = json.load(f)
-        leaderboards = data["leaderboards"]
+        rankings.rankings_handler.leaderboards = data["leaderboards"]
         log(f"leaderboards cache succeeded.")
         if bot.user.id == 1126430942924386315:
             log("updating the live leaderboards cause of start.")
