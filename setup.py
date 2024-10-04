@@ -44,5 +44,5 @@ async def on_ready():
         log(f"leaderboards cache succeeded.")
         if bot.user.id == 1126430942924386315:
             log("updating the live leaderboards cause of start.")
-            await rankings.rankings_updater.rankings(fwogutils.getgtruserrankings(limit=100, offset=0))
+            await rankings.rankings_handler.rankingsfunc(fwogutils.getgtruserrankings(limit=100, offset=0))
             log("Process done to the GTR rankings leaderboard.")
