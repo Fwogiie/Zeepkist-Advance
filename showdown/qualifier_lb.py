@@ -9,7 +9,7 @@ import nextcord
 @tasks.loop(minutes=5)
 async def qualifier_lb():
     level, users, records, strlb, embeds, count = {"id": 39381}, [], "", "", [], 1
-    with open("../storage/showdownusers.json", 'r') as read:
+    with open("storage/showdownusers.json", 'r') as read:
         contents = json.loads(read.read())
         for x in contents['s5']:
             users.append(x['id'])

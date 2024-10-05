@@ -7,7 +7,7 @@ import json
 async def sd_register(ctx):
     linkeds = fwogutils.get_linked_users()
     user = str(ctx.user.id)
-    with open("../storage/showdownusers.json", 'r') as read:
+    with open("storage/showdownusers.json", 'r') as read:
         sdusers = json.loads(read.read())
     if int(user) in sdusers['registered_users']:
         await ctx.send("You are already registered!", ephemeral=True)
@@ -18,7 +18,7 @@ async def sd_register(ctx):
             newuser = {"id": linkeduser['id'], "steamId": linkeduser['steamId'], "steamName": linkeduser['steamName'], "discordId": linkeduser['discordId'], "registered": True}
             sdusers["s5"].append(newuser)
             sdusers["registered_users"].append(int(user))
-            with open("../storage/showdownusers.json", 'w') as write:
+            with open("storage/showdownusers.json", 'w') as write:
                 json.dump(sdusers, write, indent=2)
             await ctx.edit(content="Thank you for participating!", view=None)
             await ctx.channel.send(f"{ctx.user.mention} has joined the competition!")
@@ -41,7 +41,7 @@ async def sd_register(ctx):
                 newuser = {"id": user['id'], "steamId": user['steamId'], "steamName": user['steamName'], "discordId": user['discordId'], "registered": True}
                 sdusers["s5"].append(newuser)
                 sdusers["registered_users"].append(int(ctx.user.id))
-                with open("../storage/showdownusers.json", 'w') as write:
+                with open("storage/showdownusers.json", 'w') as write:
                     json.dump(sdusers, write, indent=2)
                 await ctx.edit(content="Thank you for participating!", view=None)
                 await ctx.channel.send(f"{ctx.user.mention} has joined the competition!")

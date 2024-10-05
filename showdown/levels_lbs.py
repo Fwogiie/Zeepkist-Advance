@@ -8,7 +8,7 @@ import requests
 @tasks.loop(minutes=5)
 async def showdown_lbs():
     levels, users, records, strlb, embeds = [{"id": 992, "name": "Quasarion"}, {"id": 982, "name": "Stellar Slip"}, {"id": 708, "name": "Signalum"}, {"id": 972, "name": "Derelict Rally"}, {"id": 962, "name": "Broken Dreams"}, {"id": 5119, "name": "Magical Forest"}, {"id": 1242, "name": "Shurima Desert"}], [], "", "", []
-    with open("../storage/showdownusers.json", 'r') as read:
+    with open("storage/showdownusers.json", 'r') as read:
         contents = json.loads(read.read())
         for x in contents['s5']:
             users.append(x['id'])

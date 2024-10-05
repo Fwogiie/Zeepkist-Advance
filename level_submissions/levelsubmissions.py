@@ -29,7 +29,10 @@ class LevelSubmissionsHandler(commands.Cog):
                 return
             else:
                 level = json.loads(levelrequest.text)
-                level = level["data"]["allLevelItems"]["edges"][0]["node"]
+                try:
+                    level = level["data"]["allLevelItems"]["edges"][0]["node"]
+                except IndexError:
+                    return
                 if level["deleted"] is True:
                     return
                 gamelevels.append({"UID": level['fileUid'], "WorkshopID": level['workshopId'], "Name": level['name'], "Author": level['fileAuthor']})
