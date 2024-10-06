@@ -299,7 +299,7 @@ def setlinkedranking(user: str, pos: int):
     with open("storage/users.json", 'r') as f:
         data = json.loads(f.read())
         data["linked"][user]["userdata"]["position"] = pos
-        with open("users.json", 'w') as ft:
+        with open("storage/users.json", 'w') as ft:
             json.dump(data, ft, indent=2)
 
 def jsonapi_get_toplevelpoints(limit: int):
