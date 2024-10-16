@@ -468,7 +468,7 @@ class Zworp:
 def jsonapi_getrecord(id: int):
     return json.loads(requests.get(f"https://jsonapi.zeepkist-gtr.com/records/{id}").text)['data']['attributes']
 
-def jsonapi_getgtrpositions(frompos: int, amount: int):
+def getgtrpositions(frompos: int, amount: int):
     return json.loads(requests.post("https://graphql.zeepkist-gtr.com", json={"query": """query MyQuery($offset: Int, $first: Int) {
   allUserPoints(offset: $offset, first: $first, orderBy: RANK_ASC) {
     edges {
