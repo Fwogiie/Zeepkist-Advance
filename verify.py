@@ -47,6 +47,8 @@ class Cog(commands.Cog):
     async def on_message(self, ctx):
         if ctx.channel.id == 1201928657703292959 and ctx.author.id not in [785037540155195424, bot.user.id]:
             await ctx.delete()
+        if ctx.channel.id == 1296544182051274852:
+            await ctx.add_reaction("✅")
 
 bot.add_cog(Cog())
 
