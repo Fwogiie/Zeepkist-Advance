@@ -47,7 +47,7 @@ class LButtons(nextcord.ui.View):
                 print("e")
                 print(fwogutils.getgtruserrank(linked["id"]))
                 userrank = fwogutils.getgtruserrank(linked["id"])["rank"]
-            closeranks = self.gtrrankings[userrank-6:10]
+            closeranks = fwogutils.getgtrpositions(userrank-5, 11)
             ranks = ""
             for x in closeranks:
                 x = x['node']
