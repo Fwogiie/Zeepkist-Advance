@@ -386,14 +386,14 @@ def gtr_getalluserwrs(gtruserid: int):
     return wrs
 
 def loc_setuserwrs(gtruserid: int, wrs: list):
-    with open("gtrusercache.json", 'r') as f:
+    with open("storage/gtrusercache.json", 'r') as f:
         data = json.loads(f.read())
         data[str(gtruserid)] = wrs
-    with open("gtrusercache.json", 'w') as ft:
+    with open("storage/gtrusercache.json", 'w') as ft:
         json.dump(data, ft, indent=2)
 
 def loc_getuserwrs(gtruserid: int):
-    with open("gtrusercache.json", 'r') as f:
+    with open("storage/gtrusercache.json", 'r') as f:
         data = json.loads(f.read())
         return data[str(gtruserid)]
 
@@ -401,20 +401,20 @@ def loc_removeuserwr(gtruserid: int, level: str):
     """
     scary!
     """
-    with open("gtrusercache.json", 'r') as f:
+    with open("storage/gtrusercache.json", 'r') as f:
         data = json.loads(f.read())
         data[str(gtruserid)].remove(level)
-    with open("gtrusercache.json", 'w') as ft:
+    with open("storage/gtrusercache.json", 'w') as ft:
         json.dump(data, ft, indent=2)
 
 def loc_adduserwr(gtruserid: int, level: str):
     """
     scary!
     """
-    with open("gtrusercache.json", 'r') as f:
+    with open("storage/gtrusercache.json", 'r') as f:
         data = json.loads(f.read())
         data[str(gtruserid)].append(level)
-    with open("gtrusercache.json", 'w') as ft:
+    with open("storage/gtrusercache.json", 'w') as ft:
         json.dump(data, ft, indent=2)
 
 def jsonfromreq(req):
@@ -501,7 +501,7 @@ def getgtruserv2(userid: int=None, steamid: int=None, discordid: int=None):
             return data[0]["node"]
 
 def userhandler(userid: str=None, steamid: str=None, steamname: str=None, discordid: str=None):
-    with open("gtrusercache.json", 'r') as cacheread:
+    with open("storage/gtrusercache.json", 'r') as cacheread:
         cache = json.loads(cacheread.read())
     if userid:
         try:
@@ -516,7 +516,7 @@ def userhandler(userid: str=None, steamid: str=None, steamname: str=None, discor
                 cache["steamName"][str(user["steamName"])] = user
                 if user["discordId"] != None or discordid != "-1":
                     cache["discordId"][str(user["discordId"])] = user
-                with open("gtrusercache.json", 'w') as cachewrite:
+                with open("storage/gtrusercache.json", 'w') as cachewrite:
                     json.dump(cache, cachewrite, indent=2)
                 return user
     elif steamid:
@@ -532,7 +532,7 @@ def userhandler(userid: str=None, steamid: str=None, steamname: str=None, discor
                 cache["steamName"][str(user["steamName"])] = user
                 if user["discordId"] != None or discordid != "-1":
                     cache["discordId"][str(user["discordId"])] = user
-                with open("gtrusercache.json", 'w') as cachewrite:
+                with open("storage/gtrusercache.json", 'w') as cachewrite:
                     json.dump(cache, cachewrite, indent=2)
                 return user
     elif steamname:
@@ -554,7 +554,7 @@ def userhandler(userid: str=None, steamid: str=None, steamname: str=None, discor
                 cache["steamName"][str(user["steamName"])] = user
                 if user["discordId"] != None or discordid != "-1":
                     cache["discordId"][str(user["discordId"])] = user
-                with open("gtrusercache.json", 'w') as cachewrite:
+                with open("storage/gtrusercache.json", 'w') as cachewrite:
                     json.dump(cache, cachewrite, indent=2)
                 return user
 
