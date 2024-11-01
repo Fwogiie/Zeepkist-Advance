@@ -268,7 +268,7 @@ def getlinkedusersettings(user):
         return data["linked"][str(user)]["settings"]
 
 def userislinked(id):
-    with open("users.json", 'r') as f:
+    with open("storage/users.json", 'r') as f:
         data = json.loads(f.read())
     if str(id) in data["linked"]:
         return True
