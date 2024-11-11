@@ -1,15 +1,5 @@
-import urllib.parse
-import pathvalidate
-from collections.abc import ByteString
-from idlelib.autocomplete import FILES
-from io import FileIO
-from msilib.schema import Property
-
 import nextcord
-import urllib3
-from jinja2 import Undefined
 from pathvalidate import sanitize_filename
-
 import fwogutils
 
 

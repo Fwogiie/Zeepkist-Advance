@@ -1,11 +1,9 @@
 import json
-import time
 
 from fwogutils import queries, objects, views
 import discord
 import nextcord.ui
 import requests
-from flask import request
 
 import fwogutils
 from fwogutils import bot, log
