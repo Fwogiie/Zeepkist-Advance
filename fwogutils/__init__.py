@@ -195,14 +195,14 @@ def checkzeeplist(filename: str):
         return False
 
 def dumppl(pl):
-    with open("playlist.zeeplist", 'w') as f:
+    with open("storage/playlist.zeeplist", 'w') as f:
         json.dump(pl, f, indent=2)
 
 def renamepl(name):
-    os.rename("playlist.zeeplist", f"storage/{name}.zeeplist")
+    os.rename("storage/playlist.zeeplist", f"storage/{name}.zeeplist")
 
 def undorename(name):
-    os.rename(f"{name}.zeeplist", "storage/playlist.zeeplist")
+    os.rename(f"storage/{name}.zeeplist", "storage/playlist.zeeplist")
 
 def addgtruser(discid: str, user: str):
     with open("storage/users.json", 'r') as f:

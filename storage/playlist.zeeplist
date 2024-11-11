@@ -1,0 +1,51 @@
+{
+  "name": "test",
+  "amountOfLevels": 7,
+  "roundLength": 480.0,
+  "shufflePlaylist": false,
+  "UID": [],
+  "levels": [
+    {
+      "UID": "06082024-021703039-DeeDeeNaNaNa-936012498173-790",
+      "WorkshopID": "3303999940",
+      "Name": "The Mine of Blargh!",
+      "Author": "DeeDeeNaNaNa"
+    },
+    {
+      "UID": "27082024-180157829-[CTR]Kernkob-152636988874-455",
+      "WorkshopID": "3320405417",
+      "Name": "Abandoned Hollow",
+      "Author": "[CTR]Kernkob"
+    },
+    {
+      "UID": "29082024-154400753-[CTR]Kernkob-111433000501-427",
+      "WorkshopID": "3320404990",
+      "Name": "Flying over Cape Nuggest",
+      "Author": "[CTR]Kernkob"
+    },
+    {
+      "UID": "22082024-170833014-[CTR]Kernkob-873861837594-179",
+      "WorkshopID": "3314897903",
+      "Name": "Hypoxia",
+      "Author": "[CTR]Kernkob"
+    },
+    {
+      "UID": "11082024-211022640-[CTR]Kernkob-903513528902-368",
+      "WorkshopID": "3307525822",
+      "Name": "ZSL - Monarch Wings",
+      "Author": "[CTR]Kernkob"
+    },
+    {
+      "UID": "08062024-162748707-[CTR]Kernkob-893689665993-346",
+      "WorkshopID": "3306502798",
+      "Name": "Cape Nuggest",
+      "Author": "[CTR]Kernkob"
+    },
+    {
+      "UID": "06082024-183937990-[CTR]Kernkob-666705590488-621",
+      "WorkshopID": "3304347406",
+      "Name": "Mystic Valley",
+      "Author": "[CTR]Kernkob"
+    }
+  ]
+}
