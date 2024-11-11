@@ -53,8 +53,8 @@ class Playlist(object):
 
 
     async def get_download_url(self):
-        fwogutils.renamepl(sanitize_filename(self._name))
         fwogutils.dumppl(self.playlist_json)
+        fwogutils.renamepl(sanitize_filename(self._name))
         msg = await fwogutils.bot.get_channel(1213563680080273408).send(file=nextcord.File(f"{sanitize_filename(self._name)}.zeeplist"))
         fwogutils.undorename(sanitize_filename(self._name))
         return msg.attachments[0].url
