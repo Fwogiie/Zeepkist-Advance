@@ -29,7 +29,6 @@ import verify
 
 # Commands
 log("loading commands")
-import commands.get
 
 bot.load_extension("onami")
 
