@@ -49,13 +49,13 @@ class Playlist(object):
 
     @property
     def playlist_json(self):
-        return {"name": self.name, "amountOfLevels": self.level_count, "roundLength": self.roundlength, "shufflePlaylist": self.shuffle, "UID": [], "levels": self.levels}
+        return {"name": self.name, "amountOfLevels": self.level_count, "roundLength": self.roundlength, "shufflePlaylist": self.shuffle, "UID": [], "levels": self._levels}
 
 
     async def get_download_url(self):
         fwogutils.renamepl(sanitize_filename(self._name))
         fwogutils.dumppl(self.playlist_json)
-        msg = await fwogutils.bot.get_channel(1213563680080273408).send(file=nextcord.File(f"storage/{sanitize_filename(self._name)}.zeeplist"))
+        msg = await fwogutils.bot.get_channel(1213563680080273408).send(file=nextcord.File(f"{sanitize_filename(self._name)}.zeeplist"))
         fwogutils.undorename(sanitize_filename(self._name))
         return msg.attachments[0].url
 
