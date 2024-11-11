@@ -195,7 +195,7 @@ def checkzeeplist(filename: str):
         return False
 
 def dumppl(pl):
-    with open("playlist.zeeplist", 'w') as f:
+    with open("storage/playlist.zeeplist", 'w') as f:
         json.dump(pl, f, indent=2)
 
 def renamepl(name):
