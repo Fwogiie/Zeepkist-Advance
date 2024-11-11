@@ -19,7 +19,10 @@ async def bot_startup_handler():
         channel, message = int(getter_test.split(",")[0]), int(getter_test.split(",")[1])
         await bot.get_channel(channel).get_partial_message(message).edit(embed=embed, view=DownloadButton())
     else:
-        updatelist = getter_messages
+        log("doing base top getter")
+        for x in getter_messages:
+            channel, message = int(x.split(",")[0]), int(x.split(",")[1])
+            await bot.get_channel(channel).get_partial_message(message).edit(embed=embed, view=DownloadButton())
 
 textinput = nextcord.TextInput
 class DownloadButton(nextcord.ui.View):
