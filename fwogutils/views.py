@@ -1,9 +1,12 @@
+from cProfile import label
+
 import requests
 import json
 import nextcord
 import discord
 import fwogutils
 from fwogutils import log as log
+from fwogutils.objects import Playlist
 
 
 class LButtons(nextcord.ui.View):
@@ -187,3 +190,24 @@ class LevelSelect(nextcord.ui.View):
     async def clear_options(self, ctx):
         self.strselect.options = [nextcord.SelectOption(label='Options were cleared', description='Your arent supposed to see this, please tell fwogiie about this :3', value=1)]
         await ctx.edit(view=self)
+
+class DownloadPlaylist(nextcord.ui.View):
+    def __init__(self, download_url):
+        super().__init__()
+        self.download_url = download_url
+
+    async def hai(self):
+        btn = nextcord.ui.Button(label="Download", style=nextcord.ButtonStyle.url, url=self.download_url)
+        btn.callback = self.download_callback
+        self.add_item(btn)
+
+    @nextcord.ui.button(label="Import by:", style=nextcord.ButtonStyle.green, disabled=True)
+    async def import_by(self):
+        pass
+
+    @nextcord.ui.button(label="Playlist Importer", style=nextcord.ButtonStyle.green)
+    async def pl_importer_callback(self, btn, ctx):
+        await ctx.send("WIP", ephemeral=True)
+
+    async def download_callback(self, btn, ctx):
+        print("e")

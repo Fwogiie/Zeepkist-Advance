@@ -204,10 +204,10 @@ def dumppl(pl):
         json.dump(pl, f, indent=2)
 
 def renamepl(name):
-    os.rename("playlist.zeeplist", f"{name}.zeeplist")
+    os.rename("storage/playlist.zeeplist", f"storage/{name}.zeeplist")
 
 def undorename(name):
-    os.rename(f"{name}.zeeplist", "playlist.zeeplist")
+    os.rename(f"storage/{name}.zeeplist", "storage/playlist.zeeplist")
 
 def addgtruser(discid: str, user: str):
     with open("storage/users.json", 'r') as f:
@@ -570,29 +570,9 @@ def dump_returnlist(dump):
         dump = {"returnlist": dump}
         json.dump(dump, write)
 
-# kept comment for now
-"""for temp in range(15):
-    num = 1
-    req = requests.get(f"https://jsonapi.zworpshop.com/levels?page[size]=100&page[number]={num}")
-    if req.status_code != 200:
-        print(f"got status code {req.status_code} at num {num}.\ndata: {req.text}")
-        break
-    data = json.loads(req.text)
-    if data['data']:
-        lb, inituser = {}, []
-        for x in data['data']:
-            x = x['attributes']
-            if x['fileAuthor'] not in inituser:
-                lb[str(x['fileAuthor'])] = 1
-                inituser.append(x['fileAuthor'])
-            else:
-                lb[str(x['fileAuthor'])] += 1
-            print(f"{x['fileAuthor']} is assumed to have made a level.\ntheir level count is now: {lb[x['fileAuthor']]}")
-        num += 1
+def is_test_build():
+    if bot.user.id == 1126430942924386315:
+        return False
     else:
-        print("Scrape is assumed to be finished.")
-        break
-print(f"final assumed LB:")
-for x in lb:
-    print(x)"""
+        return True
 
