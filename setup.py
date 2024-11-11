@@ -48,5 +48,4 @@ async def on_ready():
             log("updating the live leaderboards cause of start.")
             await rankings.rankings_handler.rankingsfunc(fwogutils.getgtruserrankings(limit=100, offset=0))
             log("Process done to the GTR rankings leaderboard.")
-    if fwogutils.is_test_build():
-        await playlist_stuff.top_gtr.bot_startup_handler()
+    await playlist_stuff.top_gtr.bot_startup_handler()
