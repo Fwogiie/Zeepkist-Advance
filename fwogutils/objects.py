@@ -4,7 +4,7 @@ import fwogutils
 
 
 class Playlist(object):
-    def __init__(self, name:str="No name", roundlength:float=480.0, shuffle:bool=False, levels:list=list, json:tuple=None):
+    def __init__(self, name:str="No name", roundlength:float=480.0, shuffle:bool=False, levels:list=[], json:tuple=None):
         super().__init__()
         if json is None:
             self._name = name
