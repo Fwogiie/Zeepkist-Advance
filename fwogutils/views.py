@@ -192,11 +192,7 @@ class LevelSelect(nextcord.ui.View):
 class DownloadPlaylist(nextcord.ui.View):
     def __init__(self, download_url):
         super().__init__()
-        self.download_url = download_url
-
-    async def hai(self):
-        btn = nextcord.ui.Button(label="Download", style=nextcord.ButtonStyle.url, url=self.download_url)
-        btn.callback = self.download_callback
+        btn = nextcord.ui.Button(label="Download", style=nextcord.ButtonStyle.url, url=download_url)
         self.add_item(btn)
 
     @nextcord.ui.button(label="Import by:", style=nextcord.ButtonStyle.green, disabled=True)
@@ -207,5 +203,3 @@ class DownloadPlaylist(nextcord.ui.View):
     async def pl_importer_callback(self, btn, ctx):
         await ctx.send("WIP", ephemeral=True)
 
-    async def download_callback(self, btn, ctx):
-        print("e")

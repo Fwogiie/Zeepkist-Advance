@@ -64,9 +64,7 @@ class DownloadButton(nextcord.ui.View):
                 embed.add_field(name="Playlist:", value=f"Name: {playlist.name}\n"
                                                         f"Round Length: {fwogutils.format_time(playlist.roundlength)[:5]}\n"
                                                         f"Shuffle: {playlist.shuffle}\nAmount of Levels: {playlist.level_count}")
-                view = fwogutils.views.DownloadPlaylist(await playlist.get_download_url())
-                await view.hai()
-                await ctx.edit(content="", view=view, embed=embed)
+                await ctx.edit(content="", view=fwogutils.views.DownloadPlaylist(await playlist.get_download_url()), embed=embed)
 
 
 

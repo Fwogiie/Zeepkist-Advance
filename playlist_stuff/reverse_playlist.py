@@ -17,7 +17,7 @@ async def revpl(ctx, playlist: nextcord.Attachment = nextcord.SlashOption(descri
         given_pl.levels.reverse()
         new_pl.levels = given_pl.levels
         await ctx.edit(f"Your playlist named **{new_pl.name}** with **{new_pl.level_count}** levels has been reversed!",
-                       view=views.DownloadPlaylist(download_url=new_pl.get_download_url()))
+                       view=views.DownloadPlaylist(download_url=await new_pl.get_download_url()))
     else:
         await ctx.send("Please attach a valid .zeeplist file!", ephemeral=True)
 
