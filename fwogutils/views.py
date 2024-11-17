@@ -1,3 +1,5 @@
+from cProfile import label
+
 import requests
 import json
 import nextcord
@@ -5,6 +7,7 @@ import discord
 import fwogutils
 from fwogutils import log as log
 from fwogutils.objects import Playlist
+from playlist_stuff.top_gtr import embed
 
 
 class LButtons(nextcord.ui.View):
@@ -190,8 +193,9 @@ class LevelSelect(nextcord.ui.View):
         await ctx.edit(view=self)
 
 class DownloadPlaylist(nextcord.ui.View):
-    def __init__(self, download_url):
+    def __init__(self, download_url:str, playlist:Playlist):
         super().__init__()
+        self.playlist = playlist
         btn = nextcord.ui.Button(label="Download", style=nextcord.ButtonStyle.url, url=download_url)
         self.add_item(btn)
 
@@ -203,3 +207,60 @@ class DownloadPlaylist(nextcord.ui.View):
     async def pl_importer_callback(self, btn, ctx):
         await ctx.send("WIP", ephemeral=True)
 
+    @nextcord.ui.button(label="Edit Playlist", style=nextcord.ButtonStyle.grey, row=1)
+    async def edit_pl_callback(self, btn, ctx):
+        await ctx.edit(view=EditPlaylist(self.playlist))
+
+
+class EditPlaylist(nextcord.ui.View):
+    def __init__(self, playlist:Playlist):
+        super().__init__()
+        self.playlist = playlist
+        modal = nextcord.ui.Modal(title="Rename Playlist")
+        self.modaltext = nextcord.ui.TextInput(label="Name")
+        modal.add_item(self.modaltext)
+        modal.callback = self.modal_callback
+        self.modal = modal
+
+    @nextcord.ui.button(label="Edit:", style=nextcord.ButtonStyle.green, disabled=True)
+    async def edit(self):
+        pass
+
+    @nextcord.ui.button(label="Name", style=nextcord.ButtonStyle.grey)
+    async def edit_name(self, btn, ctx):
+        await ctx.response.send_modal(self.modal)
+
+    async def modal_callback(self, ctx):
+        self.playlist.name = self.modaltext.value
+        await ctx.edit(embed=self.playlist.embed)
+
+    @nextcord.ui.button(label="Time +", style=nextcord.ButtonStyle.grey)
+    async def time_add(self, btn, ctx):
+        self.playlist.roundlength += 30
+        await ctx.edit(embed=self.playlist.embed)
+
+    @nextcord.ui.button(label="Time -", style=nextcord.ButtonStyle.grey)
+    async def time_remove(self, btn, ctx):
+        self.playlist.roundlength -= 30
+        await ctx.edit(embed=self.playlist.embed)
+
+    @nextcord.ui.button(label="Toggle Shuffle", style=nextcord.ButtonStyle.grey)
+    async def shuffle_toggle(self, btn, ctx):
+        if self.playlist.shuffle is True:
+            self.playlist.shuffle = False
+        else:
+            self.playlist.shuffle = True
+        await ctx.edit(embed=self.playlist.embed)
+
+    @nextcord.ui.button(label="Actions:", style=nextcord.ButtonStyle.green, disabled=True, row=1)
+    async def actions(self):
+        pass
+
+    @nextcord.ui.button(label="Reverse Playlist", style=nextcord.ButtonStyle.grey, row=1)
+    async def reverse_pl(self, btn, ctx):
+        self.playlist.levels.reverse()
+        await ctx.edit(embed=self.playlist.embed)
+
+    @nextcord.ui.button(label="Apply", style=nextcord.ButtonStyle.green, row=2)
+    async def apply(self, btn, ctx):
+        await ctx.edit(view=DownloadPlaylist(await self.playlist.get_download_url(), self.playlist))

@@ -1,16 +1,16 @@
-import nextcord
+import nextcord, discord
 from pathvalidate import sanitize_filename
 import fwogutils
 
 
 class Playlist(object):
-    def __init__(self, name:str="No name", roundlength:float=480.0, shuffle:bool=False, levels:list=[], json:tuple=None):
+    def __init__(self, name:str="No name", roundlength:float=480.0, shuffle:bool=False, json:tuple=None):
         super().__init__()
         if json is None:
             self._name = name
             self._roundlength = roundlength
             self._shuffle = shuffle
-            self._levels = levels
+            self._levels = []
         else:
             self._name = json["name"]
             self._roundlength = json["roundLength"]
@@ -57,6 +57,14 @@ class Playlist(object):
     def playlist_json(self):
         return {"name": self.name, "amountOfLevels": self.level_count, "roundLength": self.roundlength, "shufflePlaylist": self.shuffle, "UID": [], "levels": self._levels}
 
+    @property
+    def embed(self):
+        embed = discord.Embed(title="Playlist", color=nextcord.Color.blue())
+        embed.add_field(name="Playlist Info:", value=f"Name: {self.name}\nTime (Round Length): {fwogutils.format_time(self.roundlength)[:5]}\n"
+                                                     f"Shuffle: {self.shuffle}\nAmount of Levels: {self.level_count}\n"
+                                                     f"First level: {self._levels[0]['Name']} by {self._levels[0]['Author']}\n"
+                                                     f"Last level: {self._levels[-1]['Name']} by {self._levels[-1]['Author']}")
+        return embed
 
     async def get_download_url(self):
         fwogutils.dumppl(self.playlist_json)

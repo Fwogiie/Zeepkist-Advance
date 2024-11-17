@@ -3,6 +3,9 @@ import json
 import nextcord
 import os
 
+from playlist_stuff.top_gtr import embed
+
+
 @bot.slash_command(name="reverse")
 async def rev(ctx):
     pass
@@ -16,8 +19,7 @@ async def revpl(ctx, playlist: nextcord.Attachment = nextcord.SlashOption(descri
         new_pl = objects.Playlist(name=given_pl.name, roundlength=given_pl.roundlength, shuffle=given_pl.shuffle)
         given_pl.levels.reverse()
         new_pl.levels = given_pl.levels
-        await ctx.edit(f"Your playlist named **{new_pl.name}** with **{new_pl.level_count}** levels has been reversed!",
-                       view=views.DownloadPlaylist(download_url=await new_pl.get_download_url()))
+        await ctx.edit(embed=new_pl.embed, view=views.DownloadPlaylist(await new_pl.get_download_url(), new_pl))
     else:
         await ctx.send("Please attach a valid .zeeplist file!", ephemeral=True)
 

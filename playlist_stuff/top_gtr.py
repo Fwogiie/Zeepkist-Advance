@@ -22,25 +22,21 @@ async def bot_startup_handler():
             channel, message = int(x.split(",")[0]), int(x.split(",")[1])
             await bot.get_channel(channel).get_partial_message(message).edit(embed=embed, view=DownloadButton())
 
-textinput = nextcord.TextInput
 class DownloadButton(nextcord.ui.View):
     def __init__(self):
         super().__init__(timeout=None, auto_defer=True)
-
-    def modal(self):
-        global textinput
         modal = nextcord.ui.Modal(title="Top GTR")
-        textinput = nextcord.ui.TextInput(label="Amount of levels (max 500)", max_length=3)
-        modal.add_item(textinput)
+        self.textinput = nextcord.ui.TextInput(label="Amount of levels (max 500)", max_length=3)
+        modal.add_item(self.textinput)
         modal.callback = self.modal_callback
-        return modal
+        self.modal = modal
 
     @nextcord.ui.button(label="Get Playlist", style=nextcord.ButtonStyle.green)
     async def button_callback(self, button, ctx):
-        await ctx.response.send_modal(self.modal())
+        await ctx.response.send_modal(self.modal)
 
     async def modal_callback(self, ctx):
-        amount = int(textinput.value)
+        amount = int(self.textinput.value)
         if amount > 500:
             await ctx.send("Level amount too high! Please try again!", ephemeral=True)
             return
@@ -60,11 +56,7 @@ class DownloadButton(nextcord.ui.View):
                     except IndexError:
                         log("a level failed.")
                     playlist.add_level(x["fileUid"],x["workshopId"],x["name"],x["fileAuthor"])
-                embed = discord.Embed(title="Playlist", description="Your Playlist is ready!", color=nextcord.Color.blue())
-                embed.add_field(name="Playlist:", value=f"Name: {playlist.name}\n"
-                                                        f"Round Length: {fwogutils.format_time(playlist.roundlength)[:5]}\n"
-                                                        f"Shuffle: {playlist.shuffle}\nAmount of Levels: {playlist.level_count}")
-                await ctx.edit(content="", view=fwogutils.views.DownloadPlaylist(await playlist.get_download_url()), embed=embed)
+                await ctx.edit(content="", view=fwogutils.views.DownloadPlaylist(await playlist.get_download_url(), playlist), embed=playlist.embed)
 
 
 
