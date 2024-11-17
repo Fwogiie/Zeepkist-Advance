@@ -7,7 +7,7 @@ import fwogutils
 from fwogutils import bot, log
 from fwogutils.queries import post_url, top_gtr
 
-getter_messages = ["1305497165128536095,1305497713579917392", "1306295442828689478,1306295591705514077"]
+getter_messages = ["1305497165128536095,1305497713579917392", "1307802539789647962,1307802618055229451"]
 getter_test = "1200814236499189842,1305507941750673459"
 embed = discord.Embed(title="Top GTR", description="Get a playlist of the levels worth the most points in GTR!", color=nextcord.Color.blue())
 
