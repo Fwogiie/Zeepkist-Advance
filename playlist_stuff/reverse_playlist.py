@@ -1,4 +1,4 @@
-from fwogutils import bot, log
+from fwogutils import bot, log, objects, views
 import json
 import nextcord
 import os
@@ -9,20 +9,15 @@ async def rev(ctx):
 
 
 @rev.subcommand(name="playlist", description="Reverse a playlist!")
-async def revpl(ctx, playlist: nextcord.Attachment = nextcord.SlashOption(description="The playlist to reverse.",
-                                                                          required=True)):
+async def revpl(ctx, playlist: nextcord.Attachment = nextcord.SlashOption(description="The playlist to reverse.", required=True)):
     log(f"reached by {ctx.user} ({ctx.user.id}) with playlist name: {playlist.filename}")
     if playlist.filename.split(".")[1:][0] == "zeeplist":
-        ctx = await ctx.send("processing")
-        pl = json.loads(await playlist.read())
-        pl['levels'].reverse()
-        name = playlist.filename.split(".")[:1][0]
-        with open("../storage/playlist.zeeplist", 'w') as f:
-            json.dump(pl, f, indent=2)
-        os.rename("../storage/playlist.zeeplist", f"{name}.zeeplist")
-        await ctx.edit("Your playlist has been reversed!", file=nextcord.File(f"{name}.zeeplist"))
-        os.rename(f"{name}.zeeplist", "../storage/playlist.zeeplist")
+        ctx, given_pl = await ctx.send("processing", ephemeral=True), objects.Playlist(json=json.loads(await playlist.read()))
+        new_pl = objects.Playlist(name=given_pl.name, roundlength=given_pl.roundlength, shuffle=given_pl.shuffle)
+        new_pl.levels = given_pl.levels.reverse()
+        await ctx.edit(f"Your playlist named **{new_pl.name}** with **{new_pl.level_count}** levels has been reversed!",
+                       view=views.DownloadPlaylist(download_url=new_pl.get_download_url()))
     else:
-        await ctx.send("Please attach a valid .zeeplist file!")
+        await ctx.send("Please attach a valid .zeeplist file!", ephemeral=True)
 
 print(f"| {__name__} loaded in")

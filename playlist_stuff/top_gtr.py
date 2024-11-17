@@ -1,5 +1,5 @@
 import json
-from fwogutils import queries, objects, views
+from fwogutils import objects, views
 import discord
 import nextcord.ui
 import requests

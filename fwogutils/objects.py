@@ -4,12 +4,18 @@ import fwogutils
 
 
 class Playlist(object):
-    def __init__(self, name:str="name"):
+    def __init__(self, name:str="No name", roundlength:float=480.0, shuffle:bool=False, levels:list=list, json:tuple=None):
         super().__init__()
-        self._name = name
-        self._roundlength = 480.0
-        self._shuffle = False
-        self._levels = []
+        if json is None:
+            self._name = name
+            self._roundlength = roundlength
+            self._shuffle = shuffle
+            self._levels = levels
+        else:
+            self._name = json["name"]
+            self._roundlength = json["roundLength"]
+            self._shuffle = json["shufflePlaylist"]
+            self._levels = json["levels"]
 
     @property
     def name(self) -> str:
@@ -61,12 +67,3 @@ class Playlist(object):
 
     def add_level(self, uid:str, workshopid:str, name:str, author:str):
         self._levels.append({"UID": uid, "WorkshopID": workshopid, "Name": name, "Author": author})
-
-
-
-
-
-
-
-
-
