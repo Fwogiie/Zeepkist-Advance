@@ -17,6 +17,7 @@ class LevelSubmissionsHandler(commands.Cog):
             return
         else:
             await self.submissionhandler(workshop_urls, message.channel.id)
+            self.ctx = message
 
     async def submissionhandler(self, workshop_urls: list, channel: int):
         gamelevels = []
@@ -26,17 +27,18 @@ class LevelSubmissionsHandler(commands.Cog):
                   "variables": {"level": int(x.split('?id=')[1])}})
             if levelrequest.status_code != 200:
                 log(f"Something went wrong in submissionhandler (POST request related :3) code: {levelrequest.status_code}: {levelrequest.text}")
-                return
+                self.ctx.add_reaction("❌")
             else:
                 level = json.loads(levelrequest.text)
                 try:
                     level = level["data"]["allLevelItems"]["edges"][0]["node"]
                 except IndexError:
-                    return
+                    self.ctx.add_reaction("❌")
                 if level["deleted"] is True:
-                    return
+                    self.ctx.add_reaction("❌")
                 gamelevels.append({"UID": level['fileUid'], "WorkshopID": level['workshopId'], "Name": level['name'], "Author": level['fileAuthor']})
         requests.post("https://fwogiiedev.com/api/levelsubmissions", json={"levels": gamelevels, "channel": str(channel)})
+        await self.ctx.add_reaction("✅")
 
 @bot.message_command(name="resubmit-level")
 async def resub_level(ctx, message):
