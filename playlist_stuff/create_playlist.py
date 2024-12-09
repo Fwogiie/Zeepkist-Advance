@@ -64,7 +64,7 @@ async def create_pl(ctx, msg: nextcord.Message):
                 pl["levels"].append(level)
                 fwogutils.dumppl(pl)
                 fwogutils.renamepl(plname)
-                await ctxe.edit(file=nextcord.File(f"{plname}.zeeplist"))
+                await ctxe.edit(file=nextcord.File(f"storage/{plname}.zeeplist"))
                 fwogutils.undorename(plname)
                 await ctx.send(f"added **{level['Name']}** to the playlist", ephemeral=True)
             async def btn_remove_duplicates(ctx):
@@ -80,7 +80,7 @@ async def create_pl(ctx, msg: nextcord.Message):
                 pl["amountOfLevels"] = len(updlvls)
                 fwogutils.dumppl(pl)
                 fwogutils.renamepl(plname)
-                await ctxe.edit(file=nextcord.File(f"{plname}.zeeplist"))
+                await ctxe.edit(file=nextcord.File(f"storage/{plname}.zeeplist"))
                 fwogutils.undorename(plname)
                 await ctx.send(f"{duplicount} Duplicates removed.", ephemeral=True)
             async def btn_shuffle_pl(ctx):
@@ -101,7 +101,7 @@ async def create_pl(ctx, msg: nextcord.Message):
                     pl["amountOfLevels"] = len(newlvls)
                     fwogutils.dumppl(pl)
                     fwogutils.renamepl(plname)
-                    await ctxe.edit(file=nextcord.File(f"{plname}.zeeplist"))
+                    await ctxe.edit(file=nextcord.File(f"storage/{plname}.zeeplist"))
                     fwogutils.undorename(plname)
                     await ctx.send("Done!", ephemeral=True)
                 async def btn_edit_level(ctx):
@@ -116,7 +116,7 @@ async def create_pl(ctx, msg: nextcord.Message):
                     pl["amountOfLevels"] = len(newlvls)
                     fwogutils.dumppl(pl)
                     fwogutils.renamepl(plname)
-                    await ctxe.edit(file=nextcord.File(f"{plname}.zeeplist"))
+                    await ctxe.edit(file=nextcord.File(f"storage/{plname}.zeeplist"))
                     fwogutils.undorename(plname)
                     await ctx.send("Done!", ephemeral=True)
                 kocview = nextcord.ui.View(timeout=60)
@@ -145,7 +145,7 @@ async def create_pl(ctx, msg: nextcord.Message):
             fwogutils.renamepl(plname)
             await ctxe.edit(f"# Your playlist has been generated!\n### Failed levels (These levels failed and would need to be added manually):\n{levelfails[:500]}\n"
                             f"### Level packs (Might need manual adjustments):\n{packlvls[:500]}\n### Duplicate Levels (Press the remove duplicates button to remove them):\n{dupliwarnlvls[:500]}",
-                            file=nextcord.File(f"{plname}.zeeplist"), view=editbtns)
+                            file=nextcord.File(f"storage/{plname}.zeeplist"), view=editbtns)
             fwogutils.undorename(plname)
     modal = nextcord.ui.Modal(title="Playlist creation")
     textinput = nextcord.ui.TextInput(label="Playlist name", min_length=1, max_length=50)
