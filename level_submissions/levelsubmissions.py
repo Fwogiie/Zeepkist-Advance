@@ -11,11 +11,10 @@ class LevelSubmissionsHandler(commands.Cog):
 
     def  __init__(self):
         self.bot = bot
-
     @commands.Cog.listener()
     async def on_message(self, message):
         workshop_urls = re.findall("https://steamcommunity\.com/sharedfiles/filedetails/\?id=\d+", message.content)
-        if not workshop_urls:
+        if not workshop_urls or message.guild.id == 706615492634476664:
             return
         else:
             await self.submissionhandler(workshop_urls, message.channel.id, message)
