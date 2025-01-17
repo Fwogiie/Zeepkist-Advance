@@ -26,7 +26,7 @@ class DownloadButton(nextcord.ui.View):
     def __init__(self):
         super().__init__(timeout=None, auto_defer=True)
         modal = nextcord.ui.Modal(title="Top GTR")
-        self.textinput = nextcord.ui.TextInput(label="Amount of levels (max 500)", max_length=3)
+        self.textinput = nextcord.ui.TextInput(label="Amount of levels (max 1000)", max_length=4)
         modal.add_item(self.textinput)
         modal.callback = self.modal_callback
         self.modal = modal
@@ -37,11 +37,11 @@ class DownloadButton(nextcord.ui.View):
 
     async def modal_callback(self, ctx):
         amount = int(self.textinput.value)
-        if amount > 500:
+        if amount > 1000:
             await ctx.send("Level amount too high! Please try again!", ephemeral=True)
             return
         else:
-            ctx = await ctx.send("Processing! This shouldn't take more than 20 seconds!", ephemeral=True)
+            ctx = await ctx.send("Processing! This shouldn't take more than 1 minute!", ephemeral=True)
             req = requests.post(post_url, json={"query": top_gtr, "variables": {"first": amount}})
             if req.status_code != 200:
                 log("something other than 200 was returned")
