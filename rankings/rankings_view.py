@@ -12,7 +12,7 @@ class LbView(nextcord.ui.View):
         def do_calc():
             ranks = ""
             for x in fwogutils.getrankings(offset=self.count_offset, limit=self.count_limit):
-                ranks += f"{x["rank"]}. `{x['steamName']}` with {x['points']} and {x['worldRecords']} World Records\n"
+                ranks += f"{x['rank']}. `{x['steamName']}` with {x['points']} and {x['worldRecords']} World Records\n"
             return ranks
         async def button_next_callback(ctx):
             self.count_offset += 30
