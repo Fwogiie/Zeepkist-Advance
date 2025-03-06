@@ -19,7 +19,7 @@ top_gtr = """query MyQuery($first: Int) {
 """
 
 rankings = """query MyQuery($offset: Int, $limit: Int) {
-  allUserPoints(offset: $offset, first: $limit) {
+  allUserPoints(offset: $offset, first: $limit, orderBy: RANK_ASC) {
     nodes {
       points
       rank

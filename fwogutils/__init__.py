@@ -283,8 +283,8 @@ def is_test_build():
     else:
         return True
 
-def getrankings(offset:int=1, limit:int=20) -> []:
-    req = requests.post(post_url, json={"query": queries.rankings, "values": {"offset": offset-1, "limit": limit}})
+def getrankings(offset:int=0, limit:int=20) -> []:
+    req = requests.post(post_url, json={"query": queries.rankings, "variables": {"offset": offset, "limit": limit}})
     if req.status_code != 200:
         log(str(req.status_code))
         return False
