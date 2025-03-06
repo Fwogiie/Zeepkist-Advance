@@ -4,6 +4,9 @@ import fwogutils
 
 
 class LbView(nextcord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
     @nextcord.ui.button(label="View more", style=nextcord.ButtonStyle.grey)
     async def _view_more(self, button, ctx):
         # Variables
@@ -21,7 +24,7 @@ class LbView(nextcord.ui.View):
             self.count_offset -= 30
             await self.more_view.edit(embed=nextcord.Embed(title=None, description=do_calc(), color=nextcord.Color.blue()))
         # Page buttons
-        view = nextcord.ui.View()
+        view = nextcord.ui.View(timeout=None)
         buttonprev = nextcord.ui.Button(label="<")
         buttonnext = nextcord.ui.Button(label=">")
         buttonprev.callback = button_prev_callback
