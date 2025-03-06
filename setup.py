@@ -43,5 +43,3 @@ async def on_ready():
     if fwogutils.is_test_build() is False:
         await rankings.rankings.startup_handler()
         log("assumed to have begun rankings leaderboard!")
-    # DELETE BEFORE COMMIT PLEASEEEEEEEEEEEEEE
-    await rankings.rankings.startup_handler()
