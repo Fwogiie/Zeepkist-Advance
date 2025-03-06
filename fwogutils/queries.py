@@ -1,4 +1,4 @@
-post_url = "https://graphql.zeepkist-gtr.com"
+post_url = "https://graphql.zeepki.st/"
 
 top_gtr = """query MyQuery($first: Int) {
   allLevelPoints(orderBy: POINTS_DESC, first: $first) {
@@ -17,3 +17,33 @@ top_gtr = """query MyQuery($first: Int) {
   }
 }
 """
+
+rankings = """query MyQuery($offset: Int, $limit: Int) {
+  allUserPoints(offset: $offset, first: $limit) {
+    nodes {
+      points
+      rank
+      worldRecords
+      userByIdUser {
+        steamName
+        discordId
+        steamId
+      }
+    }
+  }
+}
+"""
+
+levels_from_ids = """query MyQuery($in: [BigFloat!] = "") {
+  allLevelItems(filter: {workshopId: {in: $in}}) {
+    edges {
+      node {
+        fileUid
+        fileAuthor
+        workshopId
+        deleted
+        name
+      }
+    }
+  }
+}"""

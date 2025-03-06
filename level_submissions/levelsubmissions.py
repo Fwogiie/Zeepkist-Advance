@@ -1,5 +1,6 @@
 import nextcord
 
+import fwogutils.queries
 from fwogutils import bot, log
 import re
 import requests
@@ -22,7 +23,7 @@ class LevelSubmissionsHandler(commands.Cog):
     async def submissionhandler(self, workshop_urls: list, channel: int, message):
         gamelevels = []
         for x in workshop_urls:
-            levelrequest = requests.post("https://graphql.zeepkist-gtr.com",
+            levelrequest = requests.post(fwogutils.queries.post_url,
             json={"query": "query MyQuery($level: BigFloat) {allLevelItems(filter: {workshopId: {equalTo: $level}}) {edges{node { id name fileUid fileAuthor deleted workshopId}}}}",
                   "variables": {"level": int(x.split('?id=')[1])}})
             if levelrequest.status_code != 200:
