@@ -7,6 +7,7 @@ import requests
 import json
 import os
 
+import fwogutils
 from fwogutils.queries import post_url
 
 intents = nextcord.Intents.all()
@@ -190,7 +191,7 @@ def addgtruser(discid: str, user: str):
         data = json.loads(f.read())
         data["linked"][discid] = user
         data["linked"][discid]["settings"] = {"notifs": {"RU": False, "RD": False, "WRST": False}}
-        data["linked"][discid]["userdata"] = {"position": 6969}
+        data["linked"][discid]["userdata"] = {"position": fwogutils.getusergtrposition(discid)}
     with open("storage/users.json", 'w') as ft:
         json.dump(data, ft, indent=2)
 
