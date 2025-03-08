@@ -339,6 +339,7 @@ def getusergtrposition(discordid: str) -> int:
         log(f"Error! code: {request.status_code}, error: #{request.text}")
         return False
     else:
+        log(f"returning rank from user {discordid}")
         return json.loads(request.text)["data"]["allUsers"]["edges"][0]["node"]["userPointsByIdUser"]["edges"][0]["node"]["rank"]
 
 def updateuserposition(user: str, updatedpos: int):
