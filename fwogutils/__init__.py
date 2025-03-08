@@ -340,7 +340,10 @@ def getusergtrposition(discordid: str) -> int:
         return False
     else:
         log(f"returning rank from user {discordid}")
-        return json.loads(request.text)["data"]["allUsers"]["edges"][0]["node"]["userPointsByIdUser"]["edges"][0]["node"]["rank"]
+        try:
+            return json.loads(request.text)["data"]["allUsers"]["edges"][0]["node"]["userPointsByIdUser"]["edges"][0]["node"]["rank"]
+        except IndexError:
+            return False
 
 def updateuserposition(user: str, updatedpos: int):
     with open("storage/users.json", 'r') as readfile:
