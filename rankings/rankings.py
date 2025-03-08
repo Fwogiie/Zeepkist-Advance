@@ -6,6 +6,8 @@ from fwogutils import bot, log
 from nextcord.ext import tasks
 from rankings import rankings_view
 
+main_leaderboards = ["1203645881279184948-1203656747294654555"]
+test_leaderboard = "1347885622559375460-1347886582140768319"
 
 async def startup_handler():
     await rankings()
@@ -22,8 +24,13 @@ async def rankings():
         baseranks += f"{x['rank']}. `{x['steamName']}` with {x['points']} points and {x['worldRecords']} World Records\n"
     embed = discord.Embed(title="GTR Rankings", description=baseranks, timestamp=datetime.now(), color=nextcord.Color.blue())
     embed.set_footer(text="last updated")
-    lb = await bot.get_channel(1203645881279184948).fetch_message(1203656747294654555)
-    await lb.edit(embed=embed, view=rankings_view.LbView())
+    if fwogutils.is_test_build():
+        lb = await bot.get_channel(int(test_leaderboard.split("-")[0])).fetch_message(int(test_leaderboard.split("-")[1]))
+        await lb.edit(embed=embed, view=rankings_view.LbView())
+        return
+    for x in main_leaderboards:
+        lb = await bot.get_channel(int(x.split("-")[0])).fetch_message(int(x.split("-")[1]))
+        await lb.edit(embed=embed, view=rankings_view.LbView())
 
 
 print(f"| {__name__} loaded in")

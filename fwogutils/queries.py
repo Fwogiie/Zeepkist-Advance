@@ -47,3 +47,19 @@ levels_from_ids = """query MyQuery($in: [BigFloat!] = "") {
     }
   }
 }"""
+
+get_user_pos = """query MyQuery($discordId: BigFloat) {
+  allUsers(condition: {discordId: $discordId}) {
+    edges {
+      node {
+        userPointsByIdUser {
+          edges {
+            node {
+              rank
+            }
+          }
+        }
+      }
+    }
+  }
+}"""

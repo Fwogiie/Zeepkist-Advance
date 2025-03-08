@@ -9,8 +9,7 @@ import os
 
 from fwogutils.queries import post_url
 
-intents = nextcord.Intents.default()
-intents.message_content = True
+intents = nextcord.Intents.all()
 
 bot = commands.Bot(command_prefix='!',
                    intents=intents,
@@ -284,6 +283,16 @@ def is_test_build():
         return True
 
 def getrankings(offset:int=0, limit:int=20) -> []:
+    """
+    {
+    "points": 0,
+    "rank": 0,
+    "worldRecords":0,
+    "steamName": "str",
+    "steamId": int,
+    "discordId": int
+    }
+    """
     req = requests.post(post_url, json={"query": queries.rankings, "variables": {"offset": offset, "limit": limit}})
     if req.status_code != 200:
         log(str(req.status_code))
@@ -294,3 +303,47 @@ def getrankings(offset:int=0, limit:int=20) -> []:
                               "steamName": x["userByIdUser"]["steamName"], "discordId": x["userByIdUser"]["discordId"],
                               "steamId": x["userByIdUser"]["steamId"]})
     return formattedlist
+
+def getnotifusers():
+    """
+    {
+    "RUusers": ["userDiscordId"],
+    "RDusers": ["userDiscordId"],
+    "WRSTusers": {"userGtrId": {"discid": "userDiscordId"}}
+    }
+    """
+    with open("storage/users.json", 'r') as readfile:
+        users = json.loads(readfile.read())
+    return users["usercache"]
+
+def getstoreduser(discordid: str):
+    """
+    {
+    "id": userGtrId,
+    "steamName: "userSteamName",
+    "steamId": "userSteamId",
+    "settings": {},
+    "userdata": {"position": int}
+    }
+    """
+    with open("storage/users.json", 'r') as readfile:
+        users = json.loads(readfile.read())
+    try:
+        return users["linked"][discordid]
+    except KeyError:
+        return False
+
+def getusergtrposition(discordid: str) -> int:
+    request = requests.post(queries.post_url, json={"query": queries.get_user_pos, "variables": {"discordId": discordid}})
+    if request.status_code != 200:
+        log(f"Error! code: {request.status_code}, error: #{request.text}")
+        return False
+    else:
+        return json.loads(request.text)["data"]["allUsers"]["edges"][0]["node"]["userPointsByIdUser"]["edges"][0]["node"]["rank"]
+
+def updateuserposition(user: str, updatedpos: int):
+    with open("storage/users.json", 'r') as readfile:
+        users = json.loads(readfile.read())
+    users["linked"][user]["userdata"]["position"] = updatedpos
+    with open("storage/users.json", 'w') as writefile:
+        json.dump(users, writefile, indent=2)
