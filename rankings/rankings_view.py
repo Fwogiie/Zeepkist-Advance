@@ -1,6 +1,7 @@
 import nextcord.ui
 
 import fwogutils
+from fwogutils import getgtruserrank, getusergtrposition
 
 
 class LbView(nextcord.ui.View):
@@ -36,10 +37,11 @@ class LbView(nextcord.ui.View):
     @nextcord.ui.button(label="My rank", style=nextcord.ButtonStyle.green)
     async def _my_rank(self, button, ctx):
         user = fwogutils.getstoreduser(str(ctx.user.id))
+        userpos = getusergtrposition(str(ctx.user.id))
         if user:
             ranks = ""
-            for x in fwogutils.getrankings(user["userdata"]["position"]-6, 11):
-                if x["rank"] == user["userdata"]["position"]:
+            for x in fwogutils.getrankings(userpos-6, 11):
+                if x["rank"] == userpos:
                     ranks += f"> {x['rank']}. `{x['steamName']}` with {x['points']} points and {x['worldRecords']} World Records\n"
                 else:
                     ranks += f"{x['rank']}. `{x['steamName']}` with {x['points']} points and {x['worldRecords']} World Records\n"
