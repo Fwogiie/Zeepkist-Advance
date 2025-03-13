@@ -344,6 +344,7 @@ def getusergtrposition(discordid: str) -> int:
         try:
             return json.loads(request.text)["data"]["allUsers"]["edges"][0]["node"]["userPointsByIdUser"]["edges"][0]["node"]["rank"]
         except IndexError:
+            log("IndexError!")
             return False
 
 def updateuserposition(user: str, updatedpos: int):

@@ -1,7 +1,6 @@
 import nextcord.ui
-
 import fwogutils
-from fwogutils import getgtruserrank, getusergtrposition
+from fwogutils import getgtruserrank, getusergtrposition, log
 
 
 class LbView(nextcord.ui.View):
@@ -37,16 +36,20 @@ class LbView(nextcord.ui.View):
     @nextcord.ui.button(label="My rank", style=nextcord.ButtonStyle.green)
     async def _my_rank(self, button, ctx):
         user = fwogutils.getstoreduser(str(ctx.user.id))
-        userpos = getusergtrposition(str(ctx.user.id))
         if user:
-            ranks = ""
-            for x in fwogutils.getrankings(userpos-6, 11):
-                if x["rank"] == userpos:
-                    ranks += f"> {x['rank']}. `{x['steamName']}` with {x['points']} points and {x['worldRecords']} World Records\n"
-                else:
-                    ranks += f"{x['rank']}. `{x['steamName']}` with {x['points']} points and {x['worldRecords']} World Records\n"
-            embed = nextcord.Embed(title=None, description=ranks, color=nextcord.Color.blue())
-            await ctx.send(embed=embed, ephemeral=True)
+            userpos = getusergtrposition(str(ctx.user.id))
+            log(str(userpos))
+            if userpos:
+                ranks = ""
+                for x in fwogutils.getrankings(userpos-6, 11):
+                    if x["rank"] == userpos:
+                        ranks += f"> {x['rank']}. `{x['steamName']}` with {x['points']} points and {x['worldRecords']} World Records\n"
+                    else:
+                        ranks += f"{x['rank']}. `{x['steamName']}` with {x['points']} points and {x['worldRecords']} World Records\n"
+                embed = nextcord.Embed(title=None, description=ranks, color=nextcord.Color.blue())
+                await ctx.send(embed=embed, ephemeral=True)
+            else:
+                await ctx.send("Error occurred! Please let naomi know of this!\nError: `IndexError`")
         else:
             await ctx.send("You do not have GTR linked! use `/link gtr` to link!", ephemeral=True)
 
