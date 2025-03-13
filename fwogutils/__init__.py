@@ -191,7 +191,7 @@ def addgtruser(discid: str, user: str):
         data = json.loads(f.read())
         data["linked"][discid] = user
         data["linked"][discid]["settings"] = {"notifs": {"RU": False, "RD": False, "WRST": False}}
-        data["linked"][discid]["userdata"] = {"position": fwogutils.getusergtrposition(discid)}
+        data["linked"][discid]["userdata"] = {"position": fwogutils.getusergtrposition(int(user))}
     with open("storage/users.json", 'w') as ft:
         json.dump(data, ft, indent=2)
 
@@ -334,13 +334,13 @@ def getstoreduser(discordid: str):
     except KeyError:
         return False
 
-def getusergtrposition(discordid: str) -> int:
-    request = requests.post(queries.post_url, json={"query": queries.get_user_pos, "variables": {"discordId": discordid}})
+def getusergtrposition(gtruserid: int) -> int:
+    request = requests.post(queries.post_url, json={"query": queries.get_user_pos, "variables": {"id": gtruserid}})
     if request.status_code != 200:
         log(f"Error! code: {request.status_code}, error: #{request.text}")
         return False
     else:
-        log(f"returning rank from user {discordid}")
+        log(f"returning rank from user {gtruserid}")
         try:
             return json.loads(request.text)["data"]["allUsers"]["edges"][0]["node"]["userPointsByIdUser"]["edges"][0]["node"]["rank"]
         except IndexError:
