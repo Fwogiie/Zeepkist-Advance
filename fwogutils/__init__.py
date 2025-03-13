@@ -347,6 +347,19 @@ def getusergtrposition(gtruserid: int) -> int:
             log("IndexError!")
             return False
 
+async def getusergtrpositionasync(gtruserid: int) -> int:
+    request = requests.post(queries.post_url, json={"query": queries.get_user_pos, "variables": {"id": gtruserid}})
+    if request.status_code != 200:
+        log(f"Error! code: {request.status_code}, error: #{request.text}")
+        return False
+    else:
+        log(f"returning rank from user {gtruserid}")
+        try:
+            return json.loads(request.text)["data"]["allUsers"]["edges"][0]["node"]["userPointsByIdUser"]["edges"][0]["node"]["rank"]
+        except IndexError:
+            log("IndexError!")
+            return False
+
 def updateuserposition(user: str, updatedpos: int):
     with open("storage/users.json", 'r') as readfile:
         users = json.loads(readfile.read())

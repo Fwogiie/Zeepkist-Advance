@@ -1,6 +1,6 @@
 import nextcord.ui
 import fwogutils
-from fwogutils import getgtruserrank, getusergtrposition, log
+from fwogutils import getgtruserrank, getusergtrpositionasync, log
 
 
 class LbView(nextcord.ui.View):
@@ -37,7 +37,7 @@ class LbView(nextcord.ui.View):
     async def _my_rank(self, button, ctx):
         user = fwogutils.getstoreduser(str(ctx.user.id))
         if user:
-            userpos = getusergtrposition(fwogutils.getstoreduser(str(ctx.user.id))["id"])
+            userpos = await getusergtrpositionasync(fwogutils.getstoreduser(str(ctx.user.id))["id"])
             log(str(userpos))
             if userpos:
                 ranks = ""
