@@ -1,2 +1,0 @@
-token = "MTEyNjQzMDk0MjkyNDM4NjMxNQ.GbI9eX.4s-i2kH__6CxtcRsXvi4gK-kXY8PLMSAv9Jni0"
-ttoken = "MTE0MzUyMTAxNjAzMTc0NDAyNQ.G4-s1b.UnDGEisMV-st0Q9waI296eU0tK7y7ppsk5TWlk"

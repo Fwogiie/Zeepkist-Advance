@@ -37,7 +37,7 @@ class LbView(nextcord.ui.View):
     async def _my_rank(self, button, ctx):
         user = fwogutils.getstoreduser(str(ctx.user.id))
         if user:
-            userpos = getusergtrposition(str(ctx.user.id))
+            userpos = getusergtrposition(fwogutils.getstoreduser(str(ctx.user.id))["id"])
             log(str(userpos))
             if userpos:
                 ranks = ""
@@ -49,7 +49,7 @@ class LbView(nextcord.ui.View):
                 embed = nextcord.Embed(title=None, description=ranks, color=nextcord.Color.blue())
                 await ctx.send(embed=embed, ephemeral=True)
             else:
-                await ctx.send("Error occurred! Please let naomi know of this!\nError: `IndexError`")
+                await ctx.send("Error occurred! Please let naomi know of this!\nError: `IndexError`", ephemeral=True)
         else:
             await ctx.send("You do not have GTR linked! use `/link gtr` to link!", ephemeral=True)
 

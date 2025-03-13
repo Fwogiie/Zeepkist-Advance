@@ -17,7 +17,8 @@ async def rankings_notifier():
 async def rankings_checker():
     notifusers = fwogutils.getnotifusers()
     for user in notifusers["RDusers"]:
-        userupdatedpos = fwogutils.getusergtrposition(user)
+        storeduser = fwogutils.getstoreduser(user)["id"]
+        userupdatedpos = fwogutils.getusergtrposition(storeduser)
         if userupdatedpos is False:
             continue
         userunupdatedpos = fwogutils.getstoreduser(user)["userdata"]["position"]
@@ -25,7 +26,8 @@ async def rankings_checker():
             await rankdown_handler(userupdatedpos, userunupdatedpos, user)
             fwogutils.updateuserposition(user, userupdatedpos)
     for user in notifusers["RUusers"]:
-        userupdatedpos = fwogutils.getusergtrposition(user)
+        storeduser = fwogutils.getstoreduser(user)["id"]
+        userupdatedpos = fwogutils.getusergtrposition(storeduser)
         if userupdatedpos is False:
             continue
         userunupdatedpos = fwogutils.getstoreduser(user)["userdata"]["position"]

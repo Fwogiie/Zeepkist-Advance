@@ -48,8 +48,8 @@ levels_from_ids = """query MyQuery($in: [BigFloat!] = "") {
   }
 }"""
 
-get_user_pos = """query MyQuery($discordId: BigFloat) {
-  allUsers(condition: {discordId: $discordId}) {
+get_user_pos = """query MyQuery($id: Int) {
+  allUsers(condition: {id: $id}) {
     edges {
       node {
         userPointsByIdUser {
