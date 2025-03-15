@@ -186,12 +186,12 @@ def renamepl(name):
 def undorename(name):
     os.rename(f"storage/{name}.zeeplist", "storage/playlist.zeeplist")
 
-def addgtruser(discid: str, user: str):
+def addgtruser(discid: str, user: dict):
     with open("storage/users.json", 'r') as f:
         data = json.loads(f.read())
         data["linked"][discid] = user
         data["linked"][discid]["settings"] = {"notifs": {"RU": False, "RD": False, "WRST": False}}
-        data["linked"][discid]["userdata"] = {"position": fwogutils.getusergtrposition(int(user))}
+        data["linked"][discid]["userdata"] = {"position": fwogutils.getusergtrposition(int(user["id"]))}
     with open("storage/users.json", 'w') as ft:
         json.dump(data, ft, indent=2)
 
