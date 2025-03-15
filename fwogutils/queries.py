@@ -1,7 +1,7 @@
 post_url = "https://graphql.zeepki.st/"
 
-top_gtr = """query MyQuery($first: Int) {
-  allLevelPoints(orderBy: POINTS_DESC, first: $first) {
+top_gtr = """query MyQuery($first: Int, $offset: Int) {
+  allLevelPoints(orderBy: POINTS_DESC, first: $first, offset: $offset) {
     nodes {
       levelByIdLevel {
         levelItemsByIdLevel(first: 1) {

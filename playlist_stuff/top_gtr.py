@@ -42,21 +42,29 @@ class DownloadButton(nextcord.ui.View):
             return
         else:
             ctx = await ctx.send("Processing! This shouldn't take more than 1 minute!", ephemeral=True)
-            req = requests.post(post_url, json={"query": top_gtr, "variables": {"first": amount}})
-            if req.status_code != 200:
-                log("something other than 200 was returned")
-                await ctx.send(f"Error Occurred!\nError: `query 'top_gtr' returned unexpected status code: {req.status_code}. {req.text}`")
+            reqs = []
+            if amount <= 100:
+                reqs.append(requests.post(post_url, json={"query": top_gtr, "variables": {"first": amount}}))
             else:
-                log(f"200 OK, continuing")
-                playlist = fwogutils.objects.Playlist(name=f"top {amount} GTR")
-                levels = json.loads(req.text)["data"]["allLevelPoints"]["nodes"]
-                for x in levels:
-                    try:
-                        x = x["levelByIdLevel"]["levelItemsByIdLevel"]["nodes"][0]
-                    except IndexError:
-                        log("a level failed.")
-                    playlist.add_level(x["fileUid"],x["workshopId"],x["name"],x["fileAuthor"])
-                await ctx.edit(content="", view=fwogutils.views.DownloadPlaylist(await playlist.get_download_url(), playlist), embed=playlist.embed)
+                numdiv100 = range(int(amount / 100))
+                for x in numdiv100:
+                    reqs.append(requests.post(post_url, json={"query": top_gtr, "variables": {"first": 100, "offset": x*100}}))
+                reqs.append(requests.post(post_url, json={"query": top_gtr, "variables": {"first": amount-len(numdiv100)*100, "offset": len(numdiv100)*100}}))
+            playlist = fwogutils.objects.Playlist(name=f"top {amount} GTR")
+            for req in reqs:
+                if req.status_code != 200:
+                    log("something other than 200 was returned")
+                    await ctx.send(f"Error Occurred!\nError: `query 'top_gtr' returned unexpected status code: {req.status_code}. {req.text}`")
+                else:
+                    log(f"200 OK, continuing")
+                    levels = json.loads(req.text)["data"]["allLevelPoints"]["nodes"]
+                    for x in levels:
+                        try:
+                            x = x["levelByIdLevel"]["levelItemsByIdLevel"]["nodes"][0]
+                        except IndexError:
+                            log("a level failed.")
+                        playlist.add_level(x["fileUid"],x["workshopId"],x["name"],x["fileAuthor"])
+            await ctx.edit(content="", view=fwogutils.views.DownloadPlaylist(await playlist.get_download_url(), playlist), embed=playlist.embed)
 
 
 
