@@ -59,7 +59,7 @@ def getgtruser(id: int=None, discid: int=None):
     """
     if id != None:
         req = requests.post(queries.post_url, json={"query": """
-        query MyQuery($id: Int) {
+        query GetUser($id: Int) {
   allUsers(condition: {id: $id}) {
     edges {
       node {
@@ -77,7 +77,7 @@ def getgtruser(id: int=None, discid: int=None):
             return [True, json.loads(req.text)]
     elif discid != None:
         req = requests.post(queries.post_url, json={"query": """
-        query MyQuery($discid: BigFloat) {
+        query GetUserByDiscordId($discid: BigFloat) {
   allUsers(condition: {discordId: $discid}) {
     edges {
       node {
@@ -98,45 +98,6 @@ def getgtruser(id: int=None, discid: int=None):
         else:
             return [True, user[0]['node']]
 
-def getgtruserrankings(limit: int, offset: int):
-    """
-    {
-  "totalAmount": 0,
-  "rankings": [
-    {
-      "user": {
-        "id": 0,
-        "steamId": "string",
-        "steamName": "string",
-        "discordId": "string"
-      },
-      "amountOfWorldRecords": 0,
-      "position": 0,
-      "score": 0
-    }
-  ]
-}
-
-good girl :>
-    """
-    jsontxt = json.loads(requests.post(queries.post_url, json={"query": """
-    query MyQuery($first: Int = 100, $offset: Int = 0) {
-  allUserPoints(first: $first, offset: $offset, orderBy: POINTS_DESC) {
-    edges {
-      node {
-        rank
-        worldRecords
-        points
-        userByIdUser {
-          steamName
-        }
-      }
-    }
-  }
-}
-""", "variables": {"first": limit, "offset": int(offset)}}).text)
-    return jsontxt['data']['allUserPoints']['edges']
-
 def getgtruserrank(id: int):
     """
     {
@@ -148,7 +109,7 @@ def getgtruserrank(id: int):
 girl!
     """
     return json.loads(requests.post(queries.post_url, json={"query": """
-    query MyQuery($user: Int) {
+    query GetUserRank($user: Int) {
   allUsers(condition: {id: $user}) {
     edges {
       node {

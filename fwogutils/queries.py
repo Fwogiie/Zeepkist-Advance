@@ -1,6 +1,6 @@
 post_url = "https://graphql.zeepki.st/"
 
-top_gtr = """query MyQuery($first: Int, $offset: Int) {
+top_gtr = """query TopGtrLevels($first: Int, $offset: Int) {
   allLevelPoints(orderBy: POINTS_DESC, first: $first, offset: $offset) {
     nodes {
       levelByIdLevel {
@@ -18,7 +18,7 @@ top_gtr = """query MyQuery($first: Int, $offset: Int) {
 }
 """
 
-rankings = """query MyQuery($offset: Int, $limit: Int) {
+rankings = """query GetRankings($offset: Int, $limit: Int) {
   allUserPoints(offset: $offset, first: $limit, orderBy: RANK_ASC) {
     nodes {
       points
@@ -34,7 +34,7 @@ rankings = """query MyQuery($offset: Int, $limit: Int) {
 }
 """
 
-levels_from_ids = """query MyQuery($in: [BigFloat!] = "") {
+levels_from_ids = """query GetLevelsFromIds($in: [BigFloat!] = "") {
   allLevelItems(filter: {workshopId: {in: $in}}) {
     edges {
       node {
@@ -48,7 +48,7 @@ levels_from_ids = """query MyQuery($in: [BigFloat!] = "") {
   }
 }"""
 
-get_user_pos = """query MyQuery($id: Int) {
+get_user_pos = """query GetUserRanking($id: Int) {
   allUsers(condition: {id: $id}) {
     edges {
       node {
