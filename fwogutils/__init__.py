@@ -14,7 +14,7 @@ intents = nextcord.Intents.all()
 
 bot = commands.Bot(command_prefix='!',
                    intents=intents,
-                   owner_id=785037540155195424)
+                   owner_ids=[785037540155195424, 237968676614045696])
 
 bot_ids = [1143521016031744025, 1126430942924386315]
 
