@@ -16,14 +16,15 @@ import playlist_stuff
 
 # Rankings
 import rankings
+from rankings.rankings_notifs import rankings_notifier, startup_logic
 
 # Showdown
 import showdown
-from rankings.rankings_notifs import rankings_notifier, startup_logic
+from showdown import controlls
 
 # Other
 log("loading others")
-import errors
+#import errors
 import link_gtr
 import log_command
 import verify
