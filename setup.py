@@ -41,7 +41,7 @@ async def on_ready():
     for guild in bot.guilds:
         log(f"Connected to guild: {guild.name} ({guild.id}) with {guild.member_count} members.")
     log("initializing startup cache for live leaderboards.")
-    await playlist_stuff.top_gtr.bot_startup_handler()
+    # TODO Broken for now: await playlist_stuff.top_gtr.bot_startup_handler()
     await rankings.rankings.startup_handler()
     log("assumed to have begun rankings leaderboard!")
     await startup_logic()
