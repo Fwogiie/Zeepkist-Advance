@@ -8,12 +8,17 @@ from fwogutils import bot, log, queries
 import time
 
 async def startup_logic():
-    log("Showndown Leaderboards statup logic has been called.")
+    log("Showdown Leaderboards statup logic has been called.")
+    quali_leaderboard.start()
 
-# TODO quali leaderboard
+# quai leaderboards updating
 @tasks.loop(minutes=5, reconnect=True)
 async def quali_leaderboard():
-    await update_qualifier()
+    with open("showdown/storage.json", 'r') as read:
+        stored = json.loads(read.read())
+    if stored["update?"]:
+        await update_qualifier()
+    return
 
 async def update_qualifier():
     log("Qualifier leaderboard updating...")

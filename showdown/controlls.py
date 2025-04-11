@@ -120,3 +120,16 @@ async def sd_set_qualifier_channel(ctx, channel: nextcord.TextChannel, season: i
 async def sd_force_update_qualifier(ctx):
     await showdown.leaderboards.update_qualifier()
     await ctx.send("Forced!")
+
+@sd_controlls.subcommand(name="toggle_update_quali")
+async def sd_toggle_update(ctx):
+    with open("showdown/storage.json", 'r') as read:
+        stored = json.loads(read.read())
+    if stored["update?"] == True:
+        stored["update?"] = False
+        await ctx.send("Disabled updating of qualifier leaderboard.")
+    elif stored["update?"] == False:
+        stored["update?"] = True
+        await ctx.send("Enabled updating of qualifier leaderboard.")
+    with open("showdown/storage.json", 'w') as write:
+        json.dump(stored, write, indent=2)
