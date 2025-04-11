@@ -63,3 +63,50 @@ get_user_pos = """query GetUserRanking($id: Int) {
     }
   }
 }"""
+
+get_level_leaderboard = """query getLevelLeaderboard($idLevel: Int) {
+  allRecords(condition: {idLevel: $idLevel}, orderBy: TIME_ASC) {
+    edges {
+      node {
+        time
+        userByIdUser {
+          steamName
+        }
+      }
+    }
+  }
+}"""
+
+get_level_leaderboard_by_players = """query getLevelLeaderboardByPlayers($in: [Int!], $idLevel: Int) {
+  allRecords(
+    orderBy: TIME_ASC
+    filter: {idUser: {in: $in}}
+    condition: {idLevel: $idLevel}
+  ) {
+    edges {
+      node {
+        time
+        userByIdUser {
+          steamName
+        }
+      }
+    }
+  }
+}"""
+
+get_user_pb_by_id = """query getUserPbById($in: [Int!] = 10, $idLevel: Int = 10) {
+  allUsers(filter: {id: {in: $in}}) {
+    nodes {
+      recordsByIdUser(condition: {idLevel: $idLevel}, orderBy: TIME_ASC, first: 1) {
+        edges {
+          node {
+            time
+            userByIdUser {
+              steamName
+            }
+          }
+        }
+      }
+    }
+  }
+}"""

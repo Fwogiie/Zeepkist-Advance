@@ -327,3 +327,4 @@ def updateuserposition(user: str, updatedpos: int):
     users["linked"][user]["userdata"]["position"] = updatedpos
     with open("storage/users.json", 'w') as writefile:
         json.dump(users, writefile, indent=2)
+
