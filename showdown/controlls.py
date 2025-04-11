@@ -3,16 +3,17 @@ import nextcord
 import requests
 from flask import request
 import fwogutils
+import showdown.leaderboards
 from fwogutils import bot, log
 
 
 get_level_query = """query MyQuery($workshopId: BigFloat = "") {
   allLevelItems(condition: {workshopId: $workshopId}) {
     nodes {
-      id
       name
       levelByIdLevel {
         hash
+        id
       }
     }
   }
@@ -23,6 +24,7 @@ get_user_query = """query MyQuery($discordId: BigFloat = "") {
     nodes {
       steamId
       steamName
+      id
     }
   }
 }"""
@@ -50,9 +52,9 @@ async def sd_setmap(ctx, map: int, workshopid: int):
         with open("showdown/storage.json", 'r') as read:
             stored = json.loads(read.read())
         if map == 0:
-            stored["quali"] = {"hash": resp[0]["levelByIdLevel"]["hash"], "id": resp[0]["id"]}
+            stored["quali"] = {"hash": resp[0]["levelByIdLevel"]["hash"], "id": resp[0]["levelByIdLevel"]["id"]}
         else:
-            stored[str(map)] = {"hash": resp[0]["levelByIdLevel"]["hash"], "id": resp[0]["id"]}
+            stored[str(map)] = {"hash": resp[0]["levelByIdLevel"]["hash"], "id": resp[0]["levelByIdLevel"]["id"]}
         with open("showdown/storage.json", 'w') as write:
             json.dump(stored, write, indent=2)
         await ctx.send(f"{resp[0]['name']} added as map {map}")
@@ -77,6 +79,7 @@ async def sd_register(ctx):
         return
     stored["regUsers"].append(ctx.user.id)
     stored["regUsersBySteamId"].append(resp[0]["steamId"])
+    stored["regUsersById"].append(resp[0]["id"])
     with open("showdown/storage.json", 'w') as write:
         json.dump(stored, write, indent=2)
     await ctx.send(f"You have registered under the name {resp[0]['steamName']}", ephemeral=True)
@@ -93,6 +96,7 @@ async def sd_unregister(ctx):
     userindex = stored["regUsers"].index(ctx.user.id)
     stored["regUsers"].pop(userindex)
     stored["regUsersBySteamId"].pop(userindex)
+    stored["regUsersById"].pop(userindex)
     with open("showdown/storage.json", 'w') as write:
         json.dump(stored, write, indent=2)
     await ctx.send("Successfully Unregistered!", ephemeral=True)
@@ -101,3 +105,18 @@ async def sd_unregister(ctx):
 @sd_controlls.subcommand(name="set_quali_end_time")
 async def sd_setqualiendtime(ctx, unixtimestamp: int):
     pass
+
+@sd_controlls.subcommand(name="set_qualifier_channel")
+async def sd_set_qualifier_channel(ctx, channel: nextcord.TextChannel, season: int):
+    message = await channel.send(f"# Showdown Qualifier Season {season}", embed=nextcord.Embed(title=f"Showdown Qualifier Season {season}", description="Please hang on tight as we are setting up this leaderboard!", color=nextcord.Color.green()))
+    with open("showdown/storage.json", 'r') as read:
+        stored = json.loads(read.read())
+    stored["qualiLb"] = {"channel": channel.id, "message": message.id}
+    with open("showdown/storage.json", 'w') as write:
+        json.dump(stored, write, indent=2)
+    await ctx.send("Alright, Message has been sent and stored!")
+
+@sd_controlls.subcommand(name="force_update_qualifier")
+async def sd_force_update_qualifier(ctx):
+    await showdown.leaderboards.update_qualifier()
+    await ctx.send("Forced!")
