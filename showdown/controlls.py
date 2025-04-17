@@ -103,8 +103,13 @@ async def sd_unregister(ctx):
     await ctx.send(f"{ctx.user.mention} Has unregistered!")
 
 @sd_controlls.subcommand(name="set_quali_end_time")
-async def sd_setqualiendtime(ctx, unixtimestamp: int):
-    pass
+async def sd_setqualiendtime(ctx, iso: str):
+    with open("showdown/storage.json", 'r') as read:
+        stored = json.loads(read.read())
+    stored["endTime"] = iso
+    with open("showdown/storage.json", 'w') as write:
+        json.dump(stored, write, indent=2)
+    await ctx.send(f"Alright, We'll be ending at {iso}")
 
 @sd_controlls.subcommand(name="set_qualifier_channel")
 async def sd_set_qualifier_channel(ctx, channel: nextcord.TextChannel, season: int):
@@ -133,3 +138,15 @@ async def sd_toggle_update(ctx):
         await ctx.send("Enabled updating of qualifier leaderboard.")
     with open("showdown/storage.json", 'w') as write:
         json.dump(stored, write, indent=2)
+
+@sd_controlls.subcommand(name="kick")
+async def sd_setqualiendtime(ctx, discordid: str):
+    with open("showdown/storage.json", 'r') as read:
+        stored = json.loads(read.read())
+    userindex = stored["regUsers"].index(int(discordid))
+    stored["regUsers"].pop(userindex)
+    stored["regUsersBySteamId"].pop(userindex)
+    stored["regUsersById"].pop(userindex)
+    with open("showdown/storage.json", 'w') as write:
+        json.dump(stored, write, indent=2)
+    await ctx.send(f"Got <@{discordid}> the out of this event.")

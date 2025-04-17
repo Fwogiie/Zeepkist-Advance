@@ -25,7 +25,7 @@ async def update_qualifier():
     with open("showdown/storage.json", "r") as read:
         storage = json.loads(read.read())
     req = requests.post(queries.post_url,
-                        json={"query": queries.get_user_pb_by_id, "variables": {"in": storage["regUsersById"], "idLevel": storage["quali"]["id"]}})
+                        json={"query": queries.get_user_pb_by_id, "variables": {"in": storage["regUsersById"], "idLevel": storage["quali"]["id"], "lessThan": storage["endTime"]}})
     resp = json.loads(req.text)
     print(resp)
     count, records, poolonerecords, pooltworecords, substitutesrecords = 1, [], "", "", ""

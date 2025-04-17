@@ -94,10 +94,15 @@ get_level_leaderboard_by_players = """query getLevelLeaderboardByPlayers($in: [I
   }
 }"""
 
-get_user_pb_by_id = """query getUserPbById($in: [Int!] = 10, $idLevel: Int = 10) {
+get_user_pb_by_id = """query getUserPbById($in: [Int!] = 10, $idLevel: Int = 10, $lessThan: Datetime = "") {
   allUsers(filter: {id: {in: $in}}) {
     nodes {
-      recordsByIdUser(condition: {idLevel: $idLevel}, orderBy: TIME_ASC, first: 1) {
+      recordsByIdUser(
+        condition: {idLevel: $idLevel}
+        orderBy: TIME_ASC
+        first: 1
+        filter: {dateUpdated: {lessThan: $lessThan}, dateCreated: {lessThan: $lessThan}}
+      ) {
         edges {
           node {
             time
