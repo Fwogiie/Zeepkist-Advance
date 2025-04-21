@@ -27,7 +27,7 @@ async def leaderboards():
     with open("showdown/storage.json", 'r') as read:
         stored = json.loads(read.read())
     if stored["update?"]:
-        await update_qualifier()
+        await update_lbs()
     return
 
 async def update_qualifier():
