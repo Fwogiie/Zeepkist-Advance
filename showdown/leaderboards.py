@@ -7,13 +7,23 @@ import fwogutils
 from fwogutils import bot, log, queries
 import time
 
+
 async def startup_logic():
     log("Showdown Leaderboards statup logic has been called.")
     quali_leaderboard.start()
+    leaderboards.start()
 
 # quai leaderboards updating
 @tasks.loop(minutes=5, reconnect=True)
 async def quali_leaderboard():
+    with open("showdown/storage.json", 'r') as read:
+        stored = json.loads(read.read())
+    if stored["updatequali?"]:
+        await update_qualifier()
+    return
+
+@tasks.loop(minutes=5, reconnect=True)
+async def leaderboards():
     with open("showdown/storage.json", 'r') as read:
         stored = json.loads(read.read())
     if stored["update?"]:
@@ -55,3 +65,34 @@ async def update_qualifier():
     channel = bot.get_channel(storage["qualiLb"]["channel"])
     message = await channel.fetch_message(storage["qualiLb"]["message"])
     await message.edit(embeds=[pooloneembed, pooltwoembed, substitutesembed])
+
+async def update_lbs():
+    log("leaderboards updating...")
+    map, embeds = 1, []
+    for x in range(7):
+        with open("showdown/storage.json", "r") as read:
+            storage = json.loads(read.read())
+        req = requests.post(queries.post_url,
+                            json={"query": queries.get_user_pb_by_id, "variables": {"in": storage["regUsersById"], "idLevel": storage[str(map)]["id"], "lessThan": storage["endTimeLbs"]}})
+        resp = json.loads(req.text)
+        print(resp)
+        count, records, recordsstr = 0, [], ""
+        for record in resp["data"]["allUsers"]["nodes"]:
+            if record["recordsByIdUser"]["edges"]:
+                record, user = record["recordsByIdUser"]["edges"][0]["node"], record["recordsByIdUser"]["edges"][0]["node"]["userByIdUser"]["steamName"]
+                records.append(f"{record['time']}:{user}")
+                count += 1
+                if count == 15:
+                    break
+        records.sort()
+        print(records)
+        count = 1
+        for x in records:
+            recordtime, user = x.split(":")[0], x.split(":")[1]
+            recordsstr += f"`{count}. {fwogutils.format_time(float(recordtime))}` by **{user}**\n"
+            count += 1
+        embeds.append(nextcord.Embed(title=storage[str(map)]["name"], description=recordsstr, color=nextcord.Color.purple()))
+        map += 1
+    channel = bot.get_channel(storage["lbs"]["channel"])
+    message = await channel.fetch_message(storage["lbs"]["message"])
+    await message.edit(embeds=embeds)

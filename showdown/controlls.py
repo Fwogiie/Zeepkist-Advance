@@ -54,7 +54,7 @@ async def sd_setmap(ctx, map: int, workshopid: int):
         if map == 0:
             stored["quali"] = {"hash": resp[0]["levelByIdLevel"]["hash"], "id": resp[0]["levelByIdLevel"]["id"]}
         else:
-            stored[str(map)] = {"hash": resp[0]["levelByIdLevel"]["hash"], "id": resp[0]["levelByIdLevel"]["id"]}
+            stored[str(map)] = {"hash": resp[0]["levelByIdLevel"]["hash"], "id": resp[0]["levelByIdLevel"]["id"], "name": resp[0]['name']}
         with open("showdown/storage.json", 'w') as write:
             json.dump(stored, write, indent=2)
         await ctx.send(f"{resp[0]['name']} added as map {map}")
@@ -127,20 +127,20 @@ async def sd_force_update_qualifier(ctx):
     await ctx.send("Forced!")
 
 @sd_controlls.subcommand(name="toggle_update_quali")
-async def sd_toggle_update(ctx):
+async def sd_toggle_update_quali(ctx):
     with open("showdown/storage.json", 'r') as read:
         stored = json.loads(read.read())
-    if stored["update?"] == True:
-        stored["update?"] = False
+    if stored["updatequali?"] == True:
+        stored["updatequali?"] = False
         await ctx.send("Disabled updating of qualifier leaderboard.")
-    elif stored["update?"] == False:
-        stored["update?"] = True
+    elif stored["updatequali?"] == False:
+        stored["updatequali?"] = True
         await ctx.send("Enabled updating of qualifier leaderboard.")
     with open("showdown/storage.json", 'w') as write:
         json.dump(stored, write, indent=2)
 
 @sd_controlls.subcommand(name="kick")
-async def sd_setqualiendtime(ctx, discordid: str):
+async def sd_kick_user(ctx, discordid: str):
     with open("showdown/storage.json", 'r') as read:
         stored = json.loads(read.read())
     userindex = stored["regUsers"].index(int(discordid))
@@ -149,4 +149,43 @@ async def sd_setqualiendtime(ctx, discordid: str):
     stored["regUsersById"].pop(userindex)
     with open("showdown/storage.json", 'w') as write:
         json.dump(stored, write, indent=2)
-    await ctx.send(f"Got <@{discordid}> the out of this event.")
+    await ctx.send(f"Got <@{discordid}> out of this event.")
+
+@sd_controlls.subcommand(name="set_leaderboards_end_time")
+async def sd_setlbsendtime(ctx, iso: str):
+    with open("showdown/storage.json", 'r') as read:
+        stored = json.loads(read.read())
+    stored["endTimeLbs"] = iso
+    with open("showdown/storage.json", 'w') as write:
+        json.dump(stored, write, indent=2)
+    await ctx.send(f"Alright, We'll be ending at {iso}")
+
+@sd_controlls.subcommand(name="set_leaderboards_channel")
+async def sd_set_lbs_channel(ctx, channel: nextcord.TextChannel, season: int):
+    message = await channel.send(f"# Showdown Season {season}\nWe are setting up leaderboards! Please hang tight!")
+    with open("showdown/storage.json", 'r') as read:
+        stored = json.loads(read.read())
+    stored["lbs"] = {"channel": channel.id, "message": message.id}
+    with open("showdown/storage.json", 'w') as write:
+        json.dump(stored, write, indent=2)
+    await ctx.send("Alright, Message has been sent and stored!")
+
+@sd_controlls.subcommand(name="force_update_leaderboards")
+async def sd_force_update_lbs(ctx):
+    await ctx.send("Forcing!")
+    await showdown.leaderboards.update_lbs()
+    await ctx.send("Forced!")
+
+@sd_controlls.subcommand(name="toggle_update_leaderboards")
+async def sd_toggle_update_lbs(ctx):
+    with open("showdown/storage.json", 'r') as read:
+        stored = json.loads(read.read())
+    if stored["update?"] == True:
+        stored["update?"] = False
+        await ctx.send("Disabled updating of leaderboards.")
+    elif stored["update?"] == False:
+        stored["update?"] = True
+        await ctx.send("Enabled updating of leaderboards.")
+    with open("showdown/storage.json", 'w') as write:
+        json.dump(stored, write, indent=2)
+
