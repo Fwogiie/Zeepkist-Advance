@@ -78,12 +78,13 @@ async def update_lbs():
         print(resp)
         count, records, recordsstr = 0, [], ""
         for record in resp["data"]["allUsers"]["nodes"]:
-            if record["recordsByIdUser"]["edges"]:
-                record, user = record["recordsByIdUser"]["edges"][0]["node"], record["recordsByIdUser"]["edges"][0]["node"]["userByIdUser"]["steamName"]
-                records.append(f"{record['time']}:{user}")
-                count += 1
-                if count == 15:
-                    break
+            if not record["recordsByIdUser"]["edges"]:
+                continue
+            record, user = record["recordsByIdUser"]["edges"][0]["node"], record["recordsByIdUser"]["edges"][0]["node"]["userByIdUser"]["steamName"]
+            records.append(f"{record['time']}:{user}")
+            count += 1
+            if count == 15:
+                break
         records.sort()
         print(records)
         count = 1
