@@ -78,7 +78,7 @@ async def update_lbs():
         print(resp)
         count, records, recordsstr = 0, [], ""
         for record in resp["data"]["allUsers"]["nodes"]:
-            if not record["recordsByIdUser"]["edges"]:
+            if len(record["recordsByIdUser"]["edges"]) == 0:
                 continue
             record, user = record["recordsByIdUser"]["edges"][0]["node"], record["recordsByIdUser"]["edges"][0]["node"]["userByIdUser"]["steamName"]
             records.append(f"{record['time']}:{user}")
