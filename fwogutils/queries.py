@@ -1,4 +1,4 @@
-post_url = "https://graphql-beta.zeepki.st/"
+post_url = "https://graphql.zeepki.st/"
 
 top_gtr = """query TopGtrLevels($first: Int, $offset: Int) {
   allLevelPoints(orderBy: POINTS_DESC, first: $first, offset: $offset) {
