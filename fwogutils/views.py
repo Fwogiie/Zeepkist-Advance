@@ -203,12 +203,6 @@ class DownloadPlaylist(nextcord.ui.View):
     async def import_by(self):
         pass
 
-    @nextcord.ui.button(label="Playlist Importer", style=nextcord.ButtonStyle.green)
-    async def pl_importer_callback(self, btn, ctx):
-        req = requests.post("https://fwogiiedev.com/api/playlists", json=self.playlist.playlist_json)
-        plcode = req.text
-        await ctx.send(f"Use code `{plcode}` to import the playlist using Playlist Importer\nExample: `/getpl {plcode}`", ephemeral=True)
-
     @nextcord.ui.button(label="Edit Playlist", style=nextcord.ButtonStyle.grey, row=1)
     async def edit_pl_callback(self, btn, ctx):
         await ctx.edit(view=EditPlaylist(self.playlist))
