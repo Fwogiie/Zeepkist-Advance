@@ -20,7 +20,6 @@ async def notifme(ctx,
             log(f"setting {to} to False")
             fwogutils.setlinkedusersetting(setting=to, value=False, user=ctx.user.id)
             user = fwogutils.get_linked_users()[str(ctx.user.id)]
-            fwogutils.loc_setuserwrs(user['id'], ["user opt-out"])
             await ctx.send(f"We will stop to notify you for what you selected!")
         else:
             await ctx.send("You are not linked! use the `/link gtr` command to link your GTR to this server!")

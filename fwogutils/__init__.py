@@ -6,8 +6,6 @@ import pytz
 import requests
 import json
 import os
-
-import fwogutils
 from fwogutils.queries import post_url
 
 intents = nextcord.Intents.all()
@@ -152,7 +150,7 @@ def addgtruser(discid: str, user: dict):
         data = json.loads(f.read())
         data["linked"][discid] = user
         data["linked"][discid]["settings"] = {"notifs": {"RU": False, "RD": False, "WRST": False}}
-        data["linked"][discid]["userdata"] = {"position": fwogutils.getusergtrposition(int(user["id"]))}
+        data["linked"][discid]["userdata"] = {"position": getusergtrposition(int(user["id"]))}
     with open("storage/users.json", 'w') as ft:
         json.dump(data, ft, indent=2)
 
@@ -260,10 +258,10 @@ def getrankings(offset:int=0, limit:int=20) -> []:
         log(str(req.status_code))
         return False
     reqjson, formattedlist = json.loads(req.text), []
-    for x in reqjson["data"]["allUserPoints"]["nodes"]:
+    for x in reqjson["data"]["userPoints"]["nodes"]:
         formattedlist.append({"points": x["points"], "rank": x["rank"], "worldRecords": x["worldRecords"],
-                              "steamName": x["userByIdUser"]["steamName"], "discordId": x["userByIdUser"]["discordId"],
-                              "steamId": x["userByIdUser"]["steamId"]})
+                              "steamName": x["user"]["steamName"], "discordId": x["user"]["discordId"],
+                              "steamId": x["user"]["steamId"]})
     return formattedlist
 
 def getnotifusers():
@@ -316,7 +314,7 @@ async def getusergtrpositionasync(gtruserid: int) -> int:
     else:
         log(f"returning rank from user {gtruserid}")
         try:
-            return json.loads(request.text)["data"]["allUsers"]["edges"][0]["node"]["userPointsByIdUser"]["edges"][0]["node"]["rank"]
+            return json.loads(request.text)["data"]["users"]["edges"][0]["node"]["userPoints"]["edges"][0]["node"]["rank"]
         except IndexError:
             log("IndexError!")
             return False
@@ -327,4 +325,3 @@ def updateuserposition(user: str, updatedpos: int):
     users["linked"][user]["userdata"]["position"] = updatedpos
     with open("storage/users.json", 'w') as writefile:
         json.dump(users, writefile, indent=2)
-

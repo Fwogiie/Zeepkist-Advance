@@ -1,6 +1,6 @@
 import nextcord.ui
 import fwogutils
-from fwogutils import getgtruserrank, getusergtrpositionasync, log
+from fwogutils import getusergtrpositionasync, log
 
 
 class LbView(nextcord.ui.View):

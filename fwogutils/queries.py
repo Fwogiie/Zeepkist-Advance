@@ -19,12 +19,12 @@ top_gtr = """query TopGtrLevels($first: Int, $offset: Int) {
 """
 
 rankings = """query GetRankings($offset: Int, $limit: Int) {
-  allUserPoints(offset: $offset, first: $limit, orderBy: RANK_ASC) {
+  userPoints(offset: $offset, first: $limit, orderBy: RANK_ASC) {
     nodes {
       points
       rank
       worldRecords
-      userByIdUser {
+      user {
         steamName
         discordId
         steamId
@@ -49,10 +49,10 @@ levels_from_ids = """query GetLevelsFromIds($in: [BigFloat!] = "") {
 }"""
 
 get_user_pos = """query GetUserRanking($id: Int) {
-  allUsers(condition: {id: $id}) {
+  users(condition: {id: $id}, first: 1) {
     edges {
       node {
-        userPointsByIdUser {
+        userPoints {
           edges {
             node {
               rank

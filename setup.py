@@ -19,8 +19,6 @@ import rankings
 from rankings.rankings_notifs import rankings_notifier, startup_logic
 
 # Showdown
-import showdown
-from showdown import controlls, leaderboards
 
 # Other
 log("loading others")
@@ -45,4 +43,3 @@ async def on_ready():
     await rankings.rankings.startup_handler()
     log("assumed to have begun rankings leaderboard!")
     await startup_logic()
-    await showdown.leaderboards.startup_logic()
