@@ -22,7 +22,7 @@ from rankings.rankings_notifs import rankings_notifier, startup_logic
 
 # Other
 log("loading others")
-#import errors
+import errors
 import link_gtr
 import log_command
 import verify

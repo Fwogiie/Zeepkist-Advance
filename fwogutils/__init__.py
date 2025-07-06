@@ -106,22 +106,7 @@ def getgtruserrank(id: int):
 
 girl!
     """
-    return json.loads(requests.post(queries.post_url, json={"query": """
-    query GetUserRank($user: Int) {
-  allUsers(condition: {id: $user}) {
-    edges {
-      node {
-        userPointsByIdUser {
-          nodes {
-            rank
-            worldRecords
-            points
-          }
-        }
-      }
-    }
-  }
-}""", "variables": {"user": id}}).text)['data']['allUsers']['edges'][0]['node']['userPointsByIdUser']['nodes'][0]
+    return json.loads(requests.post(queries.post_url, json={"query": queries.get_user_pos, "variables": {"user": id}}).text)['data']['users']['edges'][0]['node']['userPoints']['edges'][0]['node']
 
 def checkzeeplist(filename: str):
     """
