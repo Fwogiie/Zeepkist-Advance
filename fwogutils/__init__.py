@@ -106,7 +106,7 @@ def getgtruserrank(id: int):
 
 girl!
     """
-    return json.loads(requests.post(queries.post_url, json={"query": queries.get_user_pos, "variables": {"user": id}}).text)['data']['users']['edges'][0]['node']['userPoints']['edges'][0]['node']
+    return json.loads(requests.post(queries.post_url, json={"query": queries.get_user_pos, "variables": {"id": id}}).text)['data']['users']['edges'][0]['node']['userPoints']['edges'][0]['node']
 
 def checkzeeplist(filename: str):
     """
@@ -157,9 +157,11 @@ def setlinkedusersetting(setting: str, value, user):
         if setting == 'RU' and value is True:
             data["usercache"]["RUusers"].append(str(user))
             data["linked"][str(user)]["userdata"]["position"] = getgtruserrank(data["linked"][str(user)]["id"])['rank']
+            log(data["linked"][str(user)]["userdata"]["position"])
         if setting == 'RD' and value is True:
             data["usercache"]["RDusers"].append(str(user))
             data["linked"][str(user)]["userdata"]["position"] = getgtruserrank(data["linked"][str(user)]["id"])['rank']
+            log(data["linked"][str(user)]["userdata"]["position"])
         if setting == 'WRST' and value is True:
             data["usercache"]["WRSTusers"][str(data["linked"][str(user)]["id"])] = {"discid": str(user)}
         if setting == 'RU' and value is False:
