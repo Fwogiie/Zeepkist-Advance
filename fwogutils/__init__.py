@@ -58,7 +58,7 @@ def getgtruser(id: int=None, discid: int=None):
     if id != None:
         req = requests.post(queries.post_url, json={"query": """
         query GetUser($id: Int) {
-  allUsers(condition: {id: $id}) {
+  users(condition: {id: $id}) {
     edges {
       node {
         id
@@ -75,8 +75,8 @@ def getgtruser(id: int=None, discid: int=None):
             return [True, json.loads(req.text)]
     elif discid != None:
         req = requests.post(queries.post_url, json={"query": """
-        query GetUserByDiscordId($discid: BigFloat) {
-  allUsers(condition: {discordId: $discid}) {
+        query GetUserByDiscordId($discid: BigInt) {
+  users(condition: {discordId: $discid}) {
     edges {
       node {
         id
@@ -90,7 +90,7 @@ def getgtruser(id: int=None, discid: int=None):
         if req.status_code != 200:
             return [False, req.status_code]
         user = json.loads(req.text)
-        user = user['data']['allUsers']['edges']
+        user = user['data']['users']['edges']
         if not user:
             return[False, 404]
         else:
@@ -288,7 +288,7 @@ def getusergtrposition(gtruserid: int) -> int:
     else:
         log(f"returning rank from user {gtruserid}")
         try:
-            return json.loads(request.text)["data"]["allUsers"]["edges"][0]["node"]["userPointsByIdUser"]["edges"][0]["node"]["rank"]
+            return json.loads(request.text)["data"]["users"]["edges"][0]["node"]["userPoints"]["edges"][0]["node"]["rank"]
         except IndexError:
             log("IndexError!")
             return False
