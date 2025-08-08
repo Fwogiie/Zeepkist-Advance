@@ -2,7 +2,6 @@ import datetime
 import nextcord
 from nextcord.ext import commands
 import inspect
-import pytz
 import requests
 import json
 import os
@@ -26,8 +25,8 @@ def log(text: str, type: str=None):
         else:
             logging.truncate(0)
             logging.seek(0)
-            logging.write(f"{txt}\nin {inspect.stack()[1].function} @ {datetime.datetime.now(tz=pytz.timezone('Europe/Brussels')).strftime('%m/%d, %H:%M:%S')} : {text}")
-            print(f"in {inspect.stack()[1].function} @ {datetime.datetime.now(tz=pytz.timezone('Europe/Brussels')).strftime('%m/%d, %H:%M:%S')} : {text}")
+            logging.write(f"{txt}\nin {inspect.stack()[1].function} @ {datetime.datetime.now().strftime('%m/%d, %H:%M:%S')} : {text}")
+            print(f"in {inspect.stack()[1].function} @ {datetime.datetime.now().strftime('%m/%d, %H:%M:%S')} : {text}")
 
 
 def errormessage(error):
