@@ -39,7 +39,18 @@ async def on_ready():
     for guild in bot.guilds:
         log(f"Connected to guild: {guild.name} ({guild.id}) with {guild.member_count} members.")
     log("initializing startup cache for live leaderboards.")
-    await playlist_stuff.top_gtr.bot_startup_handler()
-    await rankings.rankings.startup_handler()
-    log("assumed to have begun rankings leaderboard!")
-    await startup_logic()
+    # Load Playlist generator
+    try:
+        await playlist_stuff.top_gtr.bot_startup_handler()
+    except:
+        print("Error occurred loading top GTR playlist generator")
+    finally:
+        print("Loaded top GTR playlist generator")
+    # Load Rankings system
+    try:
+        await rankings.rankings.startup_handler()
+        await startup_logic()
+    except:
+        print("Error occurred loading the Rankings system")
+    finally:
+        print("Loaded Rankings system!")
