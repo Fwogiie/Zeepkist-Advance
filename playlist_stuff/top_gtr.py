@@ -1,6 +1,5 @@
 import json
 from fwogutils import objects, views
-import discord
 import nextcord.ui
 import requests
 import fwogutils
@@ -9,7 +8,7 @@ from fwogutils.queries import post_url, top_gtr
 
 getter_messages = ["1305497165128536095,1305497713579917392", "1307802539789647962,1307802618055229451"]
 getter_test = "1347885622559375460,1391043187920867339"
-embed = discord.Embed(title="Top GTR", description="Get a playlist of the levels worth the most points in GTR!", color=nextcord.Color.blue())
+embed = nextcord.Embed(title="Top GTR", description="Get a playlist of the levels worth the most points in GTR!", color=nextcord.Color.blue())
 
 async def bot_startup_handler():
     if fwogutils.is_test_build():

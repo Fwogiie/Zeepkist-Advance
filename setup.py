@@ -9,7 +9,7 @@ import level_submissions
 import notifications
 
 # Playlist Importer
-import playlist_importer
+#import playlist_importer #Obsolete
 
 # Playlist Stuff
 import playlist_stuff

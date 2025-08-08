@@ -3,7 +3,6 @@ from cProfile import label
 import requests
 import json
 import nextcord
-import discord
 import fwogutils
 from fwogutils import log as log
 from fwogutils.objects import Playlist
@@ -31,9 +30,9 @@ class LButtons(nextcord.ui.View):
         for x in gtrrankings[60:90]:
             x = x['node']
             strranks += f"{x['rank']}. `{x['userByIdUser']['steamName']}` with **{x['points']}** points and **{x['worldRecords']}** World Records\n"
-        embed = discord.Embed(title="GTR Rankings", description=stringedrankings, color=nextcord.Color.blue())
-        embeda = discord.Embed(title=" ", description=stringranks, color=nextcord.Color.blue())
-        embedb = discord.Embed(title=" ", description=strranks, color=nextcord.Color.blue())
+        embed = nextcord.Embed(title="GTR Rankings", description=stringedrankings, color=nextcord.Color.blue())
+        embeda = nextcord.Embed(title=" ", description=stringranks, color=nextcord.Color.blue())
+        embedb = nextcord.Embed(title=" ", description=strranks, color=nextcord.Color.blue())
         await ctx.send(embeds=[embed, embeda, embedb], ephemeral=True)
 
     @nextcord.ui.button(label="My ranking")
@@ -59,7 +58,7 @@ class LButtons(nextcord.ui.View):
                     ranks += f"{x['rank']}. `{x['userByIdUser']['steamName']}` with **{x['points']}** points and **{x['worldRecords']}** World Records\n"
                 else:
                     ranks += f"> {x['rank']}. `{x['userByIdUser']['steamName']}` with **{x['points']}** points and **{x['worldRecords']}** World Records\n"
-            embed = discord.Embed(title="Your Rank", description=ranks, color=nextcord.Color.blue())
+            embed = nextcord.Embed(title="Your Rank", description=ranks, color=nextcord.Color.blue())
             await ctx.edit("", embed=embed)
         else:
             log(f"user did not have gtr linked!")

@@ -1,4 +1,4 @@
-import nextcord, discord
+import nextcord
 from pathvalidate import sanitize_filename
 import fwogutils
 
@@ -59,7 +59,7 @@ class Playlist(object):
 
     @property
     def embed(self):
-        embed = discord.Embed(title="Playlist", color=nextcord.Color.blue())
+        embed = nextcord.Embed(title="Playlist", color=nextcord.Color.blue())
         embed.add_field(name="Playlist Info:", value=f"Name: {self.name}\nTime (Round Length): {fwogutils.format_time(self.roundlength)[:5]}\n"
                                                      f"Shuffle: {self.shuffle}\nAmount of Levels: {self.level_count}\n"
                                                      f"First level: {self._levels[0]['Name']} by {self._levels[0]['Author']}\n"
