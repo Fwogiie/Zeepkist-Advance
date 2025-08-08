@@ -1,5 +1,4 @@
 from datetime import datetime
-import discord
 import nextcord
 import fwogutils
 from fwogutils import bot, log
@@ -22,7 +21,7 @@ async def rankings():
     baseranks = ""
     for x in fwogutils.getrankings():
         baseranks += f"{x['rank']}. `{x['steamName']}` with {x['points']} points and {x['worldRecords']} World Records\n"
-    embed = discord.Embed(title="GTR Rankings", description=baseranks, timestamp=datetime.now(), color=nextcord.Color.blue())
+    embed = nextcord.Embed(title="GTR Rankings", description=baseranks, timestamp=datetime.now(), color=nextcord.Color.blue())
     embed.set_footer(text="last updated")
     if fwogutils.is_test_build():
         lb = await bot.get_channel(int(test_leaderboard.split("-")[0])).fetch_message(int(test_leaderboard.split("-")[1]))
