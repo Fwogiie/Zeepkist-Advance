@@ -37,9 +37,9 @@ async def rankings_checker():
 
 
 async def rankdown_handler(updatedpos: int, unupdatedpos: int, user: str):
-    embed = nextcord.Embed(title="Ranked down :/",
+    embed = nextcord.Embed(title="<:rank_down:1407799879451017358> Ranked down :/",
                            description=f"You have ranked down from Position {unupdatedpos} to {updatedpos} in the GTR rankings!",
-                           color=nextcord.Color.blue())
+                           color=nextcord.Color.red())
     embed.set_thumbnail("https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png")
     if fwogutils.is_test_build():
         await bot.get_channel(notif_test_channel).send(f"<@{user}>", embed=embed)
@@ -47,9 +47,9 @@ async def rankdown_handler(updatedpos: int, unupdatedpos: int, user: str):
         await bot.get_channel(notif_channel).send(f"<@{user}>", embed=embed)
 
 async def rankup_handler(updatedpos: int, unupdatedpos: int, user: str):
-    embed = nextcord.Embed(title="Ranked up!",
+    embed = nextcord.Embed(title="<:rank_up:1407799649418481785> Ranked up!",
                            description=f"You have ranked up from Position {unupdatedpos} to {updatedpos} in the GTR rankings!",
-                           color=nextcord.Color.blue())
+                           color=nextcord.Color.green())
     embed.set_thumbnail("https://cdn.discordapp.com/attachments/1066387605253525595/1202663511252013066/Projet_20240201061441.png")
     if fwogutils.is_test_build():
         await bot.get_channel(notif_test_channel).send(f"<@{user}>", embed=embed)
