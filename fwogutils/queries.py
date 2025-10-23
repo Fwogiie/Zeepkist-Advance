@@ -19,7 +19,7 @@ top_gtr = """query TopGtrLevels($first: Int, $offset: Int) {
 """
 
 rankings = """query GetRankings($offset: Int, $limit: Int) {
-  userPoints(offset: $offset, first: $limit, orderBy: RANK_ASC) {
+  userPoints(offset: $offset, first: $limit, orderBy: POINTS_DESC) {
     nodes {
       points
       rank
