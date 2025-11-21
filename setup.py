@@ -1,3 +1,5 @@
+import nextcord.guild
+
 from fwogutils import bot, log
 import fwogutils
 import json
@@ -19,6 +21,8 @@ import rankings
 from rankings.rankings_notifs import rankings_notifier, startup_logic
 
 # Showdown
+import showdown
+from showdown import controlls, leaderboards
 
 # Other
 log("loading others")
@@ -31,6 +35,7 @@ import verify
 log("loading commands")
 
 bot.load_extension("onami")
+
 
 @bot.event
 async def on_ready():

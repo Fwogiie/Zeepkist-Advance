@@ -4,7 +4,7 @@ import requests
 from flask import request
 import fwogutils
 import showdown.leaderboards
-from fwogutils import bot, log
+from fwogutils import bot, log, queries
 
 
 get_level_query = """query MyQuery($workshopId: BigFloat = "") {
@@ -19,8 +19,8 @@ get_level_query = """query MyQuery($workshopId: BigFloat = "") {
   }
 }"""
 
-get_user_query = """query MyQuery($discordId: BigFloat = "") {
-  allUsers(condition: {discordId: $discordId}) {
+get_user_query = """query MyQuery($discordId: BigInt = "") {
+  users(condition: {discordId: $discordId}) {
     nodes {
       steamId
       steamName
@@ -62,13 +62,13 @@ async def sd_setmap(ctx, map: int, workshopid: int):
 # DONE
 @bot.slash_command(name="register", description="Register for the Showdown event!", guild_ids=[1127321762686836798])
 async def sd_register(ctx):
-    req = requests.post(fwogutils.queries.post_url, json={"query": get_user_query, "variables": {"discordId": str(ctx.user.id)}})
+    req = requests.post(queries.post_url, json={"query": get_user_query, "variables": {"discordId": str(ctx.user.id)}})
     if req.status_code != 200:
         await ctx.send("Error occurred!")
         log(f"{req.status_code} - {req.text}")
         return
     resp = json.loads(req.text)
-    resp = resp["data"]["allUsers"]["nodes"]
+    resp = resp["data"]["users"]["nodes"]
     if not resp:
         await ctx.send("You do not have GTR linked! Link it by going in your in-game mod settings!", ephemeral=True)
         return
