@@ -1,3 +1,5 @@
+from typing import final
+
 import nextcord.guild
 
 from fwogutils import bot, log
@@ -59,3 +61,9 @@ async def on_ready():
         print("Error occurred loading the Rankings system")
     finally:
         print("Loaded Rankings system!")
+    try:
+        await showdown.leaderboards.startup_logic()
+    except:
+        print("Error with showdown")
+    finally:
+        print("sehr gut ja")
