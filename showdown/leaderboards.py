@@ -15,7 +15,7 @@ async def startup_logic():
     leaderboards.start()
 
 # quai leaderboards updating
-@tasks.loop(minutes=1, reconnect=True)
+@tasks.loop(minutes=5, reconnect=True)
 async def quali_leaderboard():
     with open("showdown/storage.json", 'r') as read:
         stored = json.loads(read.read())
@@ -23,7 +23,7 @@ async def quali_leaderboard():
         await update_qualifier()
     return
 
-@tasks.loop(minutes=1, reconnect=True)
+@tasks.loop(minutes=5, reconnect=True)
 async def leaderboards():
     with open("showdown/storage.json", 'r') as read:
         stored = json.loads(read.read())
