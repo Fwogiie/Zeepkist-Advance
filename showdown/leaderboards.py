@@ -39,9 +39,9 @@ async def update_qualifier():
     resp = json.loads(req.text)
     print(resp)
     count, records, poolonerecords, pooltworecords, substitutesrecords = 1, [], "", "", ""
-    for record in resp["data"]["allUsers"]["nodes"]:
-        if record["recordsByIdUser"]["edges"]:
-            record, user = record["recordsByIdUser"]["edges"][0]["node"], record["recordsByIdUser"]["edges"][0]["node"]["userByIdUser"]["steamName"]
+    for record in resp["data"]["users"]["nodes"]:
+        if record["records"]["edges"]:
+            record, user = record["records"]["edges"][0]["node"], record["records"]["edges"][0]["node"]["user"]["steamName"]
             records.append(f"{record['time']}:{user}")
     records.sort()
     print(records)
@@ -77,10 +77,10 @@ async def update_lbs():
         resp = json.loads(req.text)
         print(resp)
         count, records, recordsstr = 0, [], ""
-        for record in resp["data"]["allUsers"]["nodes"]:
-            if len(record["recordsByIdUser"]["edges"]) == 0:
+        for record in resp["data"]["users"]["nodes"]:
+            if len(record["records"]["edges"]) == 0:
                 continue
-            record, user = record["recordsByIdUser"]["edges"][0]["node"], record["recordsByIdUser"]["edges"][0]["node"]["userByIdUser"]["steamName"]
+            record, user = record["records"]["edges"][0]["node"], record["records"]["edges"][0]["node"]["user"]["steamName"]
             records.append(f"{record['time']}:{user}")
         records.sort()
         print(records)
