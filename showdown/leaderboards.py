@@ -68,31 +68,29 @@ async def update_qualifier():
 
 async def update_lbs():
     log("leaderboards updating...")
-    map, embeds = 1, []
-    for x in range(7):
-        with open("showdown/storage.json", "r") as read:
-            storage = json.loads(read.read())
+    with open("showdown/storage.json", "r") as read:
+        storage = json.loads(read.read())
+        meps = [storage["1"], storage["2"], storage["3"], storage["4"], storage["5"], storage["6"], storage["7"]]
+    embeds = []
+    for mep in meps:
         req = requests.post(queries.post_url,
-                            json={"query": queries.get_user_pb_by_id, "variables": {"in": storage["regUsersById"], "idLevel": storage[str(map)]["id"], "lessThan": storage["endTimeLbs"]}})
+                            json={"query": queries.get_user_pb_by_id,
+                                  "variables": {"in": storage["regUsersById"], "idLevel": mep["id"],
+                                                "lessThan": storage["endTime"]}})
         resp = json.loads(req.text)
         print(resp)
-        count, records, recordsstr = 0, [], ""
+        count, records, leaderboard = 1, [], ""
         for record in resp["data"]["users"]["nodes"]:
-            if len(record["records"]["edges"]) == 0:
-                continue
-            record, user = record["records"]["edges"][0]["node"], record["records"]["edges"][0]["node"]["user"]["steamName"]
-            records.append(f"{record['time']}:{user}")
+            if record["records"]["edges"]:
+                record, user = record["records"]["edges"][0]["node"], record["records"]["edges"][0]["node"]["user"][
+                    "steamName"]
+                records.append(f"{record['time']}:{user}")
         records.sort()
         print(records)
-        count = 1
         for x in records:
             recordtime, user = x.split(":")[0], x.split(":")[1]
-            recordsstr += f"`{count}. {fwogutils.format_time(float(recordtime))}` by **{user}**\n"
-            count += 1
-            if count == 16:
-                break
-        embeds.append(nextcord.Embed(title=storage[str(map)]["name"], description=recordsstr, color=nextcord.Color.purple()))
-        map += 1
-    channel = bot.get_channel(storage["lbs"]["channel"])
-    message = await channel.fetch_message(storage["lbs"]["message"])
+            leaderboard += f"{count}. `{fwogutils.format_time(float(recordtime))}` by **{user}**\n"
+        embeds.append(nextcord.Embed(title=mep["name"], description=leaderboard, color=nextcord.Color.purple()))
+    channel = bot.get_channel(storage["qualiLb"]["channel"])
+    message = await channel.fetch_message(storage["qualiLb"]["message"])
     await message.edit(embeds=embeds)
