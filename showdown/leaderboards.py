@@ -91,6 +91,6 @@ async def update_lbs():
             recordtime, user = x.split(":")[0], x.split(":")[1]
             leaderboard += f"{count}. `{fwogutils.format_time(float(recordtime))}` by **{user}**\n"
         embeds.append(nextcord.Embed(title=mep["name"], description=leaderboard, color=nextcord.Color.purple()))
-    channel = bot.get_channel(storage["qualiLb"]["channel"])
-    message = await channel.fetch_message(storage["qualiLb"]["message"])
+    channel = bot.get_channel(storage["lbs"]["channel"])
+    message = await channel.fetch_message(storage["lbs"]["message"])
     await message.edit(embeds=embeds)
