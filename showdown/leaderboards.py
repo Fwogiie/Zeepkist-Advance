@@ -6,7 +6,8 @@ from nextcord.ext import tasks
 import fwogutils
 from fwogutils import bot, log, queries
 import time
-
+import datetime
+from datetime import tzinfo
 
 async def startup_logic():
     log("Showdown Leaderboards statup logic has been called.")
@@ -14,7 +15,7 @@ async def startup_logic():
     leaderboards.start()
 
 # quai leaderboards updating
-@tasks.loop(minutes=5, reconnect=True)
+@tasks.loop(minutes=1, reconnect=True)
 async def quali_leaderboard():
     with open("showdown/storage.json", 'r') as read:
         stored = json.loads(read.read())
@@ -22,7 +23,7 @@ async def quali_leaderboard():
         await update_qualifier()
     return
 
-@tasks.loop(minutes=5, reconnect=True)
+@tasks.loop(minutes=1, reconnect=True)
 async def leaderboards():
     with open("showdown/storage.json", 'r') as read:
         stored = json.loads(read.read())
@@ -64,7 +65,7 @@ async def update_qualifier():
     substitutesembed = nextcord.Embed(title="Substitutes", description=substitutesrecords, color=nextcord.Color.light_gray())
     channel = bot.get_channel(storage["qualiLb"]["channel"])
     message = await channel.fetch_message(storage["qualiLb"]["message"])
-    await message.edit(embeds=[pooloneembed, pooltwoembed, substitutesembed])
+    await message.edit(f"# Showdown Qualifier Season 6\n-# Last updated <t:{int(datetime.datetime.now().timestamp())}:R> - Next update: ~ <t:{int(datetime.datetime.now().timestamp()+300)}:R>", embeds=[pooloneembed, pooltwoembed, substitutesembed])
 
 async def update_lbs():
     log("leaderboards updating...")
@@ -93,4 +94,4 @@ async def update_lbs():
         embeds.append(nextcord.Embed(title=mep["name"], description=leaderboard, color=nextcord.Color.purple()))
     channel = bot.get_channel(storage["lbs"]["channel"])
     message = await channel.fetch_message(storage["lbs"]["message"])
-    await message.edit(embeds=embeds)
+    await message.edit(f"# Showdown season 6\n-# Last updated <t:{int(datetime.datetime.now().timestamp())}:R> - Next update: ~ <t:{int(datetime.datetime.now().timestamp()+300)}:R>", embeds=embeds)
