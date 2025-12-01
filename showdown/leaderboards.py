@@ -77,7 +77,7 @@ async def update_lbs():
         req = requests.post(queries.post_url,
                             json={"query": queries.get_user_pb_by_id,
                                   "variables": {"in": storage["regUsersById"], "idLevel": mep["id"],
-                                                "lessThan": storage["endTime"]}})
+                                                "lessThan": storage["endTimeLbs"]}})
         resp = json.loads(req.text)
         print(resp)
         count, records, leaderboard = 1, [], ""
