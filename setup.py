@@ -7,7 +7,7 @@ import fwogutils
 import json
 
 # Level Submissions
-import level_submissions
+# None
 
 # Notifications
 import notifications
