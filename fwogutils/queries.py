@@ -1,23 +1,19 @@
 post_url = "https://graphql.zeepki.st/"
 
 top_gtr = """query TopGtrLevels($first: Int, $offset: Int) {
-    levels(orderBy: LEVEL_POINT_MAX_POINTS_DESC, first: $first, offset: $offset, filter: {
-      levelItems:  {
-         some:  {
-            levelId:  {
-               isNull: false
-            }
-         }
-      }
-    }) {
+  levels(
+    orderBy: LEVEL_POINT_MAX_POINTS_DESC
+    first: $first
+    offset: $offset
+    filter: {levelItems: {some: {levelId: {isNull: false}}}}
+  ) {
     nodes {
       levelItems(first: 1) {
         nodes {
-           levelId,
-            workshopId
-            name
-            fileAuthor
-            fileUid
+          fileUid
+          fileAuthor
+          name
+          workshopId
         }
       }
     }

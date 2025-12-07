@@ -55,11 +55,12 @@ class DownloadButton(nextcord.ui.View):
                 await ctx.edit(f"Error Occurred!\nError: `query 'top_gtr' returned unexpected status code: {req.status_code}. {req.text}`")
             else:
                 log(f"200 OK, continuing")
-                levels = json.loads(req.text)["data"]["levelPoints"]["nodes"]
+                print(json.loads(req.text))
+                levels = json.loads(req.text)["data"]["levels"]["nodes"]
                 print(levels)
                 for x in levels:
                     try:
-                        x = x["level"]["levelItems"]["nodes"][0]
+                        x = x["levelItems"]["nodes"][0]
                     except IndexError:
                         log("a level failed.")
                         continue
