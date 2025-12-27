@@ -1,5 +1,5 @@
 from fwogutils import bot, log
-import fwogutils
+import fwogutils.objects
 import nextcord
 import random
 import json
@@ -13,14 +13,15 @@ async def shuf(ctx):
 async def shufpl(ctx, playlist: nextcord.Attachment = nextcord.SlashOption(description="The playlist to Shuffle.", required=True)):
     log(f"reached by {ctx.user} ({ctx.user.id})")
     if fwogutils.checkzeeplist(playlist.filename):
-        ctx = await ctx.send("processing")
-        pl = json.loads(await playlist.read())
-        random.shuffle(pl['levels'])
-        fwogutils.dumppl(pl)
-        name = playlist.filename.split(".")[:1][0]
-        fwogutils.renamepl(name)
-        await ctx.edit("Your playlist has been shuffled!", file=nextcord.File(f"{name}.zeeplist"))
-        fwogutils.undorename(name)
+        filejson = json.loads(await playlist.read())
+        playlist = fwogutils.objects.Playlist()
+        playlist.levels = filejson["levels"]
+        playlist.name = filejson["name"]
+        playlist.shuffle = filejson["shufflePlaylist"]
+        playlist.roundlength = filejson["roundLength"]
+        await playlist.shuffle_playlist()
+        url = await playlist.get_download_url()
+        await ctx.send(f"Your playlist is ready! {url}")
     else:
         await ctx.send("Please attach a valid .zeeplist file!")
 
