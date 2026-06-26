@@ -1,19 +1,16 @@
 post_url = "https://graphql.zeepki.st/"
 
-top_gtr = """query TopGtrLevels($first: Int, $offset: Int) {
-  levels(
-    orderBy: LEVEL_POINT_MAX_POINTS_DESC
-    first: $first
-    offset: $offset
-    filter: {levelItems: {some: {levelId: {isNull: false}}}}
-  ) {
+top_gtr = """query GTR_TOP_POINTS($first: Int, $offset: Int) {
+  levelPoints(first: $first, orderBy: POINTS_DESC, offset: $offset) {
     nodes {
-      levelItems(first: 1) {
-        nodes {
-          fileUid
-          fileAuthor
-          name
-          workshopId
+      level {
+        levelItems(first: 1, condition: {deleted: false}) {
+          nodes {
+            name
+            fileUid
+            fileAuthor
+            workshopId
+          }
         }
       }
     }
@@ -111,6 +108,7 @@ get_user_pb_by_id = """query getUserPbById($in: [Int!] = 10, $idLevel: Int = 10,
             time
             user {
               steamName
+              id
             }
           }
         }

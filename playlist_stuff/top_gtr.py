@@ -56,11 +56,11 @@ class DownloadButton(nextcord.ui.View):
             else:
                 log(f"200 OK, continuing")
                 print(json.loads(req.text))
-                levels = json.loads(req.text)["data"]["levels"]["nodes"]
+                levels = json.loads(req.text)["data"]["levelPoints"]["nodes"]
                 print(levels)
                 for x in levels:
                     try:
-                        x = x["levelItems"]["nodes"][0]
+                        x = x["level"]["levelItems"]["nodes"][0]
                     except IndexError:
                         log("a level failed.")
                         continue
