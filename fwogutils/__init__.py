@@ -1,11 +1,14 @@
 import datetime
+from random import random, randint
+from turtledemo.sorting_animate import randomize
 import nextcord
 from nextcord.ext import commands
 import inspect
 import requests
 import json
 import os
-from fwogutils.queries import post_url
+
+from fwogutils import queries
 
 intents = nextcord.Intents.all()
 
@@ -33,9 +36,6 @@ def errormessage(error):
     return f"An error occured. if this persists please report it in the zeepkist modding server: [here](https://discord.gg/a4FxG9RpV3) in this thread: https://discord.com/channels/972933002516647986/1126438917420359691 \n \n Error: `{str(error)}`"
 
 def format_time(time: float):
-    """
-    you go girl <3
-    """
     minutes = int(time // 60)
     seconds = int(time % 60)
     milliseconds = int((time % 1) * 1000)
@@ -287,7 +287,7 @@ def getusergtrposition(gtruserid: int) -> int:
     else:
         log(f"returning rank from user {gtruserid}")
         try:
-            return json.loads(request.text)["data"]["users"]["edges"][0]["node"]["userPoints"]["edges"][0]["node"]["rank"]
+            return json.loads(request.text)["data"]["userPoints"]["edges"][0]["node"]["rank"]
         except IndexError:
             log("IndexError!")
             return False
@@ -300,7 +300,7 @@ async def getusergtrpositionasync(gtruserid: int) -> int:
     else:
         log(f"returning rank from user {gtruserid}")
         try:
-            return json.loads(request.text)["data"]["users"]["edges"][0]["node"]["userPoints"]["edges"][0]["node"]["rank"]
+            return json.loads(request.text)["data"]["userPoints"]["edges"][0]["node"]["rank"]
         except IndexError:
             log("IndexError!")
             return False
