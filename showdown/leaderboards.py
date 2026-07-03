@@ -83,9 +83,14 @@ async def update_lbs():
         count, records, leaderboard = 1, [], ""
         for record in resp["data"]["users"]["nodes"]:
             if record["records"]["edges"]:
-                record, user = record["records"]["edges"][0]["node"], record["records"]["edges"][0]["node"]["user"][
-                    "steamName"]
-                records.append(f"{record['time']}:{user}")
+                record, user = record["records"]["edges"][0]["node"], record["records"]["edges"][0]["node"]["user"]
+                try:
+                    if storage["playertags"][str(user["id"])]:
+                        print("reached tag check")
+                        user = f"[{storage['playertags'][str(user['id'])]}] {user['steamName']}"
+                        records.append(f"{record['time']}:{user}")
+                except:
+                    records.append(f"{record['time']}:{user['steamName']}")
         records.sort()
         print(records)
         for x in records:

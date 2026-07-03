@@ -1,4 +1,6 @@
 import json
+from cgi import maxlen
+
 import nextcord
 import requests
 from flask import request
@@ -84,6 +86,7 @@ async def sd_register(ctx):
         json.dump(stored, write, indent=2)
     await ctx.send(f"You have registered under the name {resp[0]['steamName']}", ephemeral=True)
     await ctx.send(f"<@{ctx.user.id}> has registered!")
+    await ctx.send(stored)
 
 # DONE
 @bot.slash_command(name="unregister", description="Unregister for the showdown event!", guild_ids=[1127321762686836798])
@@ -101,6 +104,7 @@ async def sd_unregister(ctx):
         json.dump(stored, write, indent=2)
     await ctx.send("Successfully Unregistered!", ephemeral=True)
     await ctx.send(f"{ctx.user.mention} Has unregistered!")
+    await ctx.send(stored)
 
 @sd_controlls.subcommand(name="set_quali_end_time")
 async def sd_setqualiendtime(ctx, iso: str):
@@ -189,3 +193,36 @@ async def sd_toggle_update_lbs(ctx):
     with open("showdown/storage.json", 'w') as write:
         json.dump(stored, write, indent=2)
 
+@sd_controlls.subcommand(name="create_team", description="teamname:str - tag:str - P1 AND P2 ARE INTs REPRESENTING THEIR GTR USER ID")
+async def sd_create_team(ctx, teamname:str, tag:str, p1:int, p2:int):
+    with open("showdown/storage.json", 'r') as read:
+        stored = json.loads(read.read())
+    try:
+        if stored["teams"][teamname]:
+            await ctx.send(f"Team already exists with name {teamname}")
+            return
+    except KeyError:
+        stored["teams"][teamname] = {"tag": tag, "players": [p1, p2]}
+        stored["playertags"][str(p1)] = tag
+        stored["playertags"][str(p2)] = tag
+        with open("showdown/storage.json", 'w') as write:
+            json.dump(stored, write, indent=2)
+        await ctx.send(f"Team **[{tag}] {teamname}** created with player IDs {p1}, {p2}")
+
+@sd_controlls.subcommand(name="remove_team", description="teamname:str - TEAMNAME OF THE TEAM TO PERMANENTLY DELETE FROM THE SYSTEM")
+async def sd_remove_team(ctx, teamname:str):
+    with open("showdown/storage.json", 'r') as read:
+        stored = json.loads(read.read())
+    try:
+        if stored["teams"][teamname]:
+            # Remove team in team list
+            team = stored["teams"].pop(teamname)
+            # Remove tag in taglist
+            for x in team["players"]:
+                print(f"popping {x}")
+                stored["playertags"].pop(str(x))
+            with open("showdown/storage.json", 'w') as write:
+                json.dump(stored, write, indent=2)
+            await ctx.send(f"team **[{team['tag']}] {teamname}** with players {team['players']} has been removed.")
+    except KeyError as error:
+            await ctx.send(f"No team by the name '{teamname}' found.\n\ndebug: {error}")
