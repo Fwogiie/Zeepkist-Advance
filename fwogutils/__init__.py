@@ -90,6 +90,7 @@ def getgtruser(id: int=None, discid: int=None):
         if not user:
             return[False, 404]
         else:
+            print(user[0])
             return [True, user[0]['node']]
 
 def getgtruserrank(id: int):
@@ -152,11 +153,11 @@ def setlinkedusersetting(setting: str, value, user):
         data["linked"][str(user)]["settings"]["notifs"][str(setting)] = value
         if setting == 'RU' and value is True:
             data["usercache"]["RUusers"].append(str(user))
-            data["linked"][str(user)]["userdata"]["position"] = getgtruserrank(data["linked"][str(user)]["id"])['rank']
+            data["linked"][str(user)]["userdata"]["position"] = getusergtrposition(data["linked"][str(user)]["id"])
             log(data["linked"][str(user)]["userdata"]["position"])
         if setting == 'RD' and value is True:
             data["usercache"]["RDusers"].append(str(user))
-            data["linked"][str(user)]["userdata"]["position"] = getgtruserrank(data["linked"][str(user)]["id"])['rank']
+            data["linked"][str(user)]["userdata"]["position"] = getusergtrposition(data["linked"][str(user)]["id"])
             log(data["linked"][str(user)]["userdata"]["position"])
         if setting == 'WRST' and value is True:
             data["usercache"]["WRSTusers"][str(data["linked"][str(user)]["id"])] = {"discid": str(user)}
