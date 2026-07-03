@@ -49,7 +49,7 @@ levels_from_ids = """query GetLevelsFromIds($in: [BigFloat!] = "") {
 }"""
 
 get_user_pos = """query getUserRanking($userId: Int) {
-  userPoints(condition: {userId: $userId}) {
+  userPoints(condition: {userId: $userId}, first: 1) {
     edges {
       node {
         rank

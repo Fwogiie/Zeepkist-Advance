@@ -277,7 +277,7 @@ def getstoreduser(discordid: str):
         return False
 
 def getusergtrposition(gtruserid: int) -> int:
-    request = requests.post(queries.post_url, json={"query": queries.get_user_pos, "variables": {"id": gtruserid}})
+    request = requests.post(queries.post_url, json={"query": queries.get_user_pos, "variables": {"userId": gtruserid}})
     if request.status_code != 200:
         log(f"Error! code: {request.status_code}, error: #{request.text}")
         return False
@@ -290,7 +290,7 @@ def getusergtrposition(gtruserid: int) -> int:
             return False
 
 async def getusergtrpositionasync(gtruserid: int) -> int:
-    request = requests.post(queries.post_url, json={"query": queries.get_user_pos, "variables": {"id": gtruserid}})
+    request = requests.post(queries.post_url, json={"query": queries.get_user_pos, "variables": {"userId": gtruserid}})
     if request.status_code != 200:
         log(f"Error! code: {request.status_code}, error: #{request.text}")
         return False
