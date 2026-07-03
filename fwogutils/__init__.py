@@ -1,6 +1,4 @@
 import datetime
-from random import random, randint
-from turtledemo.sorting_animate import randomize
 import nextcord
 from nextcord.ext import commands
 import inspect
