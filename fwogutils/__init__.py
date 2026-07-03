@@ -5,6 +5,7 @@ import inspect
 import requests
 import json
 import os
+from fwogutils.queries import post_url
 
 intents = nextcord.Intents.all()
 
