@@ -8,8 +8,6 @@ import requests
 import json
 import os
 
-from fwogutils import queries
-
 intents = nextcord.Intents.all()
 
 bot = commands.Bot(command_prefix='!',
