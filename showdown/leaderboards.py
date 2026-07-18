@@ -68,25 +68,29 @@ async def update_qualifier():
     await message.edit(f"# Showdown Qualifier Season 7\n-# Last updated <t:{int(datetime.datetime.now().timestamp())}:R> - Next update: ~ <t:{int(datetime.datetime.now().timestamp()+300)}:R>", embeds=[pooloneembed, pooltwoembed, substitutesembed])
 
 async def update_lbs():
-    log("leaderboards updating...")
+    log("leaderboards updating... opening storage file")
     with open("showdown/storage.json", "r") as read:
         storage = json.loads(read.read())
         meps = [storage["1"], storage["2"], storage["3"], storage["4"], storage["5"], storage["6"], storage["7"]]
+        log(f"maps returned as {meps}\nResseting embeds")
     embeds = []
+    log("starting records fetching")
     for mep in meps:
+        log(f"Fetching {mep}...")
         req = requests.post(queries.post_url,
                             json={"query": queries.get_user_pb_by_id,
                                   "variables": {"in": storage["regUsersById"], "idLevel": mep["id"],
                                                 "lessThan": storage["endTimeLbs"]}})
         resp = json.loads(req.text)
-        print(resp)
+        log(resp)
         count, records, leaderboard = 1, [], ""
+        log("Formatting leaderboards")
         for record in resp["data"]["users"]["nodes"]:
             if record["records"]["edges"]:
                 record, user = record["records"]["edges"][0]["node"], record["records"]["edges"][0]["node"]["user"]
                 try:
                     if storage["playertags"][str(user["id"])]:
-                        print("reached tag check")
+                        log("reached tag check")
                         user = f"[{storage['playertags'][str(user['id'])]}] {user['steamName']}"
                         records.append(f"{record['time']}:{user}")
                 except:
@@ -97,6 +101,12 @@ async def update_lbs():
             recordtime, user = x.split(":")[0], x.split(":")[1]
             leaderboard += f"{count}. `{fwogutils.format_time(float(recordtime))}` by **{user}**\n"
         embeds.append(nextcord.Embed(title=mep["name"], description=leaderboard, color=nextcord.Color.purple()))
+    log("Fetching leadernoards")
     channel = bot.get_channel(storage["lbs"]["channel"])
     message = await channel.fetch_message(storage["lbs"]["message"])
-    await message.edit(f"# Showdown season 7\n-# Last updated <t:{int(datetime.datetime.now().timestamp())}:R> - Next update: ~ <t:{int(datetime.datetime.now().timestamp()+300)}:R>", embeds=embeds)
+    log("Editing message")
+    try:
+        await message.edit(f"# Showdown season 7\n-# Last updated <t:{int(datetime.datetime.now().timestamp())}:R> - Next update: ~ <t:{int(datetime.datetime.now().timestamp()+300)}:R>", embeds=embeds)
+    except Exception as error:
+        log(f"Error happened editing message: {error}")
+        bot.get_channel(1198315255034552320).send(f"Error happened editing message: {error}")
