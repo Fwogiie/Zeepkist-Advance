@@ -7,7 +7,6 @@ notif_channel = 1207401802769633310
 notif_test_channel = 1347885622559375460
 
 async def startup_logic():
-    await rankings_checker()
     rankings_notifier.start()
 
 @tasks.loop(time=fwogutils.gtrlb_shedule())
