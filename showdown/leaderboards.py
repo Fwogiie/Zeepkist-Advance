@@ -95,10 +95,12 @@ async def update_lbs():
                         records.append(f"{record['time']}:{user}")
                 except:
                     records.append(f"{record['time']}:{user['steamName']}")
-        records.sort()
-        print(records)
+        log(records)
+        records.sort(key=lambda x: float(x.split(":")[0]))
+        log(records)
         for x in records:
             recordtime, user = x.split(":")[0], x.split(":")[1]
+            log(recordtime)
             leaderboard += f"{count}. `{fwogutils.format_time(float(recordtime))}` by **{user}**\n"
         embeds.append(nextcord.Embed(title=mep["name"], description=leaderboard, color=nextcord.Color.purple()))
     log("Fetching leadernoards")
@@ -109,4 +111,5 @@ async def update_lbs():
         await message.edit(f"# Showdown season 7\n-# Last updated <t:{int(datetime.datetime.now().timestamp())}:R> - Next update: ~ <t:{int(datetime.datetime.now().timestamp()+300)}:R>", embeds=embeds)
     except Exception as error:
         log(f"Error happened editing message: {error}")
-        bot.get_channel(1198315255034552320).send(f"Error happened editing message: {error}")
+        ch = bot.get_channel(1198315255034552320)
+        await ch.send(f"Error happened editing message: {error}")
